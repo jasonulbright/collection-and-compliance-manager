@@ -1,20 +1,14 @@
 @{
     RootModule        = 'CCMCommon.psm1'
-    ModuleVersion     = '0.9.4.5'
-    GUID              = 'b2c3d4e5-f6a7-8901-bcde-f23456789012'
+    ModuleVersion     = '0.9.5.0'
+    GUID              = '5b9e2d47-8f31-4a6c-9e0d-7c4a1f8b3e62'
     Author            = 'Jason Ulbright'
     Description       = 'Collection management and offline WQL editor for MECM device collections.'
     PowerShellVersion = '5.1'
 
     FunctionsToExport = @(
-        # Logging
-        'Initialize-Logging'
-        'Write-Log'
-
-        # CM Connection
-        'Connect-CMSite'
-        'Disconnect-CMSite'
-        'Test-CMConnection'
+        # Logging and CM connection come from the vendored SuiteCommon
+        # module (Lib\SuiteCommon), imported globally by the root module.
 
         # Collection Queries
         'Get-AllDeviceCollections'

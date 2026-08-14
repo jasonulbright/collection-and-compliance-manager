@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 0.9.4.5
+    Version    : 0.9.5.0
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -87,36 +87,25 @@ $global:PrefsPath = Join-Path $PSScriptRoot 'CCM.prefs.json'
 function Get-CmPreferences {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Returns the full preferences hashtable by design.')]
     param()
-    $defaults = @{
+    $settings = Read-SuiteSettings -Path $global:PrefsPath -Defaults @{
         DarkMode    = $true
         SiteCode    = ''
         SMSProvider = ''
         CatalogPath = ''
     }
-    if (Test-Path -LiteralPath $global:PrefsPath) {
-        try {
-            $loaded = Get-Content -LiteralPath $global:PrefsPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
-            foreach ($k in @($defaults.Keys)) {
-                $val = $loaded.$k
-                if ($null -ne $val) { $defaults[$k] = $val }
-            }
-        } catch { $null = $_ }
-    }
     # The CI/CB catalog is vendored into the project under .\Catalog. Default to it when no
     # explicit path is set (an explicit pref still wins).
-    if (-not $defaults.CatalogPath) {
+    if (-not $settings.CatalogPath) {
         $bundled = Join-Path $PSScriptRoot 'Catalog'
-        if (Test-Path -LiteralPath $bundled) { $defaults.CatalogPath = $bundled }
+        if (Test-Path -LiteralPath $bundled) { $settings.CatalogPath = $bundled }
     }
-    return $defaults
+    return $settings
 }
 
 function Save-CmPreferences {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Writes the full preferences hashtable by design.')]
     param([Parameter(Mandatory)][hashtable]$Prefs)
-    try {
-        $Prefs | ConvertTo-Json | Set-Content -LiteralPath $global:PrefsPath -Encoding UTF8
-    } catch { $null = $_ }
+    $null = Save-SuiteSettings -Path $global:PrefsPath -Settings $Prefs
 }
 
 $global:Prefs = Get-CmPreferences
@@ -4404,7 +4393,7 @@ function Show-OptionsDialog {
 
             <StackPanel x:Name="paneAbout" Visibility="Collapsed">
                 <TextBlock Text="About" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                <TextBlock x:Name="txtAboutVersion" Text="Collection and Compliance Manager v0.9.4.5"
+                <TextBlock x:Name="txtAboutVersion" Text="Collection and Compliance Manager v0.9.5.0"
                            FontSize="13" FontWeight="SemiBold"/>
                 <TextBlock Text="Browse, create, copy, and remove MECM device collections. Edit query rules with offline WQL validation and a 1-shot result preview. Apply ready-made operational queries or fill out parameterized templates and add the resulting rule to a target collection."
                            FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
