@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.6.0
+
+### Changed
+
+- **Window chrome, theming, dialogs, background-work, and the collection
+  tree now come from the vendored `SuiteCommon` module** (0.3.0). The
+  confirm dialog is the shared implementation (call sites pass their
+  owner explicitly). Behavior gains: hook state no longer leaks on
+  window close, a maximized close persists the pre-maximize geometry,
+  an off-screen saved position clamps into the nearest monitor,
+  background teardown no longer blocks the UI thread, and the
+  collection tree no longer emits a stray boolean ahead of its leaf
+  count.
+
 ## 0.9.5.0
 
 - **Shared plumbing moved to the vendored `SuiteCommon` module.** Logging
