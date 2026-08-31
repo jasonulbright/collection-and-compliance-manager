@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+First stable release. No functional changes from 0.9.6.1.
+
 ## 0.9.6.1
 
 ### Changed
