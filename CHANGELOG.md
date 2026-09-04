@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.2
+
+### Fixed
+
+- **Version labels read the script header.** The sidebar version and the
+  About panel carried literal version strings that no release updated;
+  both now read the entry script's `Version` header at startup, so the
+  window always names the version that is actually installed.
+
 ## 1.0.1
 
 ### Changed
