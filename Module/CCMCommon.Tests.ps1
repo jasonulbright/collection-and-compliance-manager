@@ -803,7 +803,7 @@ Describe 'Phase B live wrappers' {
             ))
         $r.Count | Should -Be 2
         ($r | Where-Object { -not $_.Removed }).Error | Should -Match 'remove failed'
-        ($r | Where-Object { $_.Removed }).Count | Should -Be 1
+        @($r | Where-Object { $_.Removed }).Count | Should -Be 1
     }
     It 'New-BaselineDeployment passes name/collection and defaults enforcement off' {
         New-BaselineDeployment -BaselineName 'CB A' -CollectionName 'Coll9'
