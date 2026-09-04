@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 1.0.1
+    Version    : 1.0.2
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -129,6 +129,13 @@ $window = [System.Windows.Markup.XamlReader]::Load($reader)
 
 $txtAppTitle        = $window.FindName('txtAppTitle')
 $txtVersion         = $window.FindName('txtVersion')
+# Installed version: the script header is the single source of truth for the
+# sidebar label and the About panel.
+$script:AppVersion = '0.0.0'
+foreach ($headerLine in (Get-Content -LiteralPath $PSCommandPath -TotalCount 80)) {
+    if ($headerLine -match '^\s*Version\s*:\s*([0-9][0-9\.]*[0-9])\s*$') { $script:AppVersion = $Matches[1]; break }
+}
+if ($txtVersion) { $txtVersion.Text = 'v' + $script:AppVersion }
 $txtThemeLabel      = $window.FindName('txtThemeLabel')
 $toggleTheme        = $window.FindName('toggleTheme')
 
@@ -3934,6 +3941,8 @@ function Show-OptionsDialog {
     $paneConnection   = $dlg.FindName('paneConnection')
     $paneCatalog      = $dlg.FindName('paneCatalog')
     $paneAbout        = $dlg.FindName('paneAbout')
+    $txtAboutVersion  = $dlg.FindName('txtAboutVersion')
+    if ($txtAboutVersion) { $txtAboutVersion.Text = ($txtAboutVersion.Text -replace 'v[0-9][0-9\.]*[0-9]\s*$', ('v' + $script:AppVersion)) }
     $txtSiteCode      = $dlg.FindName('txtSiteCode')
     $txtSmsProvider   = $dlg.FindName('txtSmsProvider')
     $txtCatalogPath   = $dlg.FindName('txtCatalogPath')
