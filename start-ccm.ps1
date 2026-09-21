@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 2026.09.21.0007
+    Version    : 2026.09.21.0008
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -109,6 +109,11 @@ function Save-CmPreferences {
 }
 
 $global:Prefs = Get-CmPreferences
+
+# The suite launcher hands its site code and provider to each tool it starts.
+# A value saved in this tool wins; the launcher value fills an empty one.
+if (-not $global:Prefs.SiteCode    -and $env:SUITE_CM_SITECODE) { $global:Prefs.SiteCode    = [string]$env:SUITE_CM_SITECODE }
+if (-not $global:Prefs.SMSProvider -and $env:SUITE_CM_PROVIDER) { $global:Prefs.SMSProvider = [string]$env:SUITE_CM_PROVIDER }
 
 # =============================================================================
 # Tool log.
