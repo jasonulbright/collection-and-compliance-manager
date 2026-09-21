@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that enforces NTLMv2-only authentication.
+    Creates a Configuration Manager CI + Baseline that enforces NTLMv2-only authentication.
 
 .DESCRIPTION
     Single native registry-value compliance setting:
@@ -8,7 +8,7 @@
         HKLM\SYSTEM\CurrentControlSet\Control\Lsa
             LmCompatibilityLevel = 5 (DWORD)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     LmCompatibilityLevel = 5 means "Send NTLMv2 response only; refuse LM & NTLM."
     LM and NTLMv1 are trivially crackable / relayable; leaving the level low (or unset,
@@ -22,10 +22,10 @@
     review non-compliant + dependent systems before enforcing.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -52,7 +52,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -61,7 +61,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

@@ -36,8 +36,8 @@
     Builder = @{
         ScriptPath = 'New-DODownloadModeBaseline.ps1'
         Parameters = @(
-            @{ Name = 'SiteCode';             Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site code.' }
-            @{ Name = 'SiteServer';           Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site server FQDN.' }
+            @{ Name = 'SiteCode';             Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site code.' }
+            @{ Name = 'SiteServer';           Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site server FQDN.' }
             @{ Name = 'ClientCollectionName'; Type = 'String'; Required = $false; Default = $null;  Description = 'Deploy the client baseline (DODownloadMode = 0) to this collection daily.' }
             @{ Name = 'ServerCollectionName'; Type = 'String'; Required = $false; Default = $null;  Description = 'Deploy the server baseline (DODownloadMode = 99) to this collection daily.' }
             @{ Name = 'ClientDownloadMode';   Type = 'String'; Required = $false; Default = '0';    Description = 'Expected DODownloadMode for clients. One of 0,1,2,3,99.' }
@@ -51,7 +51,7 @@
     # "All Windows Servers" if they exist, else build dedicated ones.
     DependsOn = @()
 
-    # === MECM artifacts produced ===
+    # === Configuration Manager artifacts produced ===
     Produces = @{
         ConfigurationItems     = @('Delivery Optimization: DODownloadMode (Client)', 'Delivery Optimization: DODownloadMode (Server)')
         ConfigurationBaselines = @('Delivery Optimization DODownloadMode (Client)', 'Delivery Optimization DODownloadMode (Server)')

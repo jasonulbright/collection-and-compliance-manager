@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates MECM CIs + Baselines that enforce the Delivery Optimization download
+    Creates Configuration Manager CIs + Baselines that enforce the Delivery Optimization download
     mode, with a different expected value for clients vs. servers.
 
 .DESCRIPTION
@@ -10,7 +10,7 @@
             DODownloadMode = 0   (DWORD)  -- Windows 10 / 11 clients
             DODownloadMode = 99  (DWORD)  -- Windows Server
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     Why two artifacts:
         A single registry value rule can only assert one expected value. Clients and
@@ -34,10 +34,10 @@
     on the next DO download.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER ClientCollectionName
     If specified, deploys the client baseline (DODownloadMode = ClientDownloadMode)
@@ -90,7 +90,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -99,7 +99,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

@@ -41,8 +41,8 @@
     Builder = @{
         ScriptPath = 'New-SMBSigningBaseline.ps1'
         Parameters = @(
-            @{ Name = 'SiteCode';       Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site code.' }
-            @{ Name = 'SiteServer';     Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site server FQDN.' }
+            @{ Name = 'SiteCode';       Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site code.' }
+            @{ Name = 'SiteServer';     Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site server FQDN.' }
             @{ Name = 'CollectionName'; Type = 'String'; Required = $false; Default = $null;  Description = 'If specified, deploys the baseline to this collection daily.' }
             @{ Name = 'DetectOnly';     Type = 'Switch'; Required = $false; Default = $false; Description = 'Create / deploy without remediation.' }
         )
@@ -51,7 +51,7 @@
     # === Dependencies ===
     DependsOn = @()
 
-    # === MECM artifacts produced ===
+    # === Configuration Manager artifacts produced ===
     Produces = @{
         ConfigurationItems     = @('Hardening: SMB Signing Required')
         ConfigurationBaselines = @('Hardening SMB Signing Required')

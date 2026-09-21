@@ -66,7 +66,7 @@ DependsOn = @(
 ```
 
 - `Type` — Observed: `Collection`.
-- `Name` — the live MECM object the deploy precondition checks for.
+- `Name` — the live Configuration Manager object the deploy precondition checks for.
 - `CreatedBy` — relative path to a builder that can create the dependency, or `$null`.
   **May climb out of the catalog tree**, e.g. `../../../Collections/New-HTBasedCollections.ps1`
   (resolves to `MECM/Collections/`, a sibling of `CI-CB/`). The dependency-builder affordance must

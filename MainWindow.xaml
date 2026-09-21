@@ -259,7 +259,7 @@
                             Content="Refresh"
                             Style="{StaticResource SquareInlineButtonStyle}"
                             MinWidth="120"
-                            ToolTip="Reload from MECM (or, on the Templates view, reload templates from disk)"/>
+                            ToolTip="Reload from Configuration Manager (or, on the Templates view, reload templates from disk)"/>
 
                     <TextBox x:Name="txtFilter"
                              Grid.Column="1"
@@ -665,7 +665,7 @@
                                             Height="28" MinWidth="120"
                                             Controls:ControlsHelper.ContentCharacterCasing="Normal"
                                             IsEnabled="False"
-                                            ToolTip="Deploy the selected catalog entry to MECM"/>
+                                            ToolTip="Deploy the selected catalog entry to Configuration Manager"/>
                                     <TextBlock x:Name="txtCatSelected" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"
                                                TextTrimming="CharacterEllipsis"
                                                Foreground="{DynamicResource MahApps.Brushes.Gray1}"

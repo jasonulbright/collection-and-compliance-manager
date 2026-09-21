@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that enables PowerShell Script Block Logging.
+    Creates a Configuration Manager CI + Baseline that enables PowerShell Script Block Logging.
 
 .DESCRIPTION
     Single native registry-value compliance setting:
@@ -8,7 +8,7 @@
         HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging
             EnableScriptBlockLogging = 1 (DWORD)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     Script Block Logging records the de-obfuscated content of every PowerShell script
     block to the Microsoft-Windows-PowerShell/Operational log (event 4104). It is the
@@ -23,10 +23,10 @@
     the PowerShell/Operational channel, or the events stay local.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -53,7 +53,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -62,7 +62,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

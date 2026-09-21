@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that applies Adobe's registry workaround for the
+    Creates a Configuration Manager CI + Baseline that applies Adobe's registry workaround for the
     Acrobat "All Tools pane disappears / empty when selecting Edit PDF" bug.
 
 .DESCRIPTION
@@ -9,7 +9,7 @@
         HKLM\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown
             bGenCoverPagesLabelStrings = 1 (DWORD)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     TEMPORARY WORKAROUND for a confirmed Adobe Acrobat defect: the All Tools pane goes
     blank / disappears when the user clicks Edit PDF. Per Adobe's accepted answer
@@ -20,14 +20,14 @@
     Source: https://community.adobe.com/questions-9/all-tools-pane-disappears-empty-when-i-select-edit-pdf-1628319
 
     REBOOT / RESTART REQUIRED: per Adobe's guidance, restart Acrobat and the machine after
-    the value is set. MECM remediates the value; the user does not see the fix until
+    the value is set. Configuration Manager remediates the value; the user does not see the fix until
     Acrobat (and ideally the host) restarts.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -55,7 +55,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -64,7 +64,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

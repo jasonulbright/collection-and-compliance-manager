@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    MahApps.Metro WPF shell for the MECM Collection and Compliance Manager.
+    Main window of Collection and Compliance Manager, a tool that manages Configuration Manager device collections, WQL rules and compliance baselines.
 
 .DESCRIPTION
     Sidebar navigation across three views (Collections, WQL Editor, Templates),
@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 1.0.2
+    Version    : 2026.09.21.0007
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -918,13 +918,13 @@ function Invoke-Refresh {
     param()
 
     if ($script:ActiveView -eq 'Templates') {
-        # Templates load locally from disk; no MECM dependency.
+        # Templates load locally from disk; no ConfigMgr dependency.
         Invoke-LoadTemplates
         return
     }
 
     if ($script:ActiveView -eq 'Catalog') {
-        # Catalog reads a local clone from disk; no MECM dependency.
+        # Catalog reads a local clone from disk; no ConfigMgr dependency.
         Invoke-LoadCatalog
         return
     }
@@ -3866,7 +3866,7 @@ function Show-OptionsDialog {
 
         <Grid Grid.Column="2" Grid.Row="0" Margin="20,16,20,16">
             <StackPanel x:Name="paneConnection" Visibility="Visible">
-                <TextBlock Text="MECM Connection" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <TextBlock Text="Configuration Manager Connection" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
                 <TextBlock Text="Site Code" FontSize="11" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBox x:Name="txtSiteCode" FontSize="12" Padding="6,4,6,4"
@@ -3900,7 +3900,7 @@ function Show-OptionsDialog {
                 <TextBlock Text="About" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
                 <TextBlock x:Name="txtAboutVersion" Text="Collection and Compliance Manager v1.0.0"
                            FontSize="13" FontWeight="SemiBold"/>
-                <TextBlock Text="Browse, create, copy, and remove MECM device collections. Edit query rules with offline WQL validation and a 1-shot result preview. Apply ready-made operational queries or fill out parameterized templates and add the resulting rule to a target collection."
+                <TextBlock Text="Browse, create, copy, and remove Configuration Manager device collections. Edit query rules with offline WQL validation and a 1-shot result preview. Apply ready-made operational queries or fill out parameterized templates and add the resulting rule to a target collection."
                            FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
                 <TextBlock Text="225 ready-made operational queries plus 20 parameterized templates ship with the app."
                            FontSize="12" TextWrapping="Wrap" Margin="0,12,0,0"/>
@@ -4051,7 +4051,7 @@ $window.Add_Loaded({
     Add-LogLine 'Collection and Compliance Manager ready. Configure Site / Provider in Options, then click Refresh.'
 
     # Auto-load templates so the Templates view is populated on first switch
-    # without requiring an MECM connection.
+    # without requiring a ConfigMgr connection.
     Invoke-LoadTemplates
 })
 

@@ -1,9 +1,9 @@
 @{
     RootModule        = 'CCMCommon.psm1'
-    ModuleVersion     = '1.0.2'
+    ModuleVersion     = '2026.09.21.0007'
     GUID              = '5b9e2d47-8f31-4a6c-9e0d-7c4a1f8b3e62'
     Author            = 'Jason Ulbright'
-    Description       = 'Collection management and offline WQL editor for MECM device collections.'
+    Description       = 'Collection management and offline WQL editor for Configuration Manager device collections.'
     PowerShellVersion = '5.1'
 
     FunctionsToExport = @(
