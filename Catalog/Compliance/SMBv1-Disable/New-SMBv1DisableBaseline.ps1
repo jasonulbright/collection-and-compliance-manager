@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that disables the SMBv1 server protocol.
+    Creates a Configuration Manager CI + Baseline that disables the SMBv1 server protocol.
 
 .DESCRIPTION
     Single native registry-value compliance setting:
@@ -14,16 +14,16 @@
     on if and when needed. For the supported-OS fleet that's the practical case,
     this one DWORD is the universal "SMBv1 server is off" signal.
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     Per Microsoft guidance:
     https://learn.microsoft.com/en-us/windows-server/storage/file-server/troubleshoot/detect-enable-and-disable-smbv1-v2-v3
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -50,7 +50,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -59,7 +59,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

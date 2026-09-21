@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that disables Windows Installer
+    Creates a Configuration Manager CI + Baseline that disables Windows Installer
     AlwaysInstallElevated.
 
 .DESCRIPTION
@@ -9,7 +9,7 @@
         HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer
             AlwaysInstallElevated = 0 (DWORD)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     AlwaysInstallElevated lets any user install MSI packages with SYSTEM privileges.
     When enabled it is a textbook local privilege-escalation primitive (a standard user
@@ -26,10 +26,10 @@
     No reboot required.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -56,7 +56,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -65,7 +65,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that enables LSA Protection (RunAsPPL).
+    Creates a Configuration Manager CI + Baseline that enables LSA Protection (RunAsPPL).
 
 .DESCRIPTION
     Single native registry-value compliance setting:
@@ -8,23 +8,23 @@
         HKLM\SYSTEM\CurrentControlSet\Control\Lsa
             RunAsPPL = 1 (DWORD)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     RunAsPPL runs LSASS as a Protected Process Light, blocking non-PPL processes
     (including most credential-dumping tooling) from opening a handle to LSASS memory.
     It is one of the highest-value, lowest-cost anti-credential-theft controls and is
     almost always missed -- it ships disabled and there is no nag to turn it on.
 
-    REBOOT REQUIRED: protection engages on the next boot. MECM will remediate the value
+    REBOOT REQUIRED: protection engages on the next boot. Configuration Manager will remediate the value
     but the host is not actually protected until it restarts. Validate driver/plugin
     compatibility (some smartcard / AV LSA plugins must be PPL-signed) before broad
     enforcement.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -52,7 +52,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -61,7 +61,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

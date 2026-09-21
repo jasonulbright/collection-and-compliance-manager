@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D4)](#requirements)
 [![License](https://img.shields.io/github/license/jasonulbright/collection-and-compliance-manager)](LICENSE)
 
-A MahApps.Metro WPF GUI for managing MECM (Configuration Manager) device collections, WQL rules, and compliance configuration items / baselines. Skip the slow console -- load collections into a local grid, edit WQL in a fast monospace editor, browse and deploy a catalog of pre-made CI/CB hardening baselines, edit live compliance settings, and audit drift.
+Manage Configuration Manager device collections, WQL rules, and compliance configuration items / baselines. Skip the slow console -- load collections into a local grid, edit WQL in a fast monospace editor, browse and deploy a catalog of pre-made CI/CB hardening baselines, edit live compliance settings, and audit drift.
 
 Ships with a template library (225 operational queries + 20 parameterized WQL templates) and a bundled CI/CB catalog of 16 ready-made hardening / compliance baselines.
 

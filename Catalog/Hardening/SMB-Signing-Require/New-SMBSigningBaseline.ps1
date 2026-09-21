@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that requires SMB signing on both the
+    Creates a Configuration Manager CI + Baseline that requires SMB signing on both the
     Workstation (client) and Server services.
 
 .DESCRIPTION
@@ -12,7 +12,7 @@
         HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters
             RequireSecuritySignature = 1 (DWORD)   -- inbound / server side
 
-    MECM handles discovery, comparison, and remediation natively.
+    Configuration Manager handles discovery, comparison, and remediation natively.
 
     Required SMB signing defeats SMB relay / man-in-the-middle attacks (a primary
     lateral-movement and privilege-escalation path, e.g. via Responder + ntlmrelayx).
@@ -26,10 +26,10 @@
     breaks SMB to devices that cannot sign. Run -DetectOnly first.
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -56,7 +56,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -65,7 +65,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

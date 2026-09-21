@@ -6,7 +6,7 @@
 
 .DESCRIPTION
     Tests pure-logic functions: logging, template loading, parameter expansion,
-    export. Does NOT require MECM, WMI, or administrator elevation.
+    export. Does NOT require ConfigMgr, WMI, or administrator elevation.
 
 .EXAMPLE
     Invoke-Pester .\CCMCommon.Tests.ps1
@@ -276,7 +276,7 @@ Describe 'Test-CatalogMetadata' {
         Builder = @{
             ScriptPath = 'New-SMBv1DisableBaseline.ps1'
             Parameters = @(
-                @{ Name = 'SiteCode';   Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site code.' }
+                @{ Name = 'SiteCode';   Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site code.' }
                 @{ Name = 'DetectOnly'; Type = 'Switch'; Required = $false; Default = $false; Description = 'Detect only.' }
             )
         }
@@ -421,7 +421,7 @@ Describe 'Get-CatalogIndex' {
     Builder = @{
         ScriptPath = 'New-SMBv1DisableBaseline.ps1'
         Parameters = @(
-            @{ Name = 'SiteCode';   Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site code.' }
+            @{ Name = 'SiteCode';   Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site code.' }
             @{ Name = 'DetectOnly'; Type = 'Switch'; Required = $false; Default = $false; Description = 'Detect only.' }
         )
     }
@@ -456,7 +456,7 @@ Describe 'Get-CatalogIndex' {
     Builder = @{
         ScriptPath = 'New-IntelSpecExecBaseline.ps1'
         Parameters = @(
-            @{ Name = 'SiteCode';   Type = 'String'; Required = $true;  Default = $null;  Description = 'MECM site code.' }
+            @{ Name = 'SiteCode';   Type = 'String'; Required = $true;  Default = $null;  Description = 'Configuration Manager site code.' }
             @{ Name = 'SkipDeploy'; Type = 'Switch'; Required = $false; Default = $false; Description = 'No deploy.' }
         )
     }

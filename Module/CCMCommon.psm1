@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Core module for MECM Collection and Compliance Manager with Offline WQL Editor.
+    Core module for Collection and Compliance Manager with Offline WQL Editor.
 
 .DESCRIPTION
     Import this module to get:
@@ -344,7 +344,7 @@ function Add-DirectMember {
 
     $device = Get-CMDevice -Name $DeviceName -ErrorAction SilentlyContinue
     if (-not $device) {
-        Write-Log "Device '$DeviceName' not found in MECM" -Level ERROR
+        Write-Log "Device '$DeviceName' not found in Configuration Manager" -Level ERROR
         return $false
     }
 
@@ -1229,7 +1229,7 @@ function Set-BaselineDriftTag {
 function Get-DeployedConfigurationItems {
     <#
     .SYNOPSIS
-        Lists configuration items on the connected MECM site.
+        Lists configuration items on the connected ConfigMgr site.
     .DESCRIPTION
         Wraps Get-CMConfigurationItem -Fast (-Fast skips lazy properties for grid-speed
         listing). Requires an active CM connection. Returns the raw CI objects.
@@ -1242,7 +1242,7 @@ function Get-DeployedConfigurationItems {
 function Get-DeployedConfigurationBaselines {
     <#
     .SYNOPSIS
-        Lists configuration baselines on the connected MECM site.
+        Lists configuration baselines on the connected ConfigMgr site.
     .DESCRIPTION
         Wraps Get-CMBaseline -Fast. Requires an active CM connection.
     #>

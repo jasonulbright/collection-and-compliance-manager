@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that requires RDP Network Level Authentication
+    Creates a Configuration Manager CI + Baseline that requires RDP Network Level Authentication
     and TLS security.
 
 .DESCRIPTION
@@ -10,7 +10,7 @@
             UserAuthentication = 1 (DWORD)   -- require NLA (CredSSP before session)
             SecurityLayer      = 2 (DWORD)   -- require TLS for the RDP transport
 
-    MECM handles discovery, comparison, and remediation natively.
+    Configuration Manager handles discovery, comparison, and remediation natively.
 
     NLA forces authentication before a session (and its logon screen) is created,
     blocking pre-auth RDP attack surface and a class of DoS / exploit vectors. SecurityLayer
@@ -26,10 +26,10 @@
     refresh).
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -56,7 +56,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -65,7 +65,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

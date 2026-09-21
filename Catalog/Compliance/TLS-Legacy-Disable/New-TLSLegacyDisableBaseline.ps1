@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that disables legacy TLS / SSL protocols and forces .NET strong crypto.
+    Creates a Configuration Manager CI + Baseline that disables legacy TLS / SSL protocols and forces .NET strong crypto.
 
 .DESCRIPTION
     24 native registry-value compliance settings on a single CI:
@@ -13,17 +13,17 @@
         SchUseStrongCrypto      = 1   (HKLM + WOW6432Node)
         SystemDefaultTlsVersions = 1   (HKLM + WOW6432Node)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     Reboot required for SCHANNEL to reload protocol configuration.
 
     TLS 1.3 is intentionally out of scope (not supported on Server 2019 and earlier).
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -93,7 +93,7 @@ $Settings = @(
 )
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -102,7 +102,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 

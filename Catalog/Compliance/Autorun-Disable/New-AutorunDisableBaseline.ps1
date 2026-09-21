@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates an MECM CI + Baseline that disables Autorun/Autoplay on all drive types.
+    Creates a Configuration Manager CI + Baseline that disables Autorun/Autoplay on all drive types.
 
 .DESCRIPTION
     Single native registry-value compliance setting:
@@ -8,7 +8,7 @@
         HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer
             NoDriveTypeAutoRun = 255 (0xFF, DWORD)
 
-    No embedded scripts. MECM handles discovery, comparison, and remediation natively.
+    No embedded scripts. Configuration Manager handles discovery, comparison, and remediation natively.
 
     NoDriveTypeAutoRun = 255 disables Autorun/Autoplay on every drive class (removable,
     fixed, network, etc.), defeating the classic "malicious USB / mapped share autorun"
@@ -18,10 +18,10 @@
     No reboot required (takes effect at next logon / Explorer refresh).
 
 .PARAMETER SiteCode
-    MECM site code.
+    Configuration Manager site code.
 
 .PARAMETER SiteServer
-    MECM site server FQDN.
+    Configuration Manager site server FQDN.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -48,7 +48,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ============================================================================
-# Connect to MECM
+# Connect to Configuration Manager
 # ============================================================================
 
 $modulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
@@ -57,7 +57,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the MECM admin console installed."
+        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
     }
 }
 
