@@ -1,5 +1,11 @@
 # Changelog
 
+## [2026.10.07.0009] - 2026-10-07
+
+### Changed
+
+- Sync the shared SuiteCommon module to 2026.10.07.0049.
+
 ## [2026.09.21.0008] - 2026-09-21
 
 ### Fixed
