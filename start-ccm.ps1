@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 2026.10.07.0009
+    Version    : 2026.10.11.0010
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -4063,5 +4063,7 @@ $window.Add_Loaded({
 # =============================================================================
 # Run.
 # =============================================================================
+# Suite update notice: one shared daily lookup across the suite tools; the launcher installs.
+$null = Start-SuiteUpdateNotice -Path $PSScriptRoot -OnResult { param($u) if ($u.Available) { Add-LogLine ('Suite update available: v{0}. Update from the AppPackager Suite Launcher.' -f $u.Latest) } }
 [void]$window.ShowDialog()
 try { Stop-Transcript | Out-Null } catch { $null = $_ }
