@@ -72,10 +72,11 @@ function Dump-Tree($Scope, [string]$Name) {
 function Start-App([string]$Script, [string]$Title) {
     [void][NativeUi]::SetCursorPos(1900, 1060)
     $script:proc = Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-File', (Join-Path $appDir $Script)) -PassThru
-    $w = Find-Top $Title 60; Start-Sleep -Seconds 3; Find-Top $Title 10
+    [void](Find-Top $Title 60); Start-Sleep -Seconds 3; Find-Top $Title 10
 }
 function Stop-App([string]$Script) {
-    Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -like "*$Script*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+    $target = Join-Path $appDir $Script
+    Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -like "*$target*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 }
 function Section([string]$Name, [scriptblock]$Body) { Log ('== ' + $Name); try { & $Body } catch { Log ('ERROR in ' + $Name + ': ' + $_.Exception.Message + ' @ ' + $_.InvocationInfo.ScriptLineNumber) } }
 function Find-All([string]$Name) {

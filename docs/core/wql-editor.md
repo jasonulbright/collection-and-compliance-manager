@@ -40,11 +40,11 @@ Use it to write a new rule, to test a query before you apply it, and to change o
 
 ### Add, update or remove a rule
 
-1. To add a rule, type a rule name and the WQL and select **Add Rule**. The log shows `Added rule "<name>" to collection <ID>.`
+1. To add a rule, type a rule name and the WQL and select **Add Rule**. The log is expected to show `Added rule "<name>" to collection <collection name>.`
 2. To change a rule, select it, change the name or the WQL and select **Update Rule**. If the site refuses the new rule, the tool adds the old rule back. The error says whether it did.
 3. To remove a rule, select it and select **Remove...**, then confirm.
 
-This guide did not add, update or remove a rule. The results of these buttons were checked from the code and the log texts only.
+This guide did not add, update or remove a rule. The behavior of these buttons was read from the code only. They were not run.
 
 ## Options and settings of this page
 
@@ -67,6 +67,8 @@ This guide did not add, update or remove a rule. The results of these buttons we
 |---|---|---|
 | The tree is empty. | No refresh has run. | Select **Refresh**. |
 | `WQL validate:` shows an error. | The query has a syntax error. | Correct the query. |
+| The text next to the buttons shows `Refresh first to establish a CM connection.` | No connection is open. | Select **Refresh** and try again. |
+| The text next to the buttons shows `Preview failed:` | The site could not run the query. | Read the text after the colon and the log. |
 
 ## Links
 

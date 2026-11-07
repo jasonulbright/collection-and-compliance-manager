@@ -61,7 +61,7 @@ The tool saves the open view and the window place. After a restart the window sh
 
 ## Options and settings of this page
 
-See the tables above. [Settings](../reference/settings.md) lists the file keys.
+See the table above. [Settings](../reference/settings.md) lists the file keys.
 
 ## Limits
 

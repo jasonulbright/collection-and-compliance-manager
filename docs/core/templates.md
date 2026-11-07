@@ -42,7 +42,7 @@ Use it to start from a tested query instead of a blank editor.
 
 1. Select a template and select **Apply to Collection...**. The dialog `Apply Template to Collection` opens.
 2. Select **Browse...** to pick the collection. Confirm or change the rule name. The expanded query shows.
-3. Select **Apply**. The log shows `Applied template "<name>" as rule "<rule>" on <collection>.`
+3. Select **Apply**. The log is expected to show `Applied template "<name>" as rule "<rule>" on <collection>.` This text comes from the code. It was not observed.
 
 ![The Apply Template to Collection dialog](../images/dialog-apply-template.png)
 

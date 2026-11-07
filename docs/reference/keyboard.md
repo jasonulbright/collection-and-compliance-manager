@@ -18,7 +18,7 @@ None.
 
 ### Tab order of the Collections view
 
-Press Tab from the sidebar. The focus goes in this order:
+Select the **Collections** button in the sidebar, then press Tab. The focus goes in this order:
 
 1. The sidebar buttons: **WQL Editor**, **Templates**, **Catalog**, **Live CI/CB**, **Editor**, **Auditing**, **Options**.
 2. **Refresh**.

@@ -3,6 +3,8 @@ Size-Win $win 1440 900
 $win = Find-Top 'Collection and Compliance Manager' 10
 function Idle([string]$id = 'btnRefresh', [int]$sec = 300) { Start-Sleep -Seconds 2; $null = Wait-Until { $b = Get-El $win $id -Quiet; $b -and $b.Current.IsEnabled } $sec; Start-Sleep -Seconds 2 }
 function Rows($grid) { @((Get-El $win $grid).FindAll('Descendants', (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::DataItem)))) }
+function Find-Row($grid, [string]$name) { @(Rows $grid) | Where-Object { $_.Current.Name -match ('Name=' + [regex]::Escape($name) + ';') } | Select-Object -First 1 }
+function Select-Row($grid, [string]$name) { $r = Find-Row $grid $name; if (-not $r) { Log ('ERROR: no row ' + $name + ' in ' + $grid); return $false }; Select-El $r; Start-Sleep -Milliseconds 600; return $true }
 function Pick($combo, [string]$item) { Expand-El (Get-El $win $combo); Start-Sleep -Milliseconds 500; Click-El (Find-Role $win 'ListItem' $item); Start-Sleep -Milliseconds 700 }
 function Tab([string]$name) { Select-El (Find-Role $win 'TabItem' $name); Start-Sleep -Milliseconds 900 }
 function WinNames { $c = New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::Window); (@($root.FindAll('Descendants', $c)) | ForEach-Object { $_.Current.Name }) -join ' ; ' }
@@ -21,7 +23,7 @@ Section 'first run' {
 }
 Section 'options' {
   Invoke-El (Get-El $win 'btnOptions'); $d = Find-Last 'Options' 10
-  Set-Text (Get-El $d 'txtSiteCode') $Capture.SiteCode; Set-Text (Get-El $d 'txtSmsProvider') $Capture.SmsProvider; Shot $d 'options-connection'
+  Set-Text (Get-El $d 'txtSiteCode') $Capture.SiteCode; Set-Text (Get-El $d 'txtSmsProvider') $Capture.SMSProvider; Shot $d 'options-connection'
   Invoke-El (Get-El $d 'btnCatCatalog'); Start-Sleep -Milliseconds 600; Set-Text (Get-El $d 'txtCatalogPath') (Join-Path $appDir 'Catalog'); Shot $d 'options-catalog'
   Invoke-El (Get-El $d 'btnCatAbout'); Start-Sleep -Milliseconds 600; Shot $d 'options-about'
   Invoke-El (Get-El $d 'btnCatConnection'); Invoke-El (Get-El $d 'btnOk'); Start-Sleep -Seconds 1
@@ -30,8 +32,8 @@ Section 'refresh' {
   Invoke-El (Get-El $win 'btnRefresh'); Start-Sleep -Seconds 3; Shot $win 'refresh-running'; Idle; Shot $win 'collections'
 }
 Section 'collection detail' {
-  $r = Rows 'gridCollections'
-  Select-El $r[0]; Start-Sleep -Seconds 1; Shot $win 'collection-properties'
+  if (-not (Select-Row 'gridCollections' 'All Systems')) { return }
+  Shot $win 'collection-properties'
   foreach ($t in @(@('Direct Members', 'collection-direct-members'), @('Query Rules', 'collection-query-rules'), @('Include Rules', 'collection-include-rules'), @('Exclude Rules', 'collection-exclude-rules'))) { Tab $t[0]; Shot $win $t[1] }
   Tab 'Properties'
 }
@@ -41,21 +43,25 @@ Section 'exports' {
 }
 Section 'dialogs' {
   Dlg 'btnNewCollection' 'dialog-new-collection'
-  $r = Rows 'gridCollections'; Select-El $r[7]; Start-Sleep -Milliseconds 600; Shot $win 'collection-custom-selected'
+  if (Select-Row 'gridCollections' 'All Workstations') { Shot $win 'collection-custom-selected' }
   Dlg 'btnCopyCollection' 'dialog-copy-collection'
   Dlg 'btnEditMembership' 'dialog-edit-membership'
 }
 Section 'blocked on built-in' {
-  $r = Rows 'gridCollections'; Select-El $r[0]; Start-Sleep -Milliseconds 600
+  if (-not (Select-Row 'gridCollections' 'All Systems')) { return }
   Invoke-El (Get-El $win 'btnEditMembership'); Start-Sleep -Seconds 1; Invoke-El (Get-El $win 'btnRemoveColl'); Start-Sleep -Seconds 1; Shot $win 'builtin-blocked'
 }
 Section 'remove confirm' {
   # The confirmation is captured and answered No. Nothing is removed.
-  $r = Rows 'gridCollections'; Select-El $r[7]; Start-Sleep -Milliseconds 600
+  # The step stops when the intended row is not selected or the confirmation does not show.
+  if (-not (Select-Row 'gridCollections' 'All Workstations')) { return }
   Invoke-El (Get-El $win 'btnRemoveColl'); Start-Sleep -Seconds 2
+  $no = Get-El $win 'No' -Quiet
+  if (-not $no) { Log 'ERROR: the Remove confirmation did not show. Nothing was answered.'; return }
   Log ('windows: ' + (WinNames)); Shot $win 'dialog-remove-collection'
-  $no = Get-El $win 'No' -Quiet; if ($no) { Invoke-El $no } else { Log 'ERROR: no No button'; Send-Keys '{ESC}' }
-  Start-Sleep -Seconds 1; Shot $win 'after-remove-cancel'
+  Invoke-El $no; Start-Sleep -Seconds 2
+  if (Get-El $win 'No' -Quiet) { Log 'ERROR: the Remove confirmation is still open after No.'; return }
+  Shot $win 'after-remove-cancel'
 }
 Section 'filters' {
   Set-Text (Get-El $win 'txtFilter') 'All'; Start-Sleep -Seconds 1; Shot $win 'collections-filter-text'; Set-Text (Get-El $win 'txtFilter') ''

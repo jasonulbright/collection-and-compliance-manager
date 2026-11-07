@@ -4,7 +4,7 @@ This page lists what Collection and Compliance Manager saves and where.
 
 ## What it does
 
-The tool saves its settings in `CCM.prefs.json` in the folder of the script. The Options dialog writes the file when you select **OK**. The window state is in `CCM.windowstate.json`.
+The tool saves its settings in `CCM.prefs.json` in the folder of the script. The Options dialog writes the file when you select **OK**. The file is also written when you change the **Dark Theme** switch. The window state is in `CCM.windowstate.json`.
 
 ## When to use it
 
