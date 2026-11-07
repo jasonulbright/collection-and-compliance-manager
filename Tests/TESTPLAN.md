@@ -10,6 +10,8 @@ Measured 2026-11-06 with `Invoke-Checks.ps1` (Pester 5.7.1, PSScriptAnalyzer 1.2
 
 Run: `.\Invoke-Checks.ps1` (lint, tests, coverage floor 80%). It runs in CI on both hosts (`.github/workflows/checks.yml`).
 
+Window guard: `Window.Tests.ps1` opens windows only when the environment variable `SUITE_ALLOW_WINDOW_TESTS` is `1`. CI sets it in both jobs. Otherwise Pester reports those tests as Skipped with that reason, not as Failed. Pester does not store the reason, so `Invoke-Checks.ps1` (and `Window.Tests.ps1`, when it runs alone) prints it to the console, once. `Test-WindowTestsAllowed` in `Tests/WindowHarness.ps1` makes the decision, and `Get-WpfSession` refuses to create a runspace when it says no, so no window can open. The coverage floor stays in force: the window tests run no module code, so skipping them does not lower module coverage. `WindowGuard.Tests.ps1` tests the guard with injected opt-in values and with the real environment, and checks that every test file that can open a window, in any folder, applies the guard to each top-level `Describe`. It opens no window. The test counts above were measured before the guard and are not measured again here.
+
 ## What is covered
 
 | Area | File | Contents |
@@ -24,6 +26,7 @@ Run: `.\Invoke-Checks.ps1` (lint, tests, coverage floor 80%). It runs in CI on b
 | Real cmdlet signatures | `CmCmdlet.Contract.Tests.ps1` | Every ConfigMgr call names only parameters that the real cmdlet has. Runs where the console is installed |
 | Start without the console | `Startup.Tests.ps1` | Plain message, `$false`, no raw exception |
 | Windows | `Window.Tests.ps1` | Main window with its seven views: names, titles, dialogs' XAML, no clipped text and nothing off screen at 1024x720 and 1440x900 in both themes, text and control contrast |
+| Window guard | `WindowGuard.Tests.ps1` | The guard with injected opt-in values (only 1 allows, reason text, no ComputerName parameter) and with the real environment, the session refusal, and the guard on every top-level `Describe` of every window test file. Opens no window |
 | Lab | `Lab/Invoke-CCMLab.ps1` | ZZTEST- collection, configuration item and baseline on CM01: collection actions, deployment, summary, freshness, remediation, drift tag and report, bulk removal with one failure. Checks that no other collection or baseline changed |
 
 ## Not covered, and why
