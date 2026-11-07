@@ -151,6 +151,13 @@
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Padding" Value="8"/>
             </Style>
+            <Style x:Key="TabHeaderText" TargetType="TextBlock">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -349,15 +356,15 @@
                             </StackPanel>
                         </Border>
 
-                        <TabControl x:Name="tabCollDetail" Grid.Row="1"
+                        <TabControl x:Name="tabCollDetail" Controls:HeaderedControlHelper.HeaderFontSize="13" Grid.Row="1"
                                     BorderThickness="0"
                                     Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                            <TabItem Header="Properties">
+                            <TabItem><TabItem.Header><TextBlock Text="Properties" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <TextBox x:Name="txtCollProperties"
                                          Style="{StaticResource DetailTextStyle}"
                                          Text="Select a collection to see its properties."/>
                             </TabItem>
-                            <TabItem Header="Direct Members">
+                            <TabItem><TabItem.Header><TextBlock Text="Direct Members" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <DataGrid x:Name="gridDirectMembers"
                                           Style="{StaticResource ViewDataGrid}"
                                           ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -369,7 +376,7 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem Header="Query Rules">
+                            <TabItem><TabItem.Header><TextBlock Text="Query Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <DataGrid x:Name="gridQueryRules"
                                           Style="{StaticResource ViewDataGrid}"
                                           ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -380,7 +387,7 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem Header="Include Rules">
+                            <TabItem><TabItem.Header><TextBlock Text="Include Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <DataGrid x:Name="gridIncludeRules"
                                           Style="{StaticResource ViewDataGrid}"
                                           ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -391,7 +398,7 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem Header="Exclude Rules">
+                            <TabItem><TabItem.Header><TextBlock Text="Exclude Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <DataGrid x:Name="gridExcludeRules"
                                           Style="{StaticResource ViewDataGrid}"
                                           ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -500,10 +507,10 @@
                         <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TabControl x:Name="tabTemplateKind" Grid.Column="0"
+                    <TabControl x:Name="tabTemplateKind" Controls:HeaderedControlHelper.HeaderFontSize="13" Grid.Column="0"
                                 BorderThickness="0"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                        <TabItem Header="Operational">
+                        <TabItem><TabItem.Header><TextBlock Text="Operational" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridOperationalTemplates"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -514,7 +521,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        <TabItem Header="Parameterized">
+                        <TabItem><TabItem.Header><TextBlock Text="Parameterized" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridParameterizedTemplates"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -522,7 +529,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Category" Width="120" Binding="{Binding Category}"/>
                                     <DataGridTextColumn Header="Name"     Width="*"   Binding="{Binding Name}"/>
-                                    <DataGridTextColumn Header="Params"   Width="60"  Binding="{Binding ParameterCount}"/>
+                                    <DataGridTextColumn Header="Params"   Width="75"  Binding="{Binding ParameterCount}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -688,9 +695,9 @@
                 <!-- View: Live CI/CB                                             -->
                 <!-- ============================================================ -->
                 <Grid x:Name="viewLive" Visibility="Collapsed">
-                    <TabControl x:Name="tabLive" BorderThickness="0"
+                    <TabControl x:Name="tabLive" Controls:HeaderedControlHelper.HeaderFontSize="13" BorderThickness="0"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                        <TabItem Header="Configuration Items">
+                        <TabItem><TabItem.Header><TextBlock Text="Configuration Items" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridLiveCIs"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -704,7 +711,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        <TabItem Header="Configuration Baselines">
+                        <TabItem><TabItem.Header><TextBlock Text="Configuration Baselines" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -720,7 +727,7 @@
                                         <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
                                         <DataGridTextColumn Header="Ver" Width="55" Binding="{Binding Version}"/>
                                         <DataGridTextColumn Header="Compliant" Width="90" Binding="{Binding Compliant}"/>
-                                        <DataGridTextColumn Header="Non-Compliant" Width="110" Binding="{Binding NonCompliant}"/>
+                                        <DataGridTextColumn Header="Non-Compliant" Width="125" Binding="{Binding NonCompliant}"/>
                                         <DataGridTextColumn Header="Targeted" Width="80" Binding="{Binding Targeted}"/>
                                         <DataGridTextColumn Header="ccm tag" Width="170" Binding="{Binding Tag}"/>
                                         <DataGridTextColumn Header="Last Modified" Width="140" Binding="{Binding Modified}"/>
@@ -765,7 +772,7 @@
                                             <DataGridTextColumn Header="Error" Width="70" Binding="{Binding Error}"/>
                                             <DataGridTextColumn Header="In Progress" Width="90" Binding="{Binding InProgress}"/>
                                             <DataGridTextColumn Header="Unknown" Width="80" Binding="{Binding Unknown}"/>
-                                            <DataGridTextColumn Header="Enforcement" Width="95" Binding="{Binding Enforcement}"/>
+                                            <DataGridTextColumn Header="Enforcement" Width="110" Binding="{Binding Enforcement}"/>
                                             <DataGridTextColumn Header="Last Modified" Width="140" Binding="{Binding Modified}"/>
                                             <DataGridTextColumn Header="Last Summary" Width="140" Binding="{Binding LastSummary}"/>
                                         </DataGrid.Columns>
@@ -841,9 +848,9 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TabControl x:Name="tabAudit" Grid.Row="0" BorderThickness="0"
+                    <TabControl x:Name="tabAudit" Controls:HeaderedControlHelper.HeaderFontSize="13" Grid.Row="0" BorderThickness="0"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                        <TabItem Header="Drift">
+                        <TabItem><TabItem.Header><TextBlock Text="Drift" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridAuditDrift"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -857,7 +864,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        <TabItem Header="Compliance">
+                        <TabItem><TabItem.Header><TextBlock Text="Compliance" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridAuditCompliance"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"

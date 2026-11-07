@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 2026.11.06.0014
+    Version    : 2026.11.07.0015
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -2140,6 +2140,7 @@ function Invoke-LoadEditorCIs {
             try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
             catch { Add-LogLine ('UI-thread CM connect: {0}' -f $_.Exception.Message) }
             Add-LogLine ('Editor: loaded {0} configuration items.' -f @($cboEditorCI.ItemsSource).Count)
+            Update-StatusBarSummary
         }
     })
     $script:BgTimer.Start()
