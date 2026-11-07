@@ -20,6 +20,31 @@ BeforeAll {
         param([string]$Computer, [string]$Value)
         Test-WindowTestsAllowed -ComputerName $Computer -OptIn $Value
     }
+    # Reads the top-level Describe blocks of a script from its syntax tree, so a comment or a
+    # continuation line cannot fool the check. A nested block needs no guard of its own.
+    function Get-TopLevelDescribe {
+        param([string]$Text)
+        $ast = [System.Management.Automation.Language.Parser]::ParseInput($Text, [ref]$null, [ref]$null)
+        foreach ($statement in $ast.EndBlock.Statements) {
+            if ($statement -isnot [System.Management.Automation.Language.PipelineAst]) { continue }
+            $command = $statement.PipelineElements[0] -as [System.Management.Automation.Language.CommandAst]
+            if (-not $command -or $command.GetCommandName() -ne 'Describe') { continue }
+            $elements = $command.CommandElements
+            $guarded = $false
+            for ($i = 1; $i -lt $elements.Count; $i++) {
+                $e = $elements[$i]
+                if ($e -isnot [System.Management.Automation.Language.CommandParameterAst] -or $e.ParameterName -ne 'Skip') { continue }
+                $arg = if ($e.Argument) { $e.Argument } elseif ($i + 1 -lt $elements.Count) { $elements[$i + 1] } else { $null }
+                if ($arg -and ($arg.Extent.Text -replace '\s', '') -eq '(-not$script:WindowGuard.Allowed)') { $guarded = $true }
+            }
+            $name = if ($elements.Count -gt 1 -and $elements[1] -is [System.Management.Automation.Language.StringConstantExpressionAst]) { $elements[1].Value } else { '(unnamed)' }
+            [pscustomobject]@{ Name = $name; Guarded = $guarded }
+        }
+    }
+    function Get-UnguardedDescribe {
+        param([string]$Text)
+        Get-TopLevelDescribe -Text $Text | Where-Object { -not $_.Guarded } | ForEach-Object Name
+    }
 }
 
 Describe 'Test-WindowTestsAllowed' {
@@ -102,9 +127,9 @@ Describe 'Window test files carry the guard' {
     }
 
     It '<Name> applies the guard to every top-level Describe' -ForEach $script:WindowTestFiles {
-        $describes = @(Get-Content -LiteralPath $Path | Where-Object { $_ -match '^\s*Describe\b' })
-        $describes.Count | Should -BeGreaterThan 0
-        @($describes | Where-Object { $_ -notmatch '-Skip:\(-not \$script:WindowGuard\.Allowed\)' }) | Should -BeNullOrEmpty
+        $text = Get-Content -LiteralPath $Path -Raw
+        @(Get-TopLevelDescribe -Text $text).Count | Should -BeGreaterThan 0
+        @(Get-UnguardedDescribe -Text $text) | Should -BeNullOrEmpty
     }
 }
 
