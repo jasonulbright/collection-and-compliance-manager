@@ -88,6 +88,18 @@ Describe 'Test-WindowTestsAllowed' {
     }
 }
 
+Describe 'Test-WindowTestsAllowed decides on the opt-in only' {
+    It 'has no ComputerName parameter' {
+        (Get-Command Test-WindowTestsAllowed).Parameters.Keys | Should -Not -Contain 'ComputerName'
+    }
+
+    It 'takes the OptIn parameter and no other own parameter' {
+        $common = [System.Management.Automation.PSCmdlet]::CommonParameters
+        $own = @((Get-Command Test-WindowTestsAllowed).Parameters.Keys | Where-Object { $_ -notin $common })
+        $own | Should -Be @('OptIn')
+    }
+}
+
 Describe 'Test-WindowTestsAllowed without arguments' {
     BeforeAll { $script:SavedOptIn = $env:SUITE_ALLOW_WINDOW_TESTS }
     AfterAll { $env:SUITE_ALLOW_WINDOW_TESTS = $script:SavedOptIn }
