@@ -15,7 +15,7 @@ BeforeAll {
         $def = $script:Ast.Find({ param($x) $x -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $x.Name -eq $n }, $true)
         if (-not $def) { throw "function $n not found in the script" }
         # A function cut out of the script has no $PSScriptRoot; give it the repository folder.
-        . ([scriptblock]::Create($def.Extent.Text.Replace('$PSScriptRoot', "'$($script:AppRoot)'")))
+        . ([scriptblock]::Create($def.Extent.Text.Replace('$PSScriptRoot', "'$($script:AppRoot -replace "'", "''")'")))
     }
 }
 
@@ -344,6 +344,12 @@ Describe 'Script contract' {
                 ForEach-Object { $_.GetCommandName() } | Where-Object { $_ } | Sort-Object -Unique)
         Import-Module (Join-Path $script:AppRoot 'Lib\SuiteCommon\SuiteCommon.psd1') -Global -DisableNameChecking -ErrorAction SilentlyContinue
         $missing = @($called | Where-Object { $_ -notin $own -and -not (Get-Command $_ -ErrorAction SilentlyContinue) })
-        $missing | Where-Object { $_ -notmatch '^(Get|Set|New|Remove|Start|Invoke|Add|Copy|Convert)-CM' } | Should -BeNullOrEmpty
+        # ConfigMgr cmdlets are absent on a machine without the console. The script may call only
+        # these, and they may be missing only there. Any other missing name fails, also a misspelled
+        # ConfigMgr cmdlet. A new ConfigMgr call must be added to this list on purpose.
+        $configMgrCalls = @('Remove-CMBaselineDeployment')
+        $consoleInstalled = [bool](Get-Command Get-CMDevice -CommandType Cmdlet -ErrorAction SilentlyContinue)
+        $allowedMissing = if ($consoleInstalled) { @() } else { $configMgrCalls }
+        $missing | Where-Object { $_ -notin $allowedMissing } | Should -BeNullOrEmpty
     }
 }

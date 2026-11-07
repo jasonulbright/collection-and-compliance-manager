@@ -51,7 +51,7 @@ if (-not $SkipLint) {
     )
     $settings = Join-Path $root 'Tests\PSScriptAnalyzerSettings.psd1'
     # Test files pass state to mock bodies through a global variable, and they define fake window controls that the code under test reads by name. Both are intended.
-    $testOnlyExclude = 'PSAvoidGlobalVars', 'PSUseDeclaredVarsMoreThanAssignments'
+    $testOnlyExclude = 'PSAvoidGlobalVars', 'PSUseDeclaredVarsMoreThanAssignments', 'PSUseShouldProcessForStateChangingFunctions'
     $findings = @(foreach ($t in $targets) {
         if ($t.FullName -like '*\Tests\*' -or $t.Name -like '*.Tests.ps1') { Invoke-ScriptAnalyzer -Path $t.FullName -Settings $settings -ExcludeRule $testOnlyExclude }
         else { Invoke-ScriptAnalyzer -Path $t.FullName -Settings $settings }

@@ -1,6 +1,8 @@
 #Requires -Modules Pester
 # Start-up without the ConfigMgr console: the message is plain text, the call
-# returns $false, and no raw exception reaches the user.
+# returns $false, and no raw exception reaches the user on the not-found path.
+# The branch for a module that is found but fails to import logs the caught error in the
+# vendored SuiteCommon. That text is not covered here; the fix belongs in app-packager-suite.
 
 BeforeAll {
     . "$PSScriptRoot\TestHelpers.ps1"

@@ -141,13 +141,18 @@ Describe 'Template files' {
         foreach ($fn in 'Get-OperationalTemplates', 'Get-ParameterizedTemplates') {
             $t = @(& $fn)
             ($t | Where-Object { -not $_.Name }) | Should -BeNullOrEmpty
-            ($t | Where-Object { -not ($_.Query -or $_.QueryTemplate -or $_.WQL -or $_.Expression) }) | Should -BeNullOrEmpty
+            # The application reads only .Query; a template with another property name expands to an empty query.
+            ($t | Where-Object { -not $_.Query }) | Should -BeNullOrEmpty
             ($t | Group-Object Name | Where-Object Count -gt 1 | ForEach-Object Name) | Should -BeNullOrEmpty -Because "$fn has a name twice"
         }
     }
 }
 
 Describe 'Expand-TemplateParameters' {
+    It 'returns the template unchanged when every placeholder is empty' {
+        Expand-TemplateParameters -QueryTemplate 'select {A}' -ParameterValues @{ '' = 'x' } | Should -BeExactly 'select {A}'
+    }
+
     It 'replaces <Name>' -ForEach @(
         @{ Name = 'one token';        Q = "Name = '{A}'";        V = @{ '{A}' = 'PC1' };                  Expected = "Name = 'PC1'" }
         @{ Name = 'a repeated token'; Q = '{A} and {A}';         V = @{ '{A}' = 'x' };                    Expected = 'x and x' }

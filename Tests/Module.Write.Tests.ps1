@@ -160,7 +160,11 @@ Describe 'Remove-ManagedCollection' {
 }
 
 Describe 'Set-CollectionProperties' {
-    BeforeEach { Mock Set-CMCollection { } -ModuleName CCMCommon }
+    BeforeEach {
+        $global:CurrentRefresh = 1
+        Mock Set-CMCollection { } -ModuleName CCMCommon
+        Mock Get-CMDeviceCollection { [PSCustomObject]@{ RefreshType = $global:CurrentRefresh } } -ModuleName CCMCommon
+    }
 
     It 'passes the new name and the comment' {
         Set-CollectionProperties -CollectionId 'MCM00001' -NewName 'N' -Comment 'C'
@@ -188,6 +192,20 @@ Describe 'Set-CollectionProperties' {
         Mock New-CMSchedule { 'schedule' } -ModuleName CCMCommon
         Set-CollectionProperties -CollectionId 'MCM00001' -RefreshType $Value
         Should -Invoke Set-CMCollection -ModuleName CCMCommon -Times 1 -Exactly -ParameterFilter { [bool]$RefreshSchedule -eq $Sched }
+    }
+
+    It 'keeps the schedule of a collection that is already periodic (from <From> to <Value>)' -ForEach @(@{ From = 2; Value = 6 }, @{ From = 6; Value = 2 }, @{ From = 2; Value = 2 }) {
+        $global:CurrentRefresh = $From
+        Mock New-CMSchedule { 'schedule' } -ModuleName CCMCommon
+        Set-CollectionProperties -CollectionId 'MCM00001' -RefreshType $Value
+        Should -Invoke Set-CMCollection -ModuleName CCMCommon -Times 1 -Exactly -ParameterFilter { -not $RefreshSchedule -and $RefreshType -eq $Value }
+    }
+
+    It 'sends a schedule when a collection moves to a periodic type (from <From> to <Value>)' -ForEach @(@{ From = 1; Value = 2 }, @{ From = 4; Value = 6 }) {
+        $global:CurrentRefresh = $From
+        Mock New-CMSchedule { 'schedule' } -ModuleName CCMCommon
+        Set-CollectionProperties -CollectionId 'MCM00001' -RefreshType $Value
+        Should -Invoke Set-CMCollection -ModuleName CCMCommon -Times 1 -Exactly -ParameterFilter { [bool]$RefreshSchedule }
     }
 
     It 'rejects the refresh type <Value> before it calls the site' -ForEach @(
@@ -226,6 +244,13 @@ Describe 'Add-DirectMember' {
         Add-DirectMember -CollectionId 'MCM00001' -DeviceName 'NOPE' | Should -BeFalse
         Should -Invoke Add-CMDeviceCollectionDirectMembershipRule -ModuleName CCMCommon -Times 0 -Exactly
         @($global:TestLogs | Where-Object Level -eq 'ERROR').Count | Should -Be 1
+    }
+
+    It 'returns false and logs a distinct error when the lookup itself fails' {
+        Mock Get-CMDevice { throw 'connection lost' } -ModuleName CCMCommon
+        Add-DirectMember -CollectionId 'MCM00001' -DeviceName 'PC1' | Should -BeFalse
+        Should -Invoke Add-CMDeviceCollectionDirectMembershipRule -ModuleName CCMCommon -Times 0 -Exactly
+        (@($global:TestLogs | Where-Object Level -eq 'ERROR') | ForEach-Object Message) -join '|' | Should -Match 'lookup.*failed.*connection lost'
     }
 
     It 'turns wildcard handling off for the device name' {

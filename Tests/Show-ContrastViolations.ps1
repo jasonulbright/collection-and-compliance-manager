@@ -11,6 +11,7 @@
 param()
 . "$PSScriptRoot\WindowHarness.ps1"
 . "$PSScriptRoot\WindowConfig.ps1"
+. "$PSScriptRoot\KnownContrastDefects.ps1"
 try {
     foreach ($dark in $true, $false) {
         $r = Invoke-WpfSta -Arguments @{ Dark = $dark; Config = $script:AppConfig } -Script {
@@ -24,20 +25,9 @@ try {
             }
             $w.Close(); , $out
         }
-        $keys = New-Object System.Collections.Generic.List[string]
-        foreach ($v in $r) {
-            foreach ($t in $v.Text) { $min = if ($t.Size -ge 24 -or ($t.Bold -and $t.Size -ge 18.66)) { 3.0 } else { 4.5 }; if ($t.Ratio -lt $min) { [void]$keys.Add(('text:{0}' -f $t.Text)) } }
-            foreach ($c in $v.Interactive) {
-                foreach ($m in 'EnabledText', 'DisabledText', 'EnabledBorder', 'DisabledBorder') {
-                    $x = $c.$m; if ($null -eq $x) { continue }
-                    $min = if ($m -like '*Text') { 4.5 } else { 3.0 }
-                    if ($x -lt $min) { [void]$keys.Add(('{0}:{1}' -f $c.Name, $m)) }
-                }
-            }
-        }
-        if ($null -ne $r[0].TitleBar.Inactive -and $r[0].TitleBar.Inactive -lt 4.5) { [void]$keys.Add('titlebar:inactive') }
+        $keys = Get-ContrastViolationKey -Views @($r)
         Write-Host ("== {0}" -f $(if ($dark) { 'dark' } else { 'light' }))
-        Write-Host (($keys | Sort-Object -Unique | ForEach-Object { "'" + ($_ -replace "'", "''") + "'" }) -join ', ')
+        Write-Host (($keys | ForEach-Object { "'" + ($_ -replace "'", "''") + "'" }) -join ', ')
     }
 }
 finally { Close-WpfSession }

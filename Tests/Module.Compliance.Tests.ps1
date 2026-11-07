@@ -41,7 +41,7 @@ Describe 'Test-CatalogMetadata' {
         @($r.Errors).Count | Should -Be 0
     }
 
-    It 'requires the key <Key>' -ForEach @(
+    It 'requires the key <_>' -ForEach @(
         'Id', 'Version', 'DisplayName', 'Subcategory', 'Mechanism', 'Status', 'Description', 'Severity', 'Cves', 'TenablePlugins', 'KbReferences',
         'OsScope', 'RebootRequired', 'RegistrySurface', 'Builder', 'DependsOn', 'Produces'
     ) {
@@ -307,7 +307,7 @@ Describe 'Baseline deployments' {
         @($global:TestLogs | Where-Object Level -eq 'WARN').Count | Should -Be 1
     }
 
-    It 'sets enforcement' -ForEach @(@{ On = $true }, @{ On = $false }) {
+    It 'sets enforcement to <On>' -ForEach @(@{ On = $true }, @{ On = $false }) {
         Mock Set-CMBaselineDeployment { } -ModuleName CCMCommon
         Set-BaselineDeploymentRemediation -BaselineName 'CB' -CollectionName 'Servers' -EnableEnforcement $On
         Should -Invoke Set-CMBaselineDeployment -ModuleName CCMCommon -Times 1 -Exactly -ParameterFilter { $BaselineName -eq 'CB' -and $CollectionName -eq 'Servers' -and $EnableEnforcement -eq $On }

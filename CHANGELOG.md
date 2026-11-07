@@ -7,8 +7,8 @@
 ### Fixed
 
 - Fix the Templates view. The loader passed -Path to functions that take -TemplatesPath, so no template loaded.
-- Keep the old query rule when the site refuses the new one in Update Rule. The old rule was removed first and lost. It is now added back and the error says so.
-- Apply the refresh type in Set-CollectionProperties. The parameter was accepted and ignored. A value other than 1, 2, 4 or 6 now throws before the site is called. Types 2 and 6 send a 7-day schedule.
+- Keep the old query rule when the site refuses the new one in Update Rule. The old rule was removed first and lost. It is now added back, and the error says whether it was restored. If the restore also fails, the rule stays removed and the error says so.
+- Apply the refresh type in Set-CollectionProperties. The parameter was accepted and ignored. A value other than 1, 2, 4 or 6 now throws before the site is called. Types 2 and 6 send a 7-day schedule, unless the collection is already periodic: it keeps its own schedule.
 - Add a device to a collection only by its exact name. A wildcard such as * matched many devices and added all of them. A name that matches no device or several devices adds nothing.
 - Return the cloned collection from Copy-ManagedCollection. It returned the source collection. Read the template files as UTF-8, and stop an empty template file from giving one empty template.
 - Show a message in Edit Membership when no device was added. The box was cleared and the log said it was added.

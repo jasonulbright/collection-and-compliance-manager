@@ -851,6 +851,8 @@ function Show-TemplateDetail {
 }
 
 function Update-TemplateExpandedQuery {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Rewrites a text box in the window; it changes nothing on the site.')]
+    param()
     if (-not $script:CurrentTemplate) { return }
     $tpl = $script:CurrentTemplate
     if (-not $script:CurrentTemplateRow) {
@@ -3506,7 +3508,7 @@ function Show-EditMembershipDialog {
                 $txtAddDevice.Text = ''
                 & $reload
             } else {
-                Add-LogLine ('Add direct member: no device was added for "{0}". The name must match one device exactly. See the log for the reason.' -f $name)
+                Add-LogLine ('Add direct member: no device was added for "{0}". The name must match one device exactly, and the site lookup must work. See the log for the reason.' -f $name)
             }
         } catch {
             Add-LogLine ('Add direct member failed: {0}' -f $_.Exception.Message)

@@ -6,7 +6,6 @@
         'PSAvoidUsingWriteHost'
         'PSReviewUnusedParameter'
         'PSUseSingularNouns'
-        'PSUseShouldProcessForStateChangingFunctions'
         'PSAvoidUsingPositionalParameters'
         'PSAvoidTrailingWhitespace'
     )

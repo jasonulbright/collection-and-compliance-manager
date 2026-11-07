@@ -49,6 +49,8 @@ BeforeAll {
         $script:Measured[$key] = Invoke-WpfSta -Arguments $case -Script {
             $cfg = $Arguments.Config
             $w = Open-TestWindow -XamlPath (Join-Path $Root $cfg.Xaml) -Dark $Arguments.Dark -Width $Arguments.W -Height $Arguments.H
+            # Contrast is read only at 1440x900. Clipped text and off-screen controls are read at both sizes.
+            $full = $Arguments.W -ge 1440
             $out = @()
             foreach ($view in $cfg.Views) {
                 foreach ($v in $cfg.Views) { $w.FindName($v.Container).Visibility = if ($v.Name -eq $view.Name) { 'Visible' } else { 'Collapsed' } }
@@ -56,11 +58,11 @@ BeforeAll {
                     -OptionsButtonName $cfg.OptionsButton -LogLabelName $cfg.LogLabel -ActiveView $view.Name
                 $out += [PSCustomObject]@{
                     View        = $view.Name
-                    Text        = @(Get-TextContrast $w)
+                    Text        = if ($full) { @(Get-TextContrast $w) } else { @() }
                     Clipped     = @(Get-ClippedText $w)
                     Offscreen   = @(Get-OffscreenControls $w)
-                    Interactive = @(Get-InteractiveContrast $w)
-                    TitleBar    = Get-TitleBarContrast $w
+                    Interactive = if ($full) { @(Get-InteractiveContrast $w) } else { @() }
+                    TitleBar    = if ($full) { Get-TitleBarContrast $w } else { $null }
                 }
             }
             $w.Close()
@@ -165,7 +167,7 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
         $m = ($script:Measured['{0}|1440x900' -f $Theme] | Where-Object View -eq $View)
         $m.Text.Count | Should -BeGreaterThan 3
         $known = @(Get-KnownContrastDefect -Theme $Theme)
-        $bad = $m.Text | Where-Object { $min = if ($_.Size -ge 24 -or ($_.Bold -and $_.Size -ge 18.66)) { 3.0 } else { 4.5 }; $_.Ratio -lt $min -and ($known -notcontains ('text:{0}' -f $_.Text)) }
+        $bad = $m.Text | Where-Object { $min = if (Test-LargeText $_) { 3.0 } else { 4.5 }; $_.Ratio -lt $min -and ($known -notcontains ('text:{0}' -f $_.Text)) }
         $bad | ForEach-Object { '{0} "{1}" {2} on {3} = {4}' -f $_.Name, $_.Text, $_.Foreground, $_.Backdrop, $_.Ratio } | Should -BeNullOrEmpty
     }
     It 'keeps the title text readable on the active title bar' {
@@ -175,26 +177,7 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
 
     It 'meets the standard on every control, except the listed known defects' {
         $known = Get-KnownContrastDefect -Theme $Theme
-        $violations = New-Object System.Collections.Generic.List[string]
-        foreach ($v in ($script:Measured['{0}|1440x900' -f $Theme])) {
-            foreach ($c in $v.Interactive) {
-                foreach ($metric in 'EnabledText', 'DisabledText', 'EnabledBorder', 'DisabledBorder') {
-                    $value = $c.$metric
-                    if ($null -eq $value) { continue }
-                    $min = if ($metric -like '*Text') { 4.5 } else { 3.0 }
-                    if ($value -lt $min) { [void]$violations.Add(('{0}:{1}' -f $c.Name, $metric)) }
-                }
-            }
-        }
-        foreach ($v in ($script:Measured['{0}|1440x900' -f $Theme])) {
-            foreach ($r in $v.Text) {
-                $min = if ($r.Size -ge 24 -or ($r.Bold -and $r.Size -ge 18.66)) { 3.0 } else { 4.5 }
-                if ($r.Ratio -lt $min) { [void]$violations.Add(('text:{0}' -f $r.Text)) }
-            }
-        }
-        $tbi = ($script:Measured['{0}|1440x900' -f $Theme] | Select-Object -First 1).TitleBar.Inactive
-        if ($null -ne $tbi -and $tbi -lt 4.5) { [void]$violations.Add('titlebar:inactive') }
-        $found = @($violations | Sort-Object -Unique)
+        $found = @(Get-ContrastViolationKey -Views @($script:Measured['{0}|1440x900' -f $Theme]))
         $new = @($found | Where-Object { $known -notcontains $_ })
         $fixed = @($known | Where-Object { $found -notcontains $_ })
         $new | Should -BeNullOrEmpty -Because 'a new contrast violation appeared'

@@ -132,7 +132,7 @@ $script:MeasureFunctions = {
             if ($e.TextWrapping -ne 'NoWrap' -or $e.TextTrimming -ne 'None') { continue }
             $tf = New-Object System.Windows.Media.Typeface($e.FontFamily, $e.FontStyle, $e.FontWeight, $e.FontStretch)
             $ft = New-Object System.Windows.Media.FormattedText($e.Text, [System.Globalization.CultureInfo]::CurrentCulture,
-                [System.Windows.FlowDirection]::LeftToRight, $tf, $e.FontSize, [System.Windows.Media.Brushes]::Black, 1.0)
+                [System.Windows.FlowDirection]::LeftToRight, $tf, $e.FontSize, [System.Windows.Media.Brushes]::Black, [System.Windows.Media.VisualTreeHelper]::GetDpi($e).PixelsPerDip)
             if ($e.ActualWidth + 1 -lt $ft.WidthIncludingTrailingWhitespace) {
                 $rows += [PSCustomObject]@{ Name = $e.Name; Text = $e.Text; Needed = [math]::Round($ft.WidthIncludingTrailingWhitespace, 1); Actual = [math]::Round($e.ActualWidth, 1) }
             }
@@ -198,12 +198,18 @@ $script:MeasureFunctions = {
             ($_ -is [System.Windows.Controls.Primitives.ButtonBase] -or $_ -is [System.Windows.Controls.TextBox] -or $_ -is [System.Windows.Controls.ComboBox]) -and
             $_.Name -and $_.Name -notlike 'PART_*' -and (Test-VisibleInTree $_) -and $_.ActualWidth -gt 0 })
         foreach ($c in $controls) {
-            $was = $c.IsEnabled
-            $c.IsEnabled = $true; Wait-Layout $Window 2
-            $en = Get-ControlColors $c $Window
-            $c.IsEnabled = $false; Wait-Layout $Window 2
-            $dis = Get-ControlColors $c $Window
-            $c.IsEnabled = $was; Wait-Layout $Window 1
+            # Remember where IsEnabled came from (a local value, or the parent and the style), and put it back also when a measurement throws.
+            $local = $c.ReadLocalValue([System.Windows.UIElement]::IsEnabledProperty)
+            try {
+                $c.IsEnabled = $true; Wait-Layout $Window 2
+                $en = Get-ControlColors $c $Window
+                $c.IsEnabled = $false; Wait-Layout $Window 2
+                $dis = Get-ControlColors $c $Window
+            }
+            finally {
+                if ($local -eq [System.Windows.DependencyProperty]::UnsetValue) { $c.ClearValue([System.Windows.UIElement]::IsEnabledProperty) } else { $c.IsEnabled = [bool]$local }
+                Wait-Layout $Window 1
+            }
             $rows += [PSCustomObject]@{ Name = $c.Name; Type = $en.Type; EnabledText = $en.TextRatio; DisabledText = $dis.TextRatio; EnabledBorder = $en.BorderRatio; DisabledBorder = $dis.BorderRatio }
         }
         return $rows

@@ -324,7 +324,9 @@ function Set-CollectionProperties {
     .DESCRIPTION
         RefreshType is 1 (Manual), 2 (Periodic), 4 (Continuous) or 6 (Both).
         Any other value throws before the site is called. An empty Comment
-        clears the comment; leaving Comment out keeps it.
+        clears the comment; leaving Comment out keeps it. Refresh type 2 or 6 sends a
+        7-day schedule when the collection is not periodic yet. A collection that is
+        already periodic (2 or 6) keeps its schedule.
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -343,8 +345,12 @@ function Set-CollectionProperties {
     if ($PSBoundParameters.ContainsKey('RefreshType')) {
         if ($RefreshType -notin 1, 2, 4, 6) { throw "Invalid refresh type $RefreshType. Use 1 (Manual), 2 (Periodic), 4 (Continuous) or 6 (Both)." }
         $params['RefreshType'] = $RefreshType
-        # Periodic (2) and Both (6) need a refresh schedule, as in New-ManagedCollection.
-        if ($RefreshType -in 2, 6) { $params['RefreshSchedule'] = New-CMSchedule -RecurInterval Days -RecurCount 7 }
+        # Periodic (2) and Both (6) need a refresh schedule, as in New-ManagedCollection. A collection
+        # that is already periodic keeps its own schedule (for example when 2 changes to 6).
+        if ($RefreshType -in 2, 6) {
+            $current = Get-CMDeviceCollection -Id $CollectionId -ErrorAction Stop | Select-Object -First 1
+            if ([int]$current.RefreshType -notin 2, 6) { $params['RefreshSchedule'] = New-CMSchedule -RecurInterval Days -RecurCount 7 }
+        }
     }
 
     if (-not $PSCmdlet.ShouldProcess($CollectionId, 'Update collection properties')) { return }
@@ -374,8 +380,14 @@ function Add-DirectMember {
 
     Write-Log "Resolving ResourceId for '$DeviceName'..."
 
-    $devices = @(Get-CMDevice -Name $DeviceName -DisableWildcardHandling -ErrorAction SilentlyContinue |
-            Where-Object { [string]$_.Name -ieq $DeviceName })
+    try {
+        $devices = @(Get-CMDevice -Name $DeviceName -DisableWildcardHandling -ErrorAction Stop |
+                Where-Object { [string]$_.Name -ieq $DeviceName })
+    }
+    catch {
+        Write-Log "Device lookup for '$DeviceName' failed: $($_.Exception.Message)" -Level ERROR
+        return $false
+    }
     if ($devices.Count -eq 0) {
         Write-Log "Device '$DeviceName' not found in Configuration Manager" -Level ERROR
         return $false
@@ -716,6 +728,7 @@ function Expand-TemplateParameters {
     # so a parameter value cannot pull in another parameter. The longest key wins at a position.
     if ($ParameterValues.Count -eq 0) { return $QueryTemplate }
     $keys = @($ParameterValues.Keys | Where-Object { $_ } | Sort-Object { $_.Length } -Descending | ForEach-Object { [regex]::Escape([string]$_) })
+    if ($keys.Count -eq 0) { return $QueryTemplate }
     $pattern = $keys -join '|'
     $expanded = [regex]::Replace($QueryTemplate, $pattern, {
             param($m)

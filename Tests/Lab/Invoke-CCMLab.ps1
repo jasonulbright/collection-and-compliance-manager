@@ -23,7 +23,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseUsingScopeModifierInNewRunspaces', '', Justification='Each remote script block declares its values in a param block and receives them with -ArgumentList.')]
 [CmdletBinding()]
 param(
-    [string]$CredentialFile = 'C:\projects\app-packager\docs\lab-credentials.local.ps1',
+    [Parameter(Mandatory)][string]$CredentialFile,
     [string]$ComputerName = 'CM01',
     [string]$SiteCode = 'MCM',
     [string]$Provider = 'CM01.CONTOSO.COM',
@@ -84,20 +84,38 @@ try {
         if (Test-Path -LiteralPath $f) { Get-Content -LiteralPath $f -Raw -Encoding UTF8 }
     }
     if ($json) { $results = @($json | ConvertFrom-Json) }
-    else { $results = @([PSCustomObject]@{ Step = 'run'; Ok = $false; Detail = 'The lab task wrote no result.' }) }
+    else {
+        # The task died before it wrote results.json. Its per-step lines are in progress.txt: show them.
+        $progress = @(Invoke-Command -Session $session -ArgumentList $remoteRoot -ScriptBlock {
+                param($root)
+                $f = Join-Path $root 'progress.txt'
+                if (Test-Path -LiteralPath $f) { Get-Content -LiteralPath $f -Encoding UTF8 }
+            })
+        $results = @($progress | ForEach-Object {
+                $parts = ([string]$_) -split ' \| ', 3
+                [PSCustomObject]@{ Step = $parts[1]; Ok = ($parts[0] -eq 'True'); Detail = $parts[2] }
+            })
+        $results += [PSCustomObject]@{ Step = 'run'; Ok = $false; Detail = 'The lab task wrote no result. The lines above are the steps that finished.' }
+    }
 }
 finally {
     # Remove the task and the staged files only when the task finished. A task that never wrote its
     # result may still hold ZZTEST- objects; its staged files stay for inspection.
-    Invoke-Command -Session $session -ArgumentList $taskName, $remoteRoot, ([bool]$done) -ScriptBlock {
-        param($t, $p, $finished)
-        if ($t -like 'ZZTEST-*') { Stop-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue; Unregister-ScheduledTask -TaskName $t -Confirm:$false -ErrorAction SilentlyContinue }
-        if ($finished -and $p -like "$env:SystemRoot\Temp\ZZTEST-*") { Remove-Item -LiteralPath $p -Recurse -Force -ErrorAction SilentlyContinue }
-    }
+    # The task holds the lab password. A failed unregister is a failure of this run.
+    $cleanupErrors = @(Invoke-Command -Session $session -ArgumentList $taskName, $remoteRoot, ([bool]$done) -ScriptBlock {
+            param($t, $p, $finished)
+            if ($t -like 'ZZTEST-*') {
+                try { Stop-ScheduledTask -TaskName $t -ErrorAction SilentlyContinue } catch { $null = $_ }
+                try { Unregister-ScheduledTask -TaskName $t -Confirm:$false -ErrorAction Stop } catch { "Could not unregister the task ${t}: $($_.Exception.Message)" }
+            }
+            if ($finished -and $p -like "$env:SystemRoot\Temp\ZZTEST-*") { Remove-Item -LiteralPath $p -Recurse -Force -ErrorAction SilentlyContinue }
+        })
+    foreach ($e in $cleanupErrors) { Write-Warning $e; $script:CleanupFailed = $true }
     if (-not $done) { Write-Warning "The lab task did not finish. Staged files are in $remoteRoot on $ComputerName. Check the site for ZZTEST- objects." }
     Remove-PSSession $session
 }
 
+if ($script:CleanupFailed) { $results += [PSCustomObject]@{ Step = 'task cleanup'; Ok = $false; Detail = 'The scheduled task is still registered on the site server. Remove it by hand.' } }
 foreach ($r in $results) { Write-Host ('{0} {1}  {2}' -f $(if ($r.Ok) { '[PASS]' } else { '[FAIL]' }), $r.Step, $r.Detail) }
 $bad = @($results | Where-Object { -not $_.Ok })
 Write-Host ('{0} steps, {1} failed' -f @($results).Count, $bad.Count)
