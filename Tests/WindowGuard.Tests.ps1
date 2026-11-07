@@ -1,7 +1,6 @@
 #Requires -Modules Pester
 # Tests of the window-test guard (Test-WindowTestsAllowed in WindowHarness.ps1).
-# The guard keeps window tests off the dev PC (AYW) and runs them only when
-# SUITE_ALLOW_WINDOW_TESTS is 1. Most tests inject the computer name and the
+# The guard runs window tests only when SUITE_ALLOW_WINDOW_TESTS is 1. Most tests inject the
 # opt-in value. This file opens no window.
 
 BeforeDiscovery {
@@ -15,10 +14,9 @@ BeforeDiscovery {
 
 BeforeAll {
     . "$PSScriptRoot\WindowHarness.ps1"
-    # Pass the computer name as a variable, so the linter rule against a hard-coded ComputerName stays quiet.
     function Get-Guard {
-        param([string]$Computer, [string]$Value)
-        Test-WindowTestsAllowed -ComputerName $Computer -OptIn $Value
+        param([string]$Value)
+        Test-WindowTestsAllowed -OptIn $Value
     }
     # Reads the top-level Describe blocks of a script from its syntax tree, so a comment or a
     # continuation line cannot fool the check. A nested block needs no guard of its own.
@@ -48,43 +46,22 @@ BeforeAll {
 }
 
 Describe 'Test-WindowTestsAllowed' {
-    It 'refuses on AYW even with the opt-in' {
-        $r = Get-Guard -Computer 'AYW' -Value '1'
-        $r.Allowed | Should -BeFalse
-        $r.Reason | Should -Match 'AYW'
-    }
-
-    It 'refuses on <Name> in any letter case' -ForEach @(@{ Name = 'ayw' }, @{ Name = 'Ayw' }) {
-        (Get-Guard -Computer $Name -Value '1').Allowed | Should -BeFalse
-    }
-
-    It 'refuses on AYW without the opt-in' {
-        (Get-Guard -Computer 'AYW' -Value '').Allowed | Should -BeFalse
-    }
-
-    It 'allows another computer with the opt-in 1' {
-        $r = Get-Guard -Computer 'CM01' -Value '1'
+    It 'allows the opt-in 1' {
+        $r = Get-Guard -Value '1'
         $r.Allowed | Should -BeTrue
         $r.Reason | Should -BeNullOrEmpty
     }
 
-    It 'refuses another computer when the opt-in is <Label>, and names the opt-in' -ForEach @(
+    It 'refuses when the opt-in is <Label>, and names the opt-in' -ForEach @(
         @{ Label = 'empty'; Value = '' }
         @{ Label = 'null'; Value = $null }
         @{ Label = '0'; Value = '0' }
         @{ Label = 'true'; Value = 'true' }
+        @{ Label = '2'; Value = '2' }
     ) {
-        $r = Get-Guard -Computer 'CLIENT01' -Value $Value
+        $r = Get-Guard -Value $Value
         $r.Allowed | Should -BeFalse
-        $r.Reason | Should -Match 'SUITE_ALLOW_WINDOW_TESTS'
-    }
-
-    It 'gives a reason whenever it refuses (<Name>, opt-in "<Value>")' -ForEach @(
-        @{ Name = 'AYW'; Value = '1' }
-        @{ Name = 'CM01'; Value = '' }
-        @{ Name = 'CM01'; Value = '0' }
-    ) {
-        (Get-Guard -Computer $Name -Value $Value).Reason | Should -Not -BeNullOrEmpty
+        $r.Reason | Should -Be 'SUITE_ALLOW_WINDOW_TESTS is not 1'
     }
 }
 
@@ -104,9 +81,9 @@ Describe 'Test-WindowTestsAllowed without arguments' {
     BeforeAll { $script:SavedOptIn = $env:SUITE_ALLOW_WINDOW_TESTS }
     AfterAll { $env:SUITE_ALLOW_WINDOW_TESTS = $script:SavedOptIn }
 
-    It 'reads SUITE_ALLOW_WINDOW_TESTS and the machine name by default' {
+    It 'reads SUITE_ALLOW_WINDOW_TESTS by default' {
         $env:SUITE_ALLOW_WINDOW_TESTS = '1'
-        (Test-WindowTestsAllowed).Allowed | Should -Be ([Environment]::MachineName -ine 'AYW')
+        (Test-WindowTestsAllowed).Allowed | Should -BeTrue
     }
 
     It 'refuses when the variable is 0' {
@@ -191,14 +168,5 @@ Describe 'Get-WpfSession refuses where the guard says no' {
     It 'does not hand out a cached session' {
         $script:HarnessSession = [pscustomobject]@{ RunspaceStateInfo = [pscustomobject]@{ State = 'Opened' } }
         { Get-WpfSession } | Should -Throw '*not allowed*'
-    }
-}
-
-Describe 'Machine identity' {
-    It 'takes the computer name from the machine, not from the COMPUTERNAME variable' {
-        foreach ($f in 'WindowHarness.ps1', '..\Invoke-Checks.ps1') {
-            (Get-Content -LiteralPath (Join-Path $PSScriptRoot $f) -Raw) | Should -Not -Match '\$env:COMPUTERNAME'
-        }
-        (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'WindowHarness.ps1') -Raw) | Should -Match 'MachineName'
     }
 }
