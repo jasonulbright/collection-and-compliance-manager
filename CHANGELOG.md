@@ -1,5 +1,21 @@
 # Changelog
 
+## [2026.11.07.0015] - 2026-11-07
+
+## 4 fixes and a user guide
+
+### Fixed
+
+- Show the tab headers in the theme text color, bold when selected, at size 13. The unselected headers failed the 4.5:1 contrast test and the MahApps default size of 26 made them much larger than the other text.
+- Widen the Non-Compliant and Enforcement columns of Live CI/CB. Their headers were cut.
+- Restore the status bar summary after the Editor loads the configuration items. The text Loading configuration items... stayed.
+- Widen the Params column of the Parameterized templates grid. Its header was cut.
+
+### Added
+
+- Add the user guide (docs/index.md) with images of the running window.
+- Add tools/guide-capture, one command that regenerates every image of the guide on a lab computer.
+
 ## [2026.11.06.0014] - 2026-11-06
 
 ## 8 fixes in collection actions, templates and compliance
