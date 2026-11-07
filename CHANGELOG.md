@@ -1,5 +1,24 @@
 # Changelog
 
+## [2026.11.06.0014] - 2026-11-06
+
+## 8 fixes in collection actions, templates and compliance
+
+### Fixed
+
+- Fix the Templates view. The loader passed -Path to functions that take -TemplatesPath, so no template loaded.
+- Keep the old query rule when the site refuses the new one in Update Rule. The old rule was removed first and lost. It is now added back and the error says so.
+- Apply the refresh type in Set-CollectionProperties. The parameter was accepted and ignored. A value other than 1, 2, 4 or 6 now throws before the site is called. Types 2 and 6 send a 7-day schedule.
+- Add a device to a collection only by its exact name. A wildcard such as * matched many devices and added all of them. A name that matches no device or several devices adds nothing.
+- Return the cloned collection from Copy-ManagedCollection. It returned the source collection. Read the template files as UTF-8, and stop an empty template file from giving one empty template.
+- Show a message in Edit Membership when no device was added. The box was cleared and the log said it was added.
+- Do not expand a token that a template parameter value introduces. The expansion is one pass over the template.
+- Show the whole WQL editor button row at 1024 pixels wide. Update Rule and Remove were cut off. The row now wraps. Reject catalog entry ids that contain capital letters.
+
+### Added
+
+- Support -WhatIf and -Confirm in every function of the module that changes the site, including baseline deployment, remediation, drift tag, bulk removal and the catalog builder.
+- Read the compliance counts from the deployment summary. The assignment objects carry no counts.
 ## [2026.10.25.0013] - 2026-10-25
 
 ## 1 fix
