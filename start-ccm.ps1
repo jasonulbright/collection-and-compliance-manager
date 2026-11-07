@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Main window of Collection and Compliance Manager, a tool that manages Configuration Manager device collections, WQL rules and compliance baselines.
 
@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 2026.10.25.0013
+    Version    : 2026.11.06.0014
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -851,6 +851,8 @@ function Show-TemplateDetail {
 }
 
 function Update-TemplateExpandedQuery {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Rewrites a text box in the window; it changes nothing on the site.')]
+    param()
     if (-not $script:CurrentTemplate) { return }
     $tpl = $script:CurrentTemplate
     if (-not $script:CurrentTemplateRow) {
@@ -2438,7 +2440,6 @@ function Show-AddSettingDialog {
     $cboSetDataType = & $get 'cboSetDataType'
     $panelReg     = & $get 'panelReg'
     $panelScript  = & $get 'panelScript'
-    $txtSetName   = & $get 'txtSetName'
     $btnAddOk     = & $get 'btnAddOk'
     $btnAddCancel = & $get 'btnAddCancel'
     $txtAddErr    = & $get 'txtAddErr'
@@ -3502,10 +3503,13 @@ function Show-EditMembershipDialog {
         $name = ([string]$txtAddDevice.Text).Trim()
         if (-not $name) { return }
         try {
-            Add-DirectMember -CollectionId $Collection.CollectionID -DeviceName $name
-            Add-LogLine ('Added "{0}" to {1}.' -f $name, $Collection.Name)
-            $txtAddDevice.Text = ''
-            & $reload
+            if (Add-DirectMember -CollectionId $Collection.CollectionID -DeviceName $name) {
+                Add-LogLine ('Added "{0}" to {1}.' -f $name, $Collection.Name)
+                $txtAddDevice.Text = ''
+                & $reload
+            } else {
+                Add-LogLine ('Add direct member: no device was added for "{0}". The name must match one device exactly, and the site lookup must work. See the log for the reason.' -f $name)
+            }
         } catch {
             Add-LogLine ('Add direct member failed: {0}' -f $_.Exception.Message)
         }

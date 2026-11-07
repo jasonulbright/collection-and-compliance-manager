@@ -223,12 +223,15 @@ function Get-CollectionMembers {
 # ---------------------------------------------------------------------------
 # Collection CRUD
 # ---------------------------------------------------------------------------
+# Every function below supports -WhatIf. Under -WhatIf it changes nothing and
+# returns $null, or $false where the function returns a success flag.
 
 function New-ManagedCollection {
     <#
     .SYNOPSIS
         Creates a new device collection.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$Name,
         [Parameter(Mandatory)][string]$LimitingCollectionName,
@@ -240,6 +243,7 @@ function New-ManagedCollection {
     $rtMap = @{ 'Manual' = 1; 'Periodic' = 2; 'Continuous' = 4; 'Both' = 6 }
     $rtValue = $rtMap[$RefreshType]
 
+    if (-not $PSCmdlet.ShouldProcess($Name, "Create device collection limited to '$LimitingCollectionName'")) { return }
     Write-Log "Creating collection '$Name' (limiting: '$LimitingCollectionName', refresh: $RefreshType)..."
 
     $params = @{
@@ -264,16 +268,22 @@ function New-ManagedCollection {
 function Copy-ManagedCollection {
     <#
     .SYNOPSIS
-        Clones an existing collection.
+        Clones an existing collection and returns the clone.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$SourceCollectionId,
         [Parameter(Mandatory)][string]$NewName
     )
 
+    if (-not $PSCmdlet.ShouldProcess($SourceCollectionId, "Clone collection as '$NewName'")) { return }
     Write-Log "Cloning collection $SourceCollectionId as '$NewName'..."
 
-    $clone = Copy-CMCollection -Id $SourceCollectionId -NewName $NewName -PassThru -ErrorAction Stop
+    [void](Copy-CMCollection -Id $SourceCollectionId -NewName $NewName -PassThru -ErrorAction Stop)
+    # Copy-CMCollection -PassThru returns the source collection on the lab site (checked on
+    # CM01), not the clone. Read the clone back by its exact name.
+    $clone = @(Get-CMDeviceCollection -Name $NewName -ErrorAction Stop | Where-Object { [string]$_.Name -ceq $NewName }) | Select-Object -First 1
+    if (-not $clone) { throw "Configuration Manager did not return the cloned collection '$NewName'." }
     Write-Log "Cloned to '$NewName' (ID: $($clone.CollectionID))"
     return $clone
 }
@@ -283,17 +293,23 @@ function Remove-ManagedCollection {
     .SYNOPSIS
         Deletes a device collection with safety check.
     .DESCRIPTION
-        Blocks deletion of built-in collections (IDs starting with SMS).
+        Blocks deletion of built-in collections (IDs starting with SMS). The
+        check ignores leading and trailing white space and letter case.
+        Returns $true when it deleted the collection, $false when it blocked
+        the deletion or ran under -WhatIf.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId
     )
 
+    $CollectionId = $CollectionId.Trim()
     if ($CollectionId -like 'SMS*') {
         Write-Log "BLOCKED: Cannot delete built-in collection $CollectionId" -Level WARN
         return $false
     }
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, 'Remove device collection')) { return $false }
     Write-Log "Removing collection $CollectionId..."
 
     Remove-CMDeviceCollection -CollectionId $CollectionId -Force -ErrorAction Stop
@@ -305,7 +321,14 @@ function Set-CollectionProperties {
     <#
     .SYNOPSIS
         Updates collection name, comment, or refresh type.
+    .DESCRIPTION
+        RefreshType is 1 (Manual), 2 (Periodic), 4 (Continuous) or 6 (Both).
+        Any other value throws before the site is called. An empty Comment
+        clears the comment; leaving Comment out keeps it. Refresh type 2 or 6 sends a
+        7-day schedule when the collection is not periodic yet. A collection that is
+        already periodic (2 or 6) keeps its schedule.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [string]$NewName,
@@ -313,15 +336,25 @@ function Set-CollectionProperties {
         [int]$RefreshType
     )
 
-    Write-Log "Updating properties for collection $CollectionId..."
-
     $params = @{
         CollectionId = $CollectionId
         ErrorAction  = 'Stop'
     }
     if ($NewName)     { $params['NewName'] = $NewName }
     if ($PSBoundParameters.ContainsKey('Comment')) { $params['Comment'] = $Comment }
+    if ($PSBoundParameters.ContainsKey('RefreshType')) {
+        if ($RefreshType -notin 1, 2, 4, 6) { throw "Invalid refresh type $RefreshType. Use 1 (Manual), 2 (Periodic), 4 (Continuous) or 6 (Both)." }
+        $params['RefreshType'] = $RefreshType
+        # Periodic (2) and Both (6) need a refresh schedule, as in New-ManagedCollection. A collection
+        # that is already periodic keeps its own schedule (for example when 2 changes to 6).
+        if ($RefreshType -in 2, 6) {
+            $current = Get-CMDeviceCollection -Id $CollectionId -ErrorAction Stop | Select-Object -First 1
+            if ([int]$current.RefreshType -notin 2, 6) { $params['RefreshSchedule'] = New-CMSchedule -RecurInterval Days -RecurCount 7 }
+        }
+    }
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, 'Update collection properties')) { return }
+    Write-Log "Updating properties for collection $CollectionId..."
     Set-CMCollection @params
     Write-Log "Updated collection $CollectionId"
 }
@@ -334,7 +367,12 @@ function Add-DirectMember {
     <#
     .SYNOPSIS
         Adds a device to a collection by name (resolves ResourceId automatically).
+    .DESCRIPTION
+        The name matches one device exactly (ignoring letter case). A wildcard
+        such as * is plain text. Returns $false, and adds nothing, when no
+        device or more than one device has that name, and under -WhatIf.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][string]$DeviceName
@@ -342,13 +380,25 @@ function Add-DirectMember {
 
     Write-Log "Resolving ResourceId for '$DeviceName'..."
 
-    $device = Get-CMDevice -Name $DeviceName -ErrorAction SilentlyContinue
-    if (-not $device) {
+    try {
+        $devices = @(Get-CMDevice -Name $DeviceName -DisableWildcardHandling -ErrorAction Stop |
+                Where-Object { [string]$_.Name -ieq $DeviceName })
+    }
+    catch {
+        Write-Log "Device lookup for '$DeviceName' failed: $($_.Exception.Message)" -Level ERROR
+        return $false
+    }
+    if ($devices.Count -eq 0) {
         Write-Log "Device '$DeviceName' not found in Configuration Manager" -Level ERROR
         return $false
     }
+    if ($devices.Count -gt 1) {
+        Write-Log "More than one device is named '$DeviceName' ($($devices.Count) records); nothing was added" -Level ERROR
+        return $false
+    }
 
-    $resourceId = $device.ResourceID
+    $resourceId = $devices[0].ResourceID
+    if (-not $PSCmdlet.ShouldProcess("$DeviceName (ResourceId $resourceId)", "Add to collection $CollectionId")) { return $false }
     Write-Log "Adding '$DeviceName' (ResourceId: $resourceId) to collection $CollectionId..."
 
     Add-CMDeviceCollectionDirectMembershipRule -CollectionId $CollectionId -ResourceId $resourceId -ErrorAction Stop
@@ -361,11 +411,13 @@ function Remove-DirectMember {
     .SYNOPSIS
         Removes a direct member from a collection.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][int]$ResourceId
     )
 
+    if (-not $PSCmdlet.ShouldProcess("ResourceId $ResourceId", "Remove from collection $CollectionId")) { return }
     Write-Log "Removing ResourceId $ResourceId from collection $CollectionId..."
 
     Remove-CMDeviceCollectionDirectMembershipRule -CollectionId $CollectionId -ResourceId $ResourceId -Force -ErrorAction Stop
@@ -377,12 +429,14 @@ function Add-QueryRule {
     .SYNOPSIS
         Adds a WQL query membership rule to a collection.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][string]$RuleName,
         [Parameter(Mandatory)][string]$QueryExpression
     )
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, "Add query rule '$RuleName'")) { return }
     Write-Log "Adding query rule '$RuleName' to collection $CollectionId..."
 
     Add-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $RuleName -QueryExpression $QueryExpression -ErrorAction Stop
@@ -394,11 +448,13 @@ function Remove-QueryRule {
     .SYNOPSIS
         Removes a query membership rule from a collection.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][string]$RuleName
     )
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, "Remove query rule '$RuleName'")) { return }
     Write-Log "Removing query rule '$RuleName' from collection $CollectionId..."
 
     Remove-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $RuleName -Force -ErrorAction Stop
@@ -410,9 +466,13 @@ function Update-QueryRule {
     .SYNOPSIS
         Updates a query rule by removing the old one and adding a new one.
     .DESCRIPTION
-        There is no native update cmdlet for query rules. This removes the existing
-        rule by name and adds a replacement with the same or new name.
+        There is no native update cmdlet for query rules. This reads the old
+        rule, removes it, and adds the replacement. When the site refuses the
+        replacement, the old rule is added back and the error is thrown with a
+        note on whether the old rule was restored. When the old rule does not
+        exist, nothing changes and the function throws.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][string]$OldRuleName,
@@ -420,25 +480,26 @@ function Update-QueryRule {
         [Parameter(Mandatory)][string]$NewQueryExpression
     )
 
-    Write-Log "Updating query rule '$OldRuleName' on collection $CollectionId..."
+    $old = @(Get-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $OldRuleName -ErrorAction Stop |
+            Where-Object { [string]$_.RuleName -ieq $OldRuleName }) | Select-Object -First 1
+    if (-not $old) { throw "Query rule '$OldRuleName' not found on collection $CollectionId." }
 
-    # No native update cmdlet exists, so this is remove-then-add. Capture the old expression
-    # first and roll it back if the replacement add fails -- a failed update must never leave
-    # the collection with neither rule (lost query membership can stop deployments applying).
-    $oldRule = Get-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $OldRuleName -ErrorAction Stop
-    $oldExpression = [string]$oldRule.QueryExpression
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, "Replace query rule '$OldRuleName' with '$NewRuleName'")) { return }
+    Write-Log "Updating query rule '$OldRuleName' on collection $CollectionId..."
 
     Remove-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $OldRuleName -Force -ErrorAction Stop
     try {
         Add-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $NewRuleName -QueryExpression $NewQueryExpression -ErrorAction Stop
     }
     catch {
-        Write-Log "Replacement rule add failed: $($_.Exception.Message). Rolling back '$OldRuleName'." -Level ERROR
-        if ($oldExpression) {
-            Add-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $OldRuleName -QueryExpression $oldExpression -ErrorAction Stop
-            Write-Log "Rolled back to the original rule '$OldRuleName'."
-        }
-        throw
+        $reason = $_.Exception.Message
+        $restored = $false
+        try {
+            Add-CMDeviceCollectionQueryMembershipRule -CollectionId $CollectionId -RuleName $OldRuleName -QueryExpression ([string]$old.QueryExpression) -ErrorAction Stop
+            $restored = $true
+        } catch { Write-Log "Could not restore query rule '$OldRuleName': $($_.Exception.Message)" -Level ERROR }
+        if ($restored) { throw "$reason (the old rule '$OldRuleName' was restored)" }
+        throw "$reason (the old rule '$OldRuleName' was removed and not restored)"
     }
 
     Write-Log "Updated query rule '$OldRuleName' -> '$NewRuleName'"
@@ -449,11 +510,13 @@ function Add-IncludeRule {
     .SYNOPSIS
         Adds an include collection membership rule.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][string]$IncludeCollectionId
     )
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, "Include collection $IncludeCollectionId")) { return }
     Write-Log "Adding include rule for $IncludeCollectionId to collection $CollectionId..."
 
     Add-CMDeviceCollectionIncludeMembershipRule -CollectionId $CollectionId -IncludeCollectionId $IncludeCollectionId -ErrorAction Stop
@@ -465,11 +528,13 @@ function Add-ExcludeRule {
     .SYNOPSIS
         Adds an exclude collection membership rule.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId,
         [Parameter(Mandatory)][string]$ExcludeCollectionId
     )
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, "Exclude collection $ExcludeCollectionId")) { return }
     Write-Log "Adding exclude rule for $ExcludeCollectionId to collection $CollectionId..."
 
     Add-CMDeviceCollectionExcludeMembershipRule -CollectionId $CollectionId -ExcludeCollectionId $ExcludeCollectionId -ErrorAction Stop
@@ -481,10 +546,12 @@ function Invoke-CollectionEvaluation {
     .SYNOPSIS
         Forces immediate membership evaluation for a collection.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$CollectionId
     )
 
+    if (-not $PSCmdlet.ShouldProcess($CollectionId, 'Evaluate collection membership')) { return }
     Write-Log "Forcing evaluation for collection $CollectionId..."
 
     Invoke-CMCollectionUpdate -CollectionId $CollectionId -ErrorAction Stop
@@ -599,7 +666,10 @@ function Get-OperationalTemplates {
     }
 
     try {
-        $templates = Get-Content -LiteralPath $TemplatesPath -Raw | ConvertFrom-Json
+        # Read as UTF-8 and unroll the array in a second step: Windows PowerShell 5.1 decodes a
+        # file without a byte order mark as ANSI and returns a JSON array as one object.
+        $parsed = Get-Content -LiteralPath $TemplatesPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $templates = @(@($parsed) | Where-Object { $null -ne $_ })
         Write-Log "Loaded $(@($templates).Count) operational templates"
         return $templates
     }
@@ -628,7 +698,10 @@ function Get-ParameterizedTemplates {
     }
 
     try {
-        $templates = Get-Content -LiteralPath $TemplatesPath -Raw | ConvertFrom-Json
+        # Read as UTF-8 and unroll the array in a second step: Windows PowerShell 5.1 decodes a
+        # file without a byte order mark as ANSI and returns a JSON array as one object.
+        $parsed = Get-Content -LiteralPath $TemplatesPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $templates = @(@($parsed) | Where-Object { $null -ne $_ })
         Write-Log "Loaded $(@($templates).Count) parameterized templates"
         return $templates
     }
@@ -651,11 +724,17 @@ function Expand-TemplateParameters {
         [Parameter(Mandatory)][hashtable]$ParameterValues
     )
 
-    $expanded = $QueryTemplate
-    foreach ($key in $ParameterValues.Keys) {
-        $expanded = $expanded.Replace($key, $ParameterValues[$key])
-    }
-
+    # One pass over the template: a value that contains another token is not expanded again,
+    # so a parameter value cannot pull in another parameter. The longest key wins at a position.
+    if ($ParameterValues.Count -eq 0) { return $QueryTemplate }
+    $keys = @($ParameterValues.Keys | Where-Object { $_ } | Sort-Object { $_.Length } -Descending | ForEach-Object { [regex]::Escape([string]$_) })
+    if ($keys.Count -eq 0) { return $QueryTemplate }
+    $pattern = $keys -join '|'
+    $expanded = [regex]::Replace($QueryTemplate, $pattern, {
+            param($m)
+            $v = $ParameterValues[$m.Value]
+            if ($null -eq $v) { '' } else { [string]$v }
+        })
     return $expanded
 }
 
@@ -822,7 +901,7 @@ function Test-CatalogMetadata {
     & $reqIntArray 'TenablePlugins'
 
     if ($Metadata.ContainsKey('Id') -and $Metadata['Id'] -is [string] -and
-        $Metadata['Id'] -notmatch '^[a-z0-9]+(-[a-z0-9]+)*$') {
+        $Metadata['Id'] -cnotmatch '^[a-z0-9]+(-[a-z0-9]+)*$') {
         $errors.Add("Id must be kebab-case (lowercase letters, digits, hyphens): '$($Metadata['Id'])'")
     }
     if ($Metadata.ContainsKey('Version') -and $Metadata['Version'] -is [string] -and
@@ -1103,8 +1182,10 @@ function Invoke-CatalogBuilder {
         (-NoProfile -ExecutionPolicy Bypass -File) with arguments derived from Values,
         so a builder crash cannot take down the app. stderr is merged into stdout.
         Returns an object with ExitCode, Output (string[]), and Success ($ExitCode -eq 0).
-        Blocking by design -- the caller runs it on a background runspace.
+        Blocking by design -- the caller runs it on a background runspace. Under -WhatIf it runs
+        nothing and returns $null.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]$Entry,
         [hashtable]$Values = @{},
@@ -1116,6 +1197,7 @@ function Invoke-CatalogBuilder {
     }
 
     $builderArgs = Get-CatalogBuilderArgumentList -Entry $Entry -Values $Values
+    if (-not $PSCmdlet.ShouldProcess($Entry.BuilderPath, 'Run catalog builder')) { return $null }
     Write-Log ("Invoke-CatalogBuilder: {0} {1}" -f $Entry.BuilderPath, ($builderArgs -join ' '))
 
     $global:LASTEXITCODE = 0
@@ -1201,6 +1283,7 @@ function Set-BaselineDriftTag {
         description via Get-CMBaseline, wraps it with Get-DriftTaggedDescription, and writes
         it back via Set-CMBaseline. Requires an active CM connection. Returns $true on success.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$BaselineName,
         [Parameter(Mandatory)][string]$Id,
@@ -1213,6 +1296,7 @@ function Set-BaselineDriftTag {
             return $false
         }
         $newDesc = Get-DriftTaggedDescription -Existing ([string]$baseline.LocalizedDescription) -Id $Id -Version $Version
+        if (-not $PSCmdlet.ShouldProcess($BaselineName, "Set drift tag [ccm:$Id@$Version]")) { return $false }
         Set-CMBaseline -Name $BaselineName -Description $newDesc -ErrorAction Stop
         Write-Log ("Drift tag set on '{0}': [ccm:{1}@{2}]" -f $BaselineName, $Id, $Version)
         return $true
@@ -1301,11 +1385,13 @@ function Set-BaselineDeploymentRemediation {
         Wraps Set-CMBaselineDeployment -EnableEnforcement. Enforcement on = the baseline
         remediates noncompliance on the targeted collection; off = detect-only.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$BaselineName,
         [Parameter(Mandatory)][string]$CollectionName,
         [Parameter(Mandatory)][bool]$EnableEnforcement
     )
+    if (-not $PSCmdlet.ShouldProcess("$BaselineName -> $CollectionName", "Set enforcement to $EnableEnforcement")) { return }
     Set-CMBaselineDeployment -BaselineName $BaselineName -CollectionName $CollectionName -EnableEnforcement $EnableEnforcement -ErrorAction Stop
     Write-Log ("Set remediation={0} on '{1}' -> '{2}'." -f $EnableEnforcement, $BaselineName, $CollectionName)
 }
@@ -1319,11 +1405,13 @@ function Remove-BaselineDeploymentBulk {
         Remove-CMBaselineDeployment -Force per entry; a failure on one entry does not stop
         the rest. Returns one result object per entry: Baseline, Collection, Removed (bool), Error.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param([Parameter(Mandatory)][object[]]$Deployments)
     $results = [System.Collections.Generic.List[object]]::new()
     foreach ($d in $Deployments) {
         $bn = [string]$d.BaselineName
         $cn = [string]$d.CollectionName
+        if (-not $PSCmdlet.ShouldProcess("$bn -> $cn", 'Remove baseline deployment')) { continue }
         try {
             Remove-CMBaselineDeployment -Name $bn -CollectionName $cn -Force -ErrorAction Stop
             $results.Add([pscustomobject]@{ Baseline = $bn; Collection = $cn; Removed = $true;  Error = $null })
@@ -1345,11 +1433,13 @@ function New-BaselineDeployment {
         redeploy (same collection) and reassign (new collection). EnableEnforcement defaults
         to $false (detect-only) so a re-created deployment never silently remediates.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$BaselineName,
         [Parameter(Mandatory)][string]$CollectionName,
         [bool]$EnableEnforcement = $false
     )
+    if (-not $PSCmdlet.ShouldProcess("$BaselineName -> $CollectionName", "Deploy baseline (enforcement $EnableEnforcement)")) { return }
     New-CMBaselineDeployment -Name $BaselineName -CollectionName $CollectionName -EnableEnforcement $EnableEnforcement -ErrorAction Stop
     Write-Log ("Deployed baseline '{0}' to '{1}' (enforcement={2})." -f $BaselineName, $CollectionName, $EnableEnforcement)
 }
@@ -1386,6 +1476,7 @@ function Add-ConfigurationItemSetting {
         new CI version server-side. Enum-typed values (Hive, DataType, ExpressionOperator,
         NoncomplianceSeverity, *ScriptLanguage) may be passed by their string names.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$ConfigurationItemName,
         [Parameter(Mandatory)][ValidateSet('Registry', 'Script')][string]$SettingType,
@@ -1393,6 +1484,7 @@ function Add-ConfigurationItemSetting {
     )
     $ci = Get-CMConfigurationItem -Name $ConfigurationItemName -Fast
     if (-not $ci) { throw "Configuration item '$ConfigurationItemName' not found." }
+    if (-not $PSCmdlet.ShouldProcess($ConfigurationItemName, "Add $SettingType setting")) { return }
     if ($SettingType -eq 'Registry') {
         Add-CMComplianceSettingRegistryKeyValue -InputObject $ci @Parameters -ErrorAction Stop
     } else {
@@ -1410,6 +1502,7 @@ function Set-ConfigurationItemSetting {
         splatting the supplied changes (-SettingName identifies the setting). The cmdlets create a
         new CI version server-side.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$ConfigurationItemName,
         [Parameter(Mandatory)][string]$SettingName,
@@ -1418,6 +1511,7 @@ function Set-ConfigurationItemSetting {
     )
     $ci = Get-CMConfigurationItem -Name $ConfigurationItemName -Fast
     if (-not $ci) { throw "Configuration item '$ConfigurationItemName' not found." }
+    if (-not $PSCmdlet.ShouldProcess("$ConfigurationItemName / $SettingName", "Update $SettingType setting")) { return }
     if ($SettingType -eq 'Registry') {
         Set-CMComplianceSettingRegistryKeyValue -InputObject $ci -SettingName $SettingName @Changes -ErrorAction Stop
     } else {
@@ -1434,6 +1528,7 @@ function Remove-ConfigurationItemSetting {
         Resolves the CI by name and removes the named setting via Remove-CMComplianceSetting -Force.
         Returns $true on success, $false if the CI is not found.
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string]$ConfigurationItemName,
         [Parameter(Mandatory)][string]$SettingName
@@ -1443,6 +1538,7 @@ function Remove-ConfigurationItemSetting {
         Write-Log ("Remove-ConfigurationItemSetting: CI '{0}' not found." -f $ConfigurationItemName) -Level WARN
         return $false
     }
+    if (-not $PSCmdlet.ShouldProcess("$ConfigurationItemName / $SettingName", 'Remove setting')) { return $false }
     Remove-CMComplianceSetting -InputObject $ci -SettingName $SettingName -Force -ErrorAction Stop
     Write-Log ("Removed setting '{0}' from CI '{1}'." -f $SettingName, $ConfigurationItemName)
     return $true
@@ -1514,7 +1610,9 @@ function Get-ComplianceSummary {
     $cbs = if ($BaselineName) { @(Get-CMBaseline -Name $BaselineName -Fast) } else { @(Get-CMBaseline -Fast) }
     $rows = [System.Collections.Generic.List[object]]::new()
     foreach ($cb in $cbs) {
-        foreach ($d in @(Get-CMBaselineDeployment -InputObject $cb)) {
+        # The summary objects carry the counts, the collection name and the modification time.
+        # The assignment objects (without -Summary) have none of them.
+        foreach ($d in @(Get-CMBaselineDeployment -InputObject $cb -Summary)) {
             $targeted = [int]$d.NumberTargeted
             $compliant = [int]$d.NumberSuccess
             $pct = if ($targeted -gt 0) { [math]::Round(100.0 * $compliant / $targeted, 1) } else { 0 }
@@ -1548,10 +1646,10 @@ function Get-EvaluationFreshness {
     $threshold = $AsOf.AddDays(- [math]::Abs($StaleDays))
     $rows = [System.Collections.Generic.List[object]]::new()
     foreach ($cb in @(Get-CMBaseline -Fast)) {
-        foreach ($d in @(Get-CMBaselineDeployment -InputObject $cb)) {
+        foreach ($d in @(Get-CMBaselineDeployment -InputObject $cb -Summary)) {
             $mod = $d.ModificationTime
             $modDt = if ($mod -is [datetime]) { $mod } else { $null }
-            $isStale = ($modDt -ne $null) -and ($modDt -lt $threshold)
+            $isStale = ($null -ne $modDt) -and ($modDt -lt $threshold)
             $rows.Add([pscustomobject]@{
                     Baseline    = [string]$cb.LocalizedDisplayName
                     Collection  = [string]$d.CollectionName
