@@ -108,6 +108,37 @@ Describe 'Window test files carry the guard' {
     }
 }
 
+Describe 'Get-UnguardedDescribe reads the syntax tree' {
+    It 'accepts a guard on a continuation line' {
+        $text = "Describe 'a' ``" + [Environment]::NewLine + "    -Skip:(-not `$script:WindowGuard.Allowed) { It 'x' { } }"
+        @(Get-UnguardedDescribe -Text $text) | Should -BeNullOrEmpty
+    }
+
+    It 'accepts the Skip parameter with a space instead of a colon' {
+        $text = "Describe 'a' -Skip (-not `$script:WindowGuard.Allowed) { }"
+        @(Get-UnguardedDescribe -Text $text) | Should -BeNullOrEmpty
+    }
+
+    It 'reports a Describe whose guard text is only in a comment' {
+        $text = "# -Skip:(-not `$script:WindowGuard.Allowed)" + [Environment]::NewLine + "Describe 'a' { }"
+        @(Get-UnguardedDescribe -Text $text) | Should -Be @('a')
+    }
+
+    It 'reports a Describe with another Skip value' {
+        @(Get-UnguardedDescribe -Text "Describe 'a' -Skip:`$false { }") | Should -Be @('a')
+    }
+
+    It 'does not require a nested Describe to repeat the guard' {
+        $text = "Describe 'a' -Skip:(-not `$script:WindowGuard.Allowed) { Describe 'b' { } }"
+        @(Get-UnguardedDescribe -Text $text) | Should -BeNullOrEmpty
+    }
+
+    It 'reports only the unguarded one of two top-level Describe blocks' {
+        $text = "Describe 'a' -Skip:(-not `$script:WindowGuard.Allowed) { }" + [Environment]::NewLine + "Describe 'b' { }"
+        @(Get-UnguardedDescribe -Text $text) | Should -Be @('b')
+    }
+}
+
 Describe 'Get-WpfSession refuses where the guard says no' {
     BeforeAll {
         Mock Test-WindowTestsAllowed { [pscustomobject]@{ Allowed = $false; Reason = 'test' } }
