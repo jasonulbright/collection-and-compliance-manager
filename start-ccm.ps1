@@ -1093,7 +1093,7 @@ function Invoke-Refresh {
                 $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
                 $btnRefresh.IsEnabled = $true
                 $script:IsConnectedFromBg = $false
-                Add-LogLine ('Refresh failed: {0}' -f $script:BgState.ErrorMsg)
+                Add-LogLine ('Refresh failed. {0}' -f $script:BgState.ErrorMsg)
                 Set-StatusText 'Refresh failed.'
                 return
             }
@@ -1369,6 +1369,28 @@ $btnCatClearFilters.Add_Click({
 # =============================================================================
 # Catalog deploy (A.2): form from Builder.Parameters -> confirm -> bg build + tag.
 # =============================================================================
+$script:DialogButtonStyleXaml = @'
+            <!-- The two dialog button styles, defined once for every dialog. The primary style is DialogAccentButton: white text on the accent blue. The one secondary style is DialogButton: a gray fill, the theme text color and a visible border. Cancel and Browse use it. -->
+            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Gray10}"/>
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                <Setter Property="MinWidth" Value="90"/>
+                <Setter Property="Height" Value="32"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
+            </Style>
+            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
+                <Setter Property="MinWidth" Value="90"/>
+                <Setter Property="Height" Value="32"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
+            </Style>
+'@
+
 function Show-CatalogDeployDialog {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Modal dialog show / dispose; reads as a single action.')]
     param([Parameter(Mandatory)]$Entry)
@@ -1393,19 +1415,7 @@ function Show-CatalogDeployDialog {
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/>
-                <Setter Property="Height"   Value="32"/>
-                <Setter Property="Margin"   Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/>
-                <Setter Property="Height"   Value="32"/>
-                <Setter Property="Margin"   Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="16,12,16,12">
@@ -1448,6 +1458,7 @@ function Show-CatalogDeployDialog {
 </Controls:MetroWindow>
 '@
 
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $reader2 = New-Object System.Xml.XmlNodeReader $dx
     $dlg = [System.Windows.Markup.XamlReader]::Load($reader2)
@@ -1619,7 +1630,7 @@ function Invoke-CreateDependency {
         try { [void]$i.ps.EndInvoke($i.handle) } catch { $null = $_ }
         try { $i.ps.Dispose() } catch { $null = $_ }
         foreach ($line in @($i.state.Output)) { Add-LogLine $line }
-        if ($i.state.ErrorMsg) { Add-LogLine ('Create dependency failed: {0}' -f $i.state.ErrorMsg) }
+        if ($i.state.ErrorMsg) { Add-LogLine ('Create dependency failed. {0}' -f $i.state.ErrorMsg) }
         else { Add-LogLine ('Dependency creator finished (exit {0}) for {1}. Re-open Deploy to verify.' -f $i.state.ExitCode, $i.name) }
         Set-StatusText 'Ready.'
     })
@@ -1682,7 +1693,7 @@ function Invoke-CatalogDeploy {
         try { $i.ps.Dispose() } catch { $null = $_ }
         $st = $i.state
         if ($st.ErrorMsg) {
-            Add-LogLine ('Deploy failed: {0}' -f $st.ErrorMsg)
+            Add-LogLine ('Deploy failed. {0}' -f $st.ErrorMsg)
             Set-StatusText 'Deploy failed. See log.'
         } elseif (@($st.Missing).Count) {
             Add-LogLine ('Deploy blocked: {0} dependency/dependencies missing:' -f @($st.Missing).Count)
@@ -1822,7 +1833,7 @@ function Invoke-LoadLive {
                 $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
                 $btnRefresh.IsEnabled = $true
                 $script:IsConnectedFromBg = $false
-                Add-LogLine ('Live CI/CB load failed: {0}' -f $script:BgState.ErrorMsg)
+                Add-LogLine ('Live CI/CB load failed. {0}' -f $script:BgState.ErrorMsg)
                 Set-StatusText 'Live CI/CB load failed.'
                 return
             }
@@ -1906,7 +1917,7 @@ function Invoke-LoadBaselineDeployments {
         # Only apply if the user hasn't moved to a different baseline meanwhile.
         if ([string]$gridLiveDeployments.Tag -ne [string]$i.name) { return }
         if ($i.state.ErrorMsg) {
-            Add-LogLine ('Deployments load failed for "{0}": {1}' -f $i.name, $i.state.ErrorMsg)
+            Add-LogLine ('Deployments load failed for "{0}". {1}' -f $i.name, $i.state.ErrorMsg)
             $txtLiveDeplHeader.Text = ('Deployments of "{0}" -- load failed' -f $i.name)
             return
         }
@@ -2118,7 +2129,7 @@ function Invoke-LoadEditorCIs {
             if ($script:BgState.ErrorMsg) {
                 $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
                 $btnRefresh.IsEnabled = $true; $script:IsConnectedFromBg = $false
-                Add-LogLine ('Editor: CI load failed: {0}' -f $script:BgState.ErrorMsg)
+                Add-LogLine ('Editor: CI load failed. {0}' -f $script:BgState.ErrorMsg)
                 Set-StatusText 'CI load failed.'
                 return
             }
@@ -2164,8 +2175,8 @@ function Invoke-LoadEditorSettings {
         try { $i.ps.Dispose() } catch { $null = $_ }
         if ([string]$gridEditorSettings.Tag -ne [string]$i.name) { return }
         if ($i.state.ErrorMsg) {
-            Add-LogLine ('Editor: settings load failed for "{0}": {1}' -f $i.name, $i.state.ErrorMsg)
-            $txtEditorDetail.Text = ('Settings load failed: {0}' -f $i.state.ErrorMsg)
+            Add-LogLine ('Editor: settings load failed for "{0}". {1}' -f $i.name, $i.state.ErrorMsg)
+            $txtEditorDetail.Text = ('Settings load failed. {0}' -f $i.state.ErrorMsg)
             return
         }
         $script:EditorSettings = @(@($i.state.Result) | ForEach-Object {
@@ -2210,7 +2221,7 @@ function Invoke-EditorRemoveSetting {
         try { $i.ps.Dispose() } catch { $null = $_ }
         $btnEditorRemoveSetting.IsEnabled = $true
         if ($i.state.ErrorMsg) {
-            Add-LogLine ('Editor: remove failed: {0}' -f $i.state.ErrorMsg)
+            Add-LogLine ('Editor: remove failed. {0}' -f $i.state.ErrorMsg)
             Set-StatusText 'Remove failed.'
             return
         }
@@ -2301,17 +2312,7 @@ function Show-AddSettingDialog {
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="16,12,16,12">
@@ -2424,6 +2425,7 @@ function Show-AddSettingDialog {
 </Controls:MetroWindow>
 '@
 
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $dlg = [System.Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $dx))
     $dlg.Owner = $window
@@ -2541,7 +2543,7 @@ function Invoke-EditorAddSetting {
         try { $i.ps.Dispose() } catch { $null = $_ }
         $btnEditorAddSetting.IsEnabled = $true
         if ($i.state.ErrorMsg) {
-            Add-LogLine ('Editor: add setting failed: {0}' -f $i.state.ErrorMsg)
+            Add-LogLine ('Editor: add setting failed. {0}' -f $i.state.ErrorMsg)
             Set-StatusText 'Add setting failed.'
             return
         }
@@ -2615,17 +2617,7 @@ function Show-EditSettingDialog {
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="16,12,16,12">
@@ -2702,6 +2694,7 @@ function Show-EditSettingDialog {
 </Controls:MetroWindow>
 '@
 
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $dlg = [System.Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $dx))
     $dlg.Owner = $window
@@ -2813,7 +2806,7 @@ function Invoke-EditorEditSetting {
         try { $i.ps.Dispose() } catch { $null = $_ }
         $btnEditorEditSetting.IsEnabled = $true
         if ($i.state.ErrorMsg) {
-            Add-LogLine ('Editor: update failed: {0}' -f $i.state.ErrorMsg)
+            Add-LogLine ('Editor: update failed. {0}' -f $i.state.ErrorMsg)
             Set-StatusText 'Update failed.'
             return
         }
@@ -2898,7 +2891,7 @@ function Invoke-LoadAuditing {
             if ($script:BgState.ErrorMsg) {
                 $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
                 $btnRefresh.IsEnabled = $true; $script:IsConnectedFromBg = $false
-                Add-LogLine ('Auditing load failed: {0}' -f $script:BgState.ErrorMsg)
+                Add-LogLine ('Auditing load failed. {0}' -f $script:BgState.ErrorMsg)
                 Set-StatusText 'Auditing load failed.'
                 return
             }
@@ -2992,7 +2985,7 @@ function Invoke-LoadDirectMembers {
             try { [void]$info.ps.EndInvoke($info.handle) } catch { $null = $_ }
             try { $info.ps.Dispose() } catch { $null = $_ }
             if ($info.state.ErrorMsg) {
-                Add-LogLine ('Direct members load failed: {0}' -f $info.state.ErrorMsg)
+                Add-LogLine ('Direct members load failed. {0}' -f $info.state.ErrorMsg)
                 return
             }
             # Only apply if the user hasn't moved on to a different collection.
@@ -3020,7 +3013,7 @@ $btnValidateWql.Add_Click({
     if ($result.IsValid) {
         $txtWqlValidation.Text = ('OK: query parses ({0} {1} returned).' -f $result.ResultCount, $(if ($result.ResultCount -eq 1) { 'row' } else { 'rows' }))
     } else {
-        $txtWqlValidation.Text = ('Invalid: {0}' -f $result.ErrorMessage)
+        $txtWqlValidation.Text = [string]$result.ErrorMessage
     }
     Add-LogLine ('WQL validate: {0}' -f $txtWqlValidation.Text)
 })
@@ -3058,13 +3051,13 @@ $btnPreviewWql.Add_Click({
             try { [void]$info.ps.EndInvoke($info.handle) } catch { $null = $_ }
             try { $info.ps.Dispose() } catch { $null = $_ }
             if ($info.state.ErrorMsg) {
-                $txtWqlValidation.Text = ('Preview failed: {0}' -f $info.state.ErrorMsg)
+                $txtWqlValidation.Text = ('Preview failed. {0}' -f $info.state.ErrorMsg)
                 Add-LogLine $txtWqlValidation.Text
                 return
             }
             $r = $info.state.Result
             if ($r -and -not $r.IsValid) {
-                $txtWqlValidation.Text = ('Preview failed: {0}' -f $r.ErrorMessage)
+                $txtWqlValidation.Text = [string]$r.ErrorMessage
                 Add-LogLine $txtWqlValidation.Text
                 return
             }
@@ -3198,17 +3191,7 @@ function Show-NewCollectionDialog {
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="20,16,20,12">
@@ -3236,7 +3219,7 @@ function Show-NewCollectionDialog {
                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 </Border>
                 <Button x:Name="btnPickLimiting" Grid.Column="1" Content="Browse..."
-                        Style="{StaticResource DialogButton}" MinWidth="90" Margin="0"
+                        Style="{StaticResource DialogButton}" Margin="0"
                         ToolTip="Pick the limiting collection from the folder tree."/>
             </Grid>
 
@@ -3259,6 +3242,7 @@ function Show-NewCollectionDialog {
     </Grid>
 </Controls:MetroWindow>
 '@
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $reader2 = New-Object System.Xml.XmlNodeReader $dx
     $dlg = [System.Windows.Markup.XamlReader]::Load($reader2)
@@ -3342,17 +3326,7 @@ function Show-CopyCollectionDialog {
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="20,16,20,12">
@@ -3377,6 +3351,7 @@ function Show-CopyCollectionDialog {
     </Grid>
 </Controls:MetroWindow>
 '@
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $reader2 = New-Object System.Xml.XmlNodeReader $dx
     $dlg = [System.Windows.Markup.XamlReader]::Load($reader2)
@@ -3442,11 +3417,7 @@ function Show-EditMembershipDialog {
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="28"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
             <Style x:Key="MemberRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
                 <Style.Triggers>
                     <Trigger Property="IsSelected" Value="True">
@@ -3501,6 +3472,7 @@ function Show-EditMembershipDialog {
     </Grid>
 </Controls:MetroWindow>
 '@
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $reader2 = New-Object System.Xml.XmlNodeReader $dx
     $dlg = [System.Windows.Markup.XamlReader]::Load($reader2)
@@ -3602,17 +3574,7 @@ function Show-ApplyTemplateDialog {
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="20,16,20,12">
@@ -3644,7 +3606,7 @@ function Show-ApplyTemplateDialog {
                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 </Border>
                 <Button x:Name="btnPickTarget" Grid.Column="1" Content="Browse..."
-                        Style="{StaticResource DialogButton}" MinWidth="90" Margin="0"
+                        Style="{StaticResource DialogButton}" Margin="0"
                         ToolTip="Pick the target collection from the folder tree."/>
             </Grid>
         </StackPanel>
@@ -3668,6 +3630,7 @@ function Show-ApplyTemplateDialog {
     </Grid>
 </Controls:MetroWindow>
 '@
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $reader2 = New-Object System.Xml.XmlNodeReader $dx
     $dlg = [System.Windows.Markup.XamlReader]::Load($reader2)
@@ -3868,19 +3831,7 @@ function Show-OptionsDialog {
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
                 <Setter Property="Margin" Value="0"/>
             </Style>
-            <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
-                <Setter Property="MinWidth" Value="90"/>
-                <Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
-            <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
-                <Setter Property="MinWidth" Value="90"/>
-                <Setter Property="Height" Value="32"/>
-                <Setter Property="Margin" Value="0,0,8,0"/>
-                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-            </Style>
+            <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -3926,7 +3877,7 @@ function Show-OptionsDialog {
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <DockPanel LastChildFill="True">
                     <Button x:Name="btnBrowseCatalog" DockPanel.Dock="Right" Content="Browse..."
-                            Style="{StaticResource DialogButton}" Width="90" Height="28" Margin="8,0,0,0"
+                            Style="{StaticResource DialogButton}" Margin="8,0,0,0"
                             ToolTip="Pick the catalog folder."/>
                     <TextBox x:Name="txtCatalogPath" FontSize="12" Padding="6,4,6,4"
                              Controls:TextBoxHelper.Watermark="Local path to a clone of the CI / CB catalog"/>
@@ -3960,6 +3911,7 @@ function Show-OptionsDialog {
 </Controls:MetroWindow>
 '@
 
+    $dlgXaml = $dlgXaml.Replace('<!--DIALOG_BUTTON_STYLES-->', $script:DialogButtonStyleXaml)
     [xml]$dx = $dlgXaml
     $reader2 = New-Object System.Xml.XmlNodeReader $dx
     $dlg = [System.Windows.Markup.XamlReader]::Load($reader2)

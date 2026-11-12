@@ -76,8 +76,10 @@ if (-not $SkipLint) {
 
 # ---- 2. Tests and coverage -------------------------------------------------
 $cfg = New-PesterConfiguration
+# The filters work on the path below the repository root, because a checkout can live below a folder
+# that is named .claude (a worktree). Folders named .git and .claude inside the root are outside the run.
 $testFiles = @(Get-ChildItem -LiteralPath $root -Recurse -Filter '*.Tests.ps1' -File |
-        Where-Object { $_.FullName -notlike '*\Tests\Lab\*' -and $_.FullName -notlike '*\.git\*' })
+        Where-Object { $rel = $_.FullName.Substring($root.TrimEnd('\').Length + 1); $rel -notmatch '^Tests\\Lab\\' -and $rel -notmatch '(^|\\)(\.git|\.claude)\\' })
 if ($testFiles.Count -eq 0) { Write-Host 'No test file found.'; exit 1 }
 if ($SkipWindow) { $testFiles = @($testFiles | Where-Object { $_.Name -ne 'Window.Tests.ps1' }) }
 $cfg.Run.Path = $testFiles.FullName

@@ -137,6 +137,7 @@ Section 'light states' {
     Sample-States (Get-El $win 'btnExportCsv') 'inline-button' $win
     Sample-El (Get-El $win 'btnViewCollections') 'sidebar active'
     Sample-El (Get-El $win 'btnOptions') 'sidebar options'
+    Sample-States (Get-El $win 'btnViewTemplates') 'sidebar-button' $win
     Sample-El (Find-Role $win 'TabItem' 'Properties') 'selected tab'
     Expand-El (Get-El $win 'cboCollectionFilter'); Start-Sleep -Milliseconds 500
     $item = Find-Role $win 'ListItem' 'All'; if ($item) { Sample-El $item 'combo selected item' }
@@ -145,7 +146,7 @@ Section 'light states' {
   Extra 'new dialog' {
     $d = OpenDlg 'btnNewCollection' 'New Collection'; Shot $d 'light-dialog-new-collection'
     Sample-States (Get-El $d 'btnCancel') 'dialog-button' $d
-    Sample-El (Get-El $d 'btnOk') 'dialog-accent-button'
+    Sample-States (Get-El $d 'btnOk') 'dialog-accent-button' $d
     CloseDlg $d
   }
   Extra 'copy dialog' { $d = OpenDlg 'btnCopyCollection' 'Copy Collection'; Shot $d 'light-dialog-copy-collection'; CloseDlg $d }
@@ -183,7 +184,7 @@ Section 'light states' {
     Invoke-El (Get-El $win 'btnViewCatalog'); Start-Sleep -Seconds 2; Invoke-El (Get-El $win 'Reload Catalog'); Start-Sleep -Seconds 4
     $r = @(Rows 'gridCatalog')
     if ($r.Count) {
-      Select-El $r[0]; Start-Sleep -Seconds 1; Sample-El $r[0] 'catalog selected row'; Sample-El (Get-El $win 'btnCatDeploy') 'accent inline button'
+      Select-El $r[0]; Start-Sleep -Seconds 1; Sample-El $r[0] 'catalog selected row'; Sample-States (Get-El $win 'btnCatDeploy') 'accent-inline-button' $win
       $d = OpenDlg 'btnCatDeploy' 'Deploy'; Shot $d 'light-dialog-catalog-deploy'; Sample-El (Get-El $d 'btnDeploy') 'deploy dialog accent button'; CloseDlg $d
     } else { Log 'WARN extra catalog: no catalog row' }
   }

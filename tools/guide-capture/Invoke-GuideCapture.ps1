@@ -67,11 +67,21 @@ $session = New-PSSession -ComputerName $Target -Credential $LabCredential
 $lockHeld = $false
 try {
     # One capture at a time on each lab computer: another session may use the interactive desktop.
-    # New-Item without -Force fails when the lock file exists. The tool waits, then takes the lock.
+    # New-Item without -Force fails with an IOException when the lock file exists: that means busy, and the tool waits.
+    # Any other error surfaces. A lock older than 60 minutes is stale: the tool removes it and tries again.
     $lockEnd = (Get-Date).AddMinutes(30)
     while (-not $lockHeld) {
-        $lockHeld = [bool](Invoke-Command $session { New-Item -ItemType Directory 'C:\guide' -Force | Out-Null; try { New-Item -ItemType File 'C:\guide\capture.lock' -ErrorAction Stop | Out-Null; $true } catch { $false } })
-        if (-not $lockHeld) {
+        $state = Invoke-Command $session {
+            New-Item -ItemType Directory 'C:\guide' -Force | Out-Null
+            try { New-Item -ItemType File 'C:\guide\capture.lock' -ErrorAction Stop | Out-Null; 'taken' }
+            catch [System.IO.IOException] {
+                $item = Get-Item 'C:\guide\capture.lock' -ErrorAction SilentlyContinue
+                if ($item -and ((Get-Date) - $item.LastWriteTime).TotalMinutes -gt 60) { Remove-Item 'C:\guide\capture.lock' -Force; 'stale' } else { 'busy' }
+            }
+        }
+        if ($state -eq 'taken') { $lockHeld = $true }
+        elseif ($state -eq 'stale') { Write-Warning 'Removed a capture.lock that was older than 60 minutes.' }
+        else {
             if ((Get-Date) -gt $lockEnd) { throw 'C:\guide\capture.lock stayed for 30 minutes. Another capture is running.' }
             Start-Sleep -Seconds 20
         }
@@ -140,6 +150,8 @@ try {
 }
 finally {
     # Each cleanup runs on its own, so that a failed cleanup cannot replace the original error.
+    # After a timeout or an error the task and the runner of this capture may still run: stop them before the lock goes.
+    try { Invoke-Command $session { param($t, $r) Stop-ScheduledTask $t -ErrorAction SilentlyContinue; Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -like "*$r\*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } } -ArgumentList $taskName, $root } catch { Write-Warning "Stopping the capture task failed: $($_.Exception.Message)" }
     try { Invoke-Command $session { param($t) Unregister-ScheduledTask $t -Confirm:$false -ErrorAction SilentlyContinue } -ArgumentList $taskName } catch { Write-Warning "Cleanup of the scheduled task failed: $($_.Exception.Message)" }
     try { Invoke-Command $session { param($r) Remove-Item $r -Recurse -Force -ErrorAction SilentlyContinue } -ArgumentList $root } catch { Write-Warning "Cleanup of $root failed: $($_.Exception.Message)" }
     # Release the lock last, and only when this run took it.

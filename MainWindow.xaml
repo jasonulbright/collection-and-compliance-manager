@@ -39,6 +39,8 @@
                                 <SolidColorBrush Color="{DynamicResource MahApps.Colors.AccentBase}"/>
                             </Setter.Value>
                         </Setter>
+                        <!-- The pressed state is blue, so it carries white text. -->
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                     </Trigger>
                     <Trigger Property="IsEnabled" Value="False">
                         <Setter TargetName="Bd" Property="Opacity" Value="0.5"/>
@@ -113,7 +115,9 @@
                  never rendered with the per-DataGrid setters in play. -->
             <!-- The primary inline button: white text on the accent blue. -->
             <Style x:Key="AccentInlineButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
                 <Setter Property="Height" Value="28"/>
                 <Setter Property="MinWidth" Value="100"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>

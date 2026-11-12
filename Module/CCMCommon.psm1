@@ -589,7 +589,7 @@ function Test-WqlQuery {
         return [PSCustomObject]@{
             IsValid      = $false
             ResultCount  = 0
-            ErrorMessage = $_.Exception.Message
+            ErrorMessage = 'The query is not valid. See the log file.'
         }
     }
 }
@@ -636,7 +636,7 @@ function Invoke-WqlPreview {
         Write-Log "WQL preview failed: $_" -Level ERROR
         return [PSCustomObject]@{
             IsValid      = $false
-            ErrorMessage = $_.Exception.Message
+            ErrorMessage = 'The preview failed. See the log file.'
             TotalCount   = 0
             Results      = @()
         }
@@ -1417,7 +1417,7 @@ function Remove-BaselineDeploymentBulk {
             $results.Add([pscustomobject]@{ Baseline = $bn; Collection = $cn; Removed = $true;  Error = $null })
             Write-Log ("Removed deployment '{0}' from '{1}'." -f $bn, $cn)
         } catch {
-            $results.Add([pscustomobject]@{ Baseline = $bn; Collection = $cn; Removed = $false; Error = $_.Exception.Message })
+            $results.Add([pscustomobject]@{ Baseline = $bn; Collection = $cn; Removed = $false; Error = 'See the log file.' })
             Write-Log ("Remove deployment '{0}' from '{1}' failed: {2}" -f $bn, $cn, $_.Exception.Message) -Level ERROR
         }
     }

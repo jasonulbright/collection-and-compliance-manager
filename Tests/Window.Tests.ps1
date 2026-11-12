@@ -57,6 +57,12 @@ BeforeAll {
                 param($n)
                 $n -is [System.Management.Automation.Language.StringConstantExpressionAst] -and $n.Value -match '^\s*<Controls:MetroWindow'
             }, $true) | ForEach-Object { $_.Value })
+    # The dialog button styles are defined once in the shell script. Each dialog takes them at its placeholder.
+    $styleAst = $ast.Find({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -eq '$script:DialogButtonStyleXaml' }, $true)
+    if ($styleAst) {
+        $styleXaml = [string]$styleAst.Right.Expression.Value
+        $script:DialogXaml = @($script:DialogXaml | ForEach-Object { $_.Replace('<!--DIALOG_BUTTON_STYLES-->', $styleXaml) })
+    }
 
     $script:Measured = @{}
     foreach ($case in @(

@@ -329,7 +329,7 @@ Describe 'Baseline deployments' {
         $r = @(Remove-BaselineDeploymentBulk -Deployments @(
                 [PSCustomObject]@{ BaselineName = 'CB1'; CollectionName = 'A' }, [PSCustomObject]@{ BaselineName = 'CB1'; CollectionName = 'B' }, [PSCustomObject]@{ BaselineName = 'CB2'; CollectionName = 'C' }))
         ($r | ForEach-Object Removed) -join ',' | Should -Be 'True,False,True'
-        $r[1].Error | Should -Be 'in use'
+        $r[1].Error | Should -Be 'See the log file.'
         $r[0].Error | Should -BeNullOrEmpty
         Should -Invoke Remove-CMBaselineDeployment -ModuleName CCMCommon -Times 3 -Exactly -ParameterFilter { $Force }
     }

@@ -30,20 +30,27 @@ The same as [Capture the images again](capture-images.md).
 | inline-button pressed | `#000000` | `#FFFFFF` | 21.0 |
 | sidebar active | `#005A9E` | `#FFFFFF` | 7.1 |
 | sidebar options | `#0078D4` | `#FFFFFF` | 4.5 |
+| sidebar-button normal | `#0078D4` | `#FFFFFF` | 4.5 |
+| sidebar-button hover | `#0078D4` | `#FFFFFF` | 4.5 |
+| sidebar-button pressed | `#0078D7` | `#FFFFFF` | 4.5 |
 | selected tab | `#FFFFFF` | `#000000` | 21.0 |
 | combo selected item | `#3393DF` | `#FFF3EA` | 3.0 |
-| dialog-button normal | `#FFFFFF` | `#000000` | 21.0 |
+| dialog-button normal | `#F7F7F7` | `#000000` | 19.6 |
 | dialog-button hover | `#E0E0E0` | `#000000` | 15.9 |
 | dialog-button pressed | `#000000` | `#FFFFFF` | 21.0 |
-| dialog-accent-button | `#3393DF` | `#FFFFFF` | 3.3 |
+| dialog-accent-button normal | `#0078D7` | `#FFFFFF` | 4.5 |
+| dialog-accent-button hover | `#004881` | `#FFFFFF` | 9.4 |
+| dialog-accent-button pressed | `#000000` | `#FFFFFF` | 21.0 |
 | members grid selected row | `#3393DF` | `#FFFFFF` | 3.3 |
 | collection tree selected item | `#3393DF` | `#FFFFFF` | 3.3 |
 | rule list selected item | `#3393DF` | `#FFFFFF` | 3.3 |
 | template selected row | `#3393DF` | `#FCFDFD` | 3.2 |
 | catalog selected row | `#3393DF` | `#FFFFFF` | 3.3 |
-| accent inline button (Deploy) | `#3393DF` | `#FFFFFF` | 3.3 |
-| deploy dialog accent button | `#3393DF` | `#FFFFFF` | 3.3 |
-| options accent button | `#3393DF` | `#FBFCFD` | 3.2 |
+| accent-inline-button normal | `#0078D7` | `#FFFFFF` | 4.5 |
+| accent-inline-button hover | `#004881` | `#FFFFFF` | 9.4 |
+| accent-inline-button pressed | `#000000` | `#FFFFFF` | 21.0 |
+| deploy dialog accent button | `#0078D7` | `#FFFFFF` | 4.5 |
+| options accent button | `#0078D7` | `#FBFCFD` | 4.4 |
 
 A selected row, list item or tree item shows white text on the accent blue. A button that is pressed shows white text on black. A button that the pointer is over shows black text on light gray. The sidebar buttons show white text on blue.
 
@@ -77,10 +84,22 @@ A selected row, list item or tree item shows white text on the accent blue. A bu
 
 ![A dialog button that is pressed](../images/light-state-dialog-button-pressed.png)
 
+![A sidebar button with the pointer over it](../images/light-state-sidebar-button-hover.png)
+
+![A sidebar button that is pressed](../images/light-state-sidebar-button-pressed.png)
+
+![The Deploy button with the pointer over it](../images/light-state-accent-inline-button-hover.png)
+
+![The Deploy button that is pressed](../images/light-state-accent-inline-button-pressed.png)
+
+![A dialog accent button with the pointer over it](../images/light-state-dialog-accent-button-hover.png)
+
+![A dialog accent button that is pressed](../images/light-state-dialog-accent-button-pressed.png)
+
 ## Limits
 
 - The capture shows no disabled button in this theme state, so the page has no disabled sample.
-- The accent blue gives white text a contrast ratio of 3.2 to 3.3. The shared theme library owns this color.
+- The buttons take the accent base color, which gives white text 4.5:1. The selected rows and items use the lighter accent color, which gives white text 3.2 to 3.3:1. The shared theme library owns this color.
 
 ## Links
 
