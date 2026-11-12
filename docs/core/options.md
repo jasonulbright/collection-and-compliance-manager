@@ -41,7 +41,7 @@ The page shows the version and a short description.
 
 ### Theme
 
-The **Dark Theme** switch at the bottom of the sidebar changes the theme. The tool keeps the choice.
+The **Dark Theme** switch at the bottom of the sidebar changes the theme. The tool keeps the choice. The theme changes colors only. Font size, weight and style stay the same. Every blue background shows white text.
 
 ![The Collections view in the light theme](../images/light-collections.png)
 
@@ -71,7 +71,7 @@ See the table above. [Settings](../reference/settings.md) lists the file keys.
 
 | Message or symptom | Cause | Fix |
 |---|---|---|
-| The status bar shows `Open Options to configure site code and SMS provider, then refresh.` | The site code or the provider is empty. | Fill both fields. |
+| The status bar shows `Open Options to configure site code and SMS Provider, then refresh.` | The site code or the provider is empty. | Fill both fields. |
 
 ## Links
 

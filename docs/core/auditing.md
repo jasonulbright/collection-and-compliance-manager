@@ -28,7 +28,7 @@ Use it to find baselines that are older than the catalog, and to find collection
 
 ![The Compliance tab](../images/auditing-compliance.png)
 
-4. To save a tab, select **Export current tab to CSV...** and select **Save** in the dialog.
+4. To save a tab, select **Export Current Tab to CSV...** and select **Save** in the dialog.
 
 ## Options and settings of this page
 
@@ -36,7 +36,7 @@ Use it to find baselines that are older than the catalog, and to find collection
 |---|---|
 | **Refresh** | Reads drift and compliance. |
 | Filter box | Filters by baseline name. |
-| **Export current tab to CSV...** | Saves the selected tab. |
+| **Export Current Tab to CSV...** | Saves the selected tab. |
 
 ## Limits
 

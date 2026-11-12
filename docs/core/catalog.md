@@ -33,8 +33,8 @@ Use it to find an entry by subcategory, severity, status, operating system, CVE 
 ### Filter the catalog
 
 1. Type text in the filter box to filter by name or ID.
-2. Use the lists **Subcategory**, **Severity**, **Status** and **OS scope**, and the boxes **CVE ID** and **Tenable plugin**.
-3. Select **Clear filters** to remove every filter.
+2. Use the lists **Subcategory**, **Severity**, **Status** and **OS Scope**, and the boxes **CVE ID** and **Tenable Plugin**.
+3. Select **Clear Filters** to remove every filter.
 
 ![The CVE ID filter](../images/catalog-filter-cve.png)
 
@@ -54,7 +54,7 @@ This guide opened the dialog and cancelled it. The result of **Deploy** was not 
 |---|---|
 | **Reload Catalog** | Reads the catalog folder again. |
 | Filter box and the filter fields | Filter the grid. |
-| **Clear filters** | Removes every filter. |
+| **Clear Filters** | Removes every filter. |
 | **Deploy...** | Opens the deploy dialog for the selected entry. |
 
 ## Limits

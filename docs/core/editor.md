@@ -31,7 +31,7 @@ Use it to add or correct a registry or script setting of a configuration item.
 
 ![The configuration item list](../images/editor-ci-list.png)
 
-2. Select an item. The grid shows its settings. Select a setting to read it in the **Setting detail** pane.
+2. Select an item. The grid shows its settings. Select a setting to read it in the **Setting Detail** pane.
 
 ![An item picked](../images/editor-ci-picked.png)
 

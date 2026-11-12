@@ -38,7 +38,9 @@ Describe 'Test-WqlQuery' {
         $r = Test-WqlQuery -QueryExpression 'selec nonsense'
         $r.IsValid | Should -BeFalse
         $r.ResultCount | Should -Be 0
-        $r.ErrorMessage | Should -Be 'Invalid query "WQL"'
+        $r.ErrorMessage | Should -Be 'The query is not valid. See the log file.'
+        $r.ErrorMessage | Should -Not -Match 'Invalid query'
+        @($global:TestLogs | Where-Object { $_.Message -match 'Invalid query' }).Count | Should -BeGreaterThan 0
         @($global:TestLogs | Where-Object Level -eq 'WARN').Count | Should -Be 1
     }
 
@@ -97,6 +99,8 @@ Describe 'Invoke-WqlPreview' {
         $r = Invoke-WqlPreview -QueryExpression 'x'
         $r.TotalCount | Should -Be 0
         @($r.Results).Count | Should -Be 0
+        $r.ErrorMessage | Should -Be 'The preview failed. See the log file.'
+        $r.ErrorMessage | Should -Not -Match 'bad query'
         @($global:TestLogs | Where-Object Level -eq 'ERROR').Count | Should -Be 1
     }
 }

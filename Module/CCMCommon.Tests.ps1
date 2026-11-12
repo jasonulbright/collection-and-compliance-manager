@@ -802,7 +802,7 @@ Describe 'Phase B live wrappers' {
                 [pscustomobject]@{ BaselineName = 'CB B'; CollectionName = 'Coll2' }
             ))
         $r.Count | Should -Be 2
-        ($r | Where-Object { -not $_.Removed }).Error | Should -Match 'remove failed'
+        ($r | Where-Object { -not $_.Removed }).Error | Should -Be 'See the log file.'
         @($r | Where-Object { $_.Removed }).Count | Should -Be 1
     }
     It 'New-BaselineDeployment passes name/collection and defaults enforcement off' {

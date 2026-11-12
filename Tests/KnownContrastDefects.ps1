@@ -4,10 +4,18 @@
 # (remove it here). Run Show-ContrastViolations.ps1 to print the current list.
 #
 # Text must reach 4.5:1 and a control border 3:1, enabled and disabled, in both
-# themes. The causes are shared by every suite tool: the SuiteCommon palette
-# (sidebar button border #555555 on #1E1E1E is 2.06:1), the MahApps disabled
-# style, the light text box border and the unselected tab header. The fix
-# belongs in app-packager-suite, then a sync of the vendored copy, not here.
+# themes. The causes are shared by every suite tool, and the window test measured each of them:
+#   - DisabledText: the MahApps disabled style. It is the upstream limitation of this list.
+#   - text:Deploy...: the same style on the disabled Deploy button of the Catalog view.
+#   - EnabledBorder and DisabledBorder of text boxes, combo boxes and read-only detail boxes in the light
+#     theme: the MahApps border color is lighter than 3:1.
+#   - cbo...:EnabledText and DisabledText in the light theme: the MahApps combo box text color.
+#   - titlebar:inactive: the title bar of an inactive window.
+# The Deploy button and the dialog accent buttons take the accent base color, which gives white text 4.5:1 and
+# more in the light theme. They are not in this list. The selected rows and items use the lighter accent
+# color. White text on it measures 3.2 to 3.3:1 (see the light theme check page of the guide). The window test
+# does not measure rows and items, so no entry exists. It is a larger item for the shared theme library.
+# The fix for every entry belongs in app-packager-suite, then a sync of the vendored copy, not here.
 
 function Get-KnownContrastDefect {
     param([Parameter(Mandatory)][ValidateSet('dark', 'light')][string]$Theme)
@@ -19,51 +27,43 @@ function Get-KnownContrastDefect {
                 'btnCopyToWqlEditor:DisabledText', 'btnEditMembership:DisabledText', 'btnEditorAddSetting:DisabledText',
                 'btnEditorEditSetting:DisabledText', 'btnEditorRemoveSetting:DisabledText', 'btnEvaluateColl:DisabledText',
                 'btnExportCsv:DisabledText', 'btnExportHtml:DisabledText', 'btnNewCollection:DisabledText',
-                'btnOptions:DisabledBorder', 'btnOptions:EnabledBorder', 'btnPreviewWql:DisabledText',
-                'btnRefresh:DisabledText', 'btnRemoveColl:DisabledText', 'btnRemoveRule:DisabledText',
-                'btnUpdateRule:DisabledText', 'btnValidateWql:DisabledText', 'btnViewAuditing:DisabledBorder',
-                'btnViewAuditing:DisabledText', 'btnViewAuditing:EnabledBorder', 'btnViewCatalog:DisabledBorder',
-                'btnViewCatalog:DisabledText', 'btnViewCatalog:EnabledBorder', 'btnViewCollections:DisabledBorder',
-                'btnViewCollections:DisabledText', 'btnViewCollections:EnabledBorder', 'btnViewEditor:DisabledBorder',
-                'btnViewEditor:DisabledText', 'btnViewEditor:EnabledBorder', 'btnViewLive:DisabledBorder',
-                'btnViewLive:DisabledText', 'btnViewLive:EnabledBorder', 'btnViewTemplates:DisabledBorder',
-                'btnViewTemplates:DisabledText', 'btnViewTemplates:EnabledBorder', 'btnViewWqlEditor:DisabledBorder',
-                'btnViewWqlEditor:DisabledText', 'btnViewWqlEditor:EnabledBorder',
-                'text:Deploy...',
-                'titlebar:inactive', 'txtCatDetail:DisabledBorder',
-                'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder',
-                'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder', 'txtWqlEditor:DisabledBorder',
-                'txtWqlEditor:EnabledBorder'
+                'btnPreviewWql:DisabledText', 'btnRefresh:DisabledText', 'btnRemoveColl:DisabledText',
+                'btnRemoveRule:DisabledText', 'btnUpdateRule:DisabledText', 'btnValidateWql:DisabledText',
+                'btnViewAuditing:DisabledText', 'btnViewCatalog:DisabledText', 'btnViewCollections:DisabledText',
+                'btnViewEditor:DisabledText', 'btnViewLive:DisabledText', 'btnViewTemplates:DisabledText',
+                'btnViewWqlEditor:DisabledText', 'text:Deploy...', 'titlebar:inactive',
+                'txtCatDetail:DisabledBorder', 'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder',
+                'txtEditorDetail:EnabledBorder', 'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
+                'txtWqlEditor:DisabledBorder', 'txtWqlEditor:EnabledBorder'
             )
         }
         'light' {
             @(
                 'btnAddRule:DisabledText', 'btnApplyTemplate:DisabledText', 'btnAuditExport:DisabledText',
-                'btnCatClearFilters:DisabledText', 'btnCatDeploy:DisabledText', 'btnCatDeploy:EnabledText',
-                'btnCopyCollection:DisabledText', 'btnCopyToWqlEditor:DisabledText', 'btnEditMembership:DisabledText',
-                'btnEditorAddSetting:DisabledText', 'btnEditorEditSetting:DisabledText', 'btnEditorRemoveSetting:DisabledText',
-                'btnEvaluateColl:DisabledText', 'btnExportCsv:DisabledText', 'btnExportHtml:DisabledText',
-                'btnNewCollection:DisabledText', 'btnOptions:DisabledText', 'btnPreviewWql:DisabledText',
-                'btnRefresh:DisabledText', 'btnRemoveColl:DisabledText', 'btnRemoveRule:DisabledText',
-                'btnUpdateRule:DisabledText', 'btnValidateWql:DisabledText', 'btnViewAuditing:DisabledText',
-                'btnViewCatalog:DisabledText', 'btnViewCollections:DisabledText', 'btnViewEditor:DisabledText',
-                'btnViewLive:DisabledText', 'btnViewTemplates:DisabledText', 'btnViewWqlEditor:DisabledText',
-                'cboCatOsScope:DisabledBorder', 'cboCatOsScope:DisabledText', 'cboCatOsScope:EnabledBorder',
-                'cboCatOsScope:EnabledText', 'cboCatSeverity:DisabledBorder', 'cboCatSeverity:DisabledText',
-                'cboCatSeverity:EnabledBorder', 'cboCatSeverity:EnabledText', 'cboCatStatus:DisabledBorder',
-                'cboCatStatus:DisabledText', 'cboCatStatus:EnabledBorder', 'cboCatStatus:EnabledText',
-                'cboCatSubcategory:DisabledBorder', 'cboCatSubcategory:DisabledText', 'cboCatSubcategory:EnabledBorder',
-                'cboCatSubcategory:EnabledText', 'cboCollectionFilter:DisabledBorder', 'cboCollectionFilter:DisabledText',
-                'cboCollectionFilter:EnabledBorder', 'cboCollectionFilter:EnabledText', 'cboEditorCI:DisabledBorder',
-                'cboEditorCI:DisabledText', 'cboEditorCI:EnabledBorder', 'cboEditorCI:EnabledText',
-                'text:Deploy...',
-                'titlebar:inactive',
-                'txtCatCve:DisabledBorder', 'txtCatCve:EnabledBorder', 'txtCatDetail:DisabledBorder',
-                'txtCatDetail:EnabledBorder', 'txtCatTenable:DisabledBorder', 'txtCatTenable:EnabledBorder',
-                'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder', 'txtFilter:DisabledBorder',
-                'txtFilter:EnabledBorder', 'txtRuleName:DisabledBorder', 'txtRuleName:EnabledBorder',
-                'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder', 'txtWqlEditor:DisabledBorder',
-                'txtWqlEditor:EnabledBorder', 'txtWqlTreeFilter:DisabledBorder', 'txtWqlTreeFilter:EnabledBorder'
+                'btnCatClearFilters:DisabledText', 'btnCatDeploy:DisabledText', 'btnCopyCollection:DisabledText',
+                'btnCopyToWqlEditor:DisabledText', 'btnEditMembership:DisabledText', 'btnEditorAddSetting:DisabledText',
+                'btnEditorEditSetting:DisabledText', 'btnEditorRemoveSetting:DisabledText', 'btnEvaluateColl:DisabledText',
+                'btnExportCsv:DisabledText', 'btnExportHtml:DisabledText', 'btnNewCollection:DisabledText',
+                'btnOptions:DisabledText', 'btnPreviewWql:DisabledText', 'btnRefresh:DisabledText',
+                'btnRemoveColl:DisabledText', 'btnRemoveRule:DisabledText', 'btnUpdateRule:DisabledText',
+                'btnValidateWql:DisabledText', 'btnViewAuditing:DisabledText', 'btnViewCatalog:DisabledText',
+                'btnViewCollections:DisabledText', 'btnViewEditor:DisabledText', 'btnViewLive:DisabledText',
+                'btnViewTemplates:DisabledText', 'btnViewWqlEditor:DisabledText', 'cboCatOsScope:DisabledBorder',
+                'cboCatOsScope:DisabledText', 'cboCatOsScope:EnabledBorder', 'cboCatOsScope:EnabledText',
+                'cboCatSeverity:DisabledBorder', 'cboCatSeverity:DisabledText', 'cboCatSeverity:EnabledBorder',
+                'cboCatSeverity:EnabledText', 'cboCatStatus:DisabledBorder', 'cboCatStatus:DisabledText',
+                'cboCatStatus:EnabledBorder', 'cboCatStatus:EnabledText', 'cboCatSubcategory:DisabledBorder',
+                'cboCatSubcategory:DisabledText', 'cboCatSubcategory:EnabledBorder', 'cboCatSubcategory:EnabledText',
+                'cboCollectionFilter:DisabledBorder', 'cboCollectionFilter:DisabledText', 'cboCollectionFilter:EnabledBorder',
+                'cboCollectionFilter:EnabledText', 'cboEditorCI:DisabledBorder', 'cboEditorCI:DisabledText',
+                'cboEditorCI:EnabledBorder', 'cboEditorCI:EnabledText', 'text:Deploy...',
+                'titlebar:inactive', 'txtCatCve:DisabledBorder', 'txtCatCve:EnabledBorder',
+                'txtCatDetail:DisabledBorder', 'txtCatDetail:EnabledBorder', 'txtCatTenable:DisabledBorder',
+                'txtCatTenable:EnabledBorder', 'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder',
+                'txtFilter:DisabledBorder', 'txtFilter:EnabledBorder', 'txtRuleName:DisabledBorder',
+                'txtRuleName:EnabledBorder', 'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
+                'txtWqlEditor:DisabledBorder', 'txtWqlEditor:EnabledBorder', 'txtWqlTreeFilter:DisabledBorder',
+                'txtWqlTreeFilter:EnabledBorder'
             )
         }
     }

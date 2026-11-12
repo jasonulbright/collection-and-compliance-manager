@@ -65,7 +65,7 @@ if (-not $SkipLint) {
     # Test files pass state to mock bodies through a global variable, and they define fake window controls that the code under test reads by name. Both are intended.
     $testOnlyExclude = 'PSAvoidGlobalVars', 'PSUseDeclaredVarsMoreThanAssignments', 'PSUseShouldProcessForStateChangingFunctions'
     $findings = @(foreach ($t in $targets) {
-        if ($t.FullName -like '*\Tests\*' -or $t.Name -like '*.Tests.ps1') { Invoke-ScriptAnalyzer -Path $t.FullName -Settings $settings -ExcludeRule $testOnlyExclude }
+        if ($t.FullName.Substring($root.TrimEnd('\').Length + 1) -like 'Tests\*' -or $t.Name -like '*.Tests.ps1') { Invoke-ScriptAnalyzer -Path $t.FullName -Settings $settings -ExcludeRule $testOnlyExclude }
         else { Invoke-ScriptAnalyzer -Path $t.FullName -Settings $settings }
     })
     $blocking = @($findings | Where-Object { $_.Severity -in 'Error', 'Warning' })
@@ -76,8 +76,10 @@ if (-not $SkipLint) {
 
 # ---- 2. Tests and coverage -------------------------------------------------
 $cfg = New-PesterConfiguration
+# The filters work on the path below the repository root, because a checkout can live below a folder
+# that is named .claude (a worktree). Folders named .git and .claude inside the root are outside the run.
 $testFiles = @(Get-ChildItem -LiteralPath $root -Recurse -Filter '*.Tests.ps1' -File |
-        Where-Object { $_.FullName -notlike '*\Tests\Lab\*' -and $_.FullName -notlike '*\.git\*' })
+        Where-Object { $rel = $_.FullName.Substring($root.TrimEnd('\').Length + 1); $rel -notmatch '^Tests\\Lab\\' -and $rel -notmatch '(^|\\)(\.git|\.claude)\\' })
 if ($testFiles.Count -eq 0) { Write-Host 'No test file found.'; exit 1 }
 if ($SkipWindow) { $testFiles = @($testFiles | Where-Object { $_.Name -ne 'Window.Tests.ps1' }) }
 $cfg.Run.Path = $testFiles.FullName

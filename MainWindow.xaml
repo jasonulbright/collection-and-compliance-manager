@@ -36,9 +36,11 @@
                     <Trigger Property="IsPressed" Value="True">
                         <Setter TargetName="Bd" Property="Background">
                             <Setter.Value>
-                                <SolidColorBrush Color="#3A3A3A"/>
+                                <SolidColorBrush Color="{DynamicResource MahApps.Colors.AccentBase}"/>
                             </Setter.Value>
                         </Setter>
+                        <!-- The pressed state is blue, so it carries white text. -->
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                     </Trigger>
                     <Trigger Property="IsEnabled" Value="False">
                         <Setter TargetName="Bd" Property="Opacity" Value="0.5"/>
@@ -55,13 +57,9 @@
                 <Setter Property="FontSize" Value="13"/>
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="Background">
-                    <Setter.Value><SolidColorBrush Color="#1E1E1E"/></Setter.Value>
-                </Setter>
-                <Setter Property="BorderBrush">
-                    <Setter.Value><SolidColorBrush Color="#555555"/></Setter.Value>
-                </Setter>
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
                 <Setter Property="BorderThickness" Value="1"/>
             </Style>
 
@@ -71,8 +69,34 @@
             <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
                 <Setter Property="Margin" Value="12,14,0,6"/>
                 <Setter Property="FontSize" Value="11"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Gray1}"/>
+            </Style>
+
+            <!-- Selected and highlighted items: white text on the accent blue, in both themes. -->
+            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="TreeViewItem" BasedOn="{StaticResource MahApps.Styles.TreeViewItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MahApps.Styles.ComboBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style x:Key="SquareInlineButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
@@ -89,6 +113,18 @@
                  dependency-property precedence chain. Mouse-click selection
                  IS happening (keyboard arrow proves it) but the highlight
                  never rendered with the per-DataGrid setters in play. -->
+            <!-- The primary inline button: white text on the accent blue. -->
+            <Style x:Key="AccentInlineButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
+                <Setter Property="Height" Value="28"/>
+                <Setter Property="MinWidth" Value="100"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+
             <Style x:Key="ViewDataGridRow" TargetType="DataGridRow"
                    BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ThemeBackground}"/>
@@ -125,6 +161,11 @@
 
             <Style x:Key="GridCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource MahApps.Styles.DataGridCell}">
                 <Setter Property="Padding" Value="6,0,6,0"/>
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style x:Key="GridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MahApps.Styles.DataGridColumnHeader}">
@@ -191,34 +232,34 @@
                                                IsOn="True"
                                                OnContent="" OffContent=""
                                                MinWidth="0"
-                                               ToolTip="Toggle dark / light theme"/>
+                                               ToolTip="Switch between the dark and the light theme."/>
                     </DockPanel>
                 </StackPanel>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="COLLECTIONS" Style="{StaticResource SectionHeaderStyle}"/>
+                        <TextBlock Text="Collections" Style="{StaticResource SectionHeaderStyle}"/>
                         <Button x:Name="btnViewCollections" Content="Collections" Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Browse all device collections, edit membership, create / copy / remove"/>
+                                ToolTip="Show the device collections of the site."/>
                         <Button x:Name="btnViewWqlEditor"  Content="WQL Editor"  Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Offline WQL editor for collection query rules with validation and preview"/>
+                                ToolTip="Edit the WQL of collection query rules."/>
                         <Button x:Name="btnViewTemplates"  Content="Templates"   Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Ready-made and parameterized query templates"/>
+                                ToolTip="Show the query templates."/>
 
-                        <TextBlock Text="CI / CB" Style="{StaticResource SectionHeaderStyle}"/>
+                        <TextBlock Text="CI/CB" Style="{StaticResource SectionHeaderStyle}"/>
                         <Button x:Name="btnViewCatalog" Content="Catalog" Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Browse the CI / CB catalog from a local clone (set Catalog Path in Options)"/>
+                                ToolTip="Show the catalog of configuration items and baselines."/>
                         <Button x:Name="btnViewLive" Content="Live CI/CB" Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Browse configuration items and baselines on the live site, with per-baseline deployments"/>
+                                ToolTip="Show the configuration items and baselines of the site."/>
                         <Button x:Name="btnViewEditor" Content="Editor" Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Edit the compliance settings of a configuration item"/>
+                                ToolTip="Edit the settings of a configuration item."/>
                         <Button x:Name="btnViewAuditing" Content="Auditing" Style="{StaticResource ViewButtonStyle}"
-                                ToolTip="Compliance summary, drift (catalog vs deployed), and evaluation freshness"/>
+                                ToolTip="Show compliance, drift and evaluation age."/>
 
                         <Button x:Name="btnOptions" Content="Options"
                                 Style="{StaticResource OptionsButtonStyle}"
                                 Margin="8,24,8,3"
-                                ToolTip="Site code, SMS provider, about"/>
+                                ToolTip="Set the site code and the SMS Provider."/>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>
@@ -241,7 +282,7 @@
 
             <Border Grid.Row="0" Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="16,12,16,10">
                 <StackPanel>
-                    <TextBlock x:Name="txtModuleTitle" Text="Collections" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="txtModuleTitle" Text="Collections" FontSize="18" FontWeight="Bold"/>
                     <TextBlock x:Name="txtModuleSubtitle"
                                Text="Configure Site / Provider in Options, then click Refresh."
                                FontSize="11"
@@ -266,7 +307,7 @@
                             Content="Refresh"
                             Style="{StaticResource SquareInlineButtonStyle}"
                             MinWidth="120"
-                            ToolTip="Reload from Configuration Manager (or, on the Templates view, reload templates from disk)"/>
+                            ToolTip="Load the data of the active view."/>
 
                     <TextBox x:Name="txtFilter"
                              Grid.Column="1"
@@ -280,7 +321,7 @@
                               Width="180"
                               Margin="0,0,8,0"
                               FontSize="12"
-                              ToolTip="Limit rows by membership shape">
+                              ToolTip="Filter the collections by membership.">
                         <ComboBoxItem Content="All" IsSelected="True"/>
                         <ComboBoxItem Content="Built-in only"/>
                         <ComboBoxItem Content="Custom only"/>
@@ -290,9 +331,9 @@
                     </ComboBox>
 
                     <Button x:Name="btnExportCsv"  Grid.Column="3" Content="Export CSV"  Style="{StaticResource SquareInlineButtonStyle}"
-                            ToolTip="Export the active view to CSV"/>
+                            ToolTip="Export the active view to a CSV file."/>
                     <Button x:Name="btnExportHtml" Grid.Column="4" Content="Export HTML" Style="{StaticResource SquareInlineButtonStyle}"
-                            ToolTip="Export the active view to a styled HTML report"/>
+                            ToolTip="Export the active view to an HTML file."/>
                 </Grid>
             </Border>
 
@@ -344,15 +385,15 @@
                         <Border Grid.Row="0" Padding="0,8,0,8">
                             <StackPanel Orientation="Horizontal">
                                 <Button x:Name="btnNewCollection"  Content="New Collection"   Style="{StaticResource SquareInlineButtonStyle}" MinWidth="130"
-                                        ToolTip="Create a new device collection"/>
+                                        ToolTip="Create a device collection."/>
                                 <Button x:Name="btnCopyCollection" Content="Copy..."          Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                        ToolTip="Clone the selected collection (rules + name + comment)"/>
+                                        ToolTip="Copy the selected collection with its rules."/>
                                 <Button x:Name="btnEditMembership" Content="Edit Membership..." Style="{StaticResource SquareInlineButtonStyle}" MinWidth="150"
-                                        ToolTip="Add / remove direct members, include / exclude rules"/>
+                                        ToolTip="Edit direct members and include and exclude rules."/>
                                 <Button x:Name="btnEvaluateColl"   Content="Evaluate"         Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                        ToolTip="Force a membership evaluation on the selected collection"/>
+                                        ToolTip="Evaluate the membership of the selected collection."/>
                                 <Button x:Name="btnRemoveColl"     Content="Remove..."        Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                        ToolTip="Delete the selected collection"/>
+                                        ToolTip="Remove the selected collection."/>
                             </StackPanel>
                         </Border>
 
@@ -459,7 +500,7 @@
                                    Text="Pick a collection from the tree on the left."
                                    TextTrimming="CharacterEllipsis"/>
 
-                        <TextBlock Grid.Row="1" Text="Rules in this collection" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,4"/>
+                        <TextBlock Grid.Row="1" Text="Rules in This Collection" FontSize="11" FontWeight="Bold" Margin="0,4,0,4"/>
                         <Border Grid.Row="2" BorderThickness="1"
                                 BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
@@ -468,7 +509,7 @@
                                      Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
                         </Border>
 
-                        <TextBlock Grid.Row="3" Text="Rule Name" FontSize="11" FontWeight="SemiBold" Margin="0,12,0,4"/>
+                        <TextBlock Grid.Row="3" Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,12,0,4"/>
                         <TextBox x:Name="txtRuleName" Grid.Row="4" FontSize="12" Padding="6,4,6,4" Margin="0,0,0,8"/>
 
                         <TextBox x:Name="txtWqlEditor" Grid.Row="5" Style="{StaticResource WqlEditorStyle}"
@@ -480,15 +521,15 @@
                         <Border Grid.Row="6" Padding="0,8,0,8">
                             <WrapPanel Orientation="Horizontal">
                                 <Button x:Name="btnValidateWql" Content="Validate Query"  Style="{StaticResource SquareInlineButtonStyle}" MinWidth="130"
-                                        ToolTip="Run a syntax check on the WQL editor contents"/>
+                                        ToolTip="Check the syntax of the query."/>
                                 <Button x:Name="btnPreviewWql"  Content="Preview Results" Style="{StaticResource SquareInlineButtonStyle}" MinWidth="130"
-                                        ToolTip="Run the WQL against the SMS Provider and show match count + sample"/>
+                                        ToolTip="Run the query on the SMS Provider and show the matching devices."/>
                                 <Button x:Name="btnAddRule"    Content="Add Rule"    Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                        ToolTip="Add the editor contents as a new query rule"/>
+                                        ToolTip="Add the query as a rule of the collection."/>
                                 <Button x:Name="btnUpdateRule" Content="Update Rule" Style="{StaticResource SquareInlineButtonStyle}" MinWidth="110"
-                                        ToolTip="Replace the selected rule's WQL with the editor contents"/>
+                                        ToolTip="Replace the query of the selected rule."/>
                                 <Button x:Name="btnRemoveRule" Content="Remove..."   Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                        ToolTip="Delete the selected query rule"/>
+                                        ToolTip="Remove the selected query rule."/>
                                 <TextBlock x:Name="txtWqlValidation" FontSize="12"
                                            VerticalAlignment="Center" Margin="8,0,0,0"
                                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -529,7 +570,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Category" Width="120" Binding="{Binding Category}"/>
                                     <DataGridTextColumn Header="Name"     Width="*"   Binding="{Binding Name}"/>
-                                    <DataGridTextColumn Header="Params"   Width="75"  Binding="{Binding ParameterCount}"/>
+                                    <DataGridTextColumn Header="Parameters" Width="100"  Binding="{Binding ParameterCount}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -543,22 +584,22 @@
                         <Border DockPanel.Dock="Bottom" Padding="0,8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <Button x:Name="btnCopyToWqlEditor" Content="Copy to WQL Editor"      Style="{StaticResource SquareInlineButtonStyle}" MinWidth="160"
-                                        ToolTip="Send the expanded query to the WQL Editor view"/>
+                                        ToolTip="Copy the query to the WQL Editor."/>
                                 <Button x:Name="btnApplyTemplate"   Content="Apply to Collection..."  Style="{StaticResource SquareInlineButtonStyle}" MinWidth="170"
-                                        ToolTip="Add the expanded query as a rule on a chosen collection"/>
+                                        ToolTip="Add the query as a rule of a collection."/>
                             </StackPanel>
                         </Border>
 
                         <StackPanel DockPanel.Dock="Top">
-                            <TextBlock Text="Description" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
+                            <TextBlock Text="Description" FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
                             <TextBlock x:Name="txtTemplateDescription" TextWrapping="Wrap" FontSize="12"
                                        Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
 
-                            <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="SemiBold" Margin="0,12,0,4"/>
+                            <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="Bold" Margin="0,12,0,4"/>
                             <TextBlock x:Name="txtTemplateLimiting" FontSize="12"
                                        Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
 
-                            <TextBlock x:Name="txtTemplateParamsHeader" Text="Parameters" FontSize="11" FontWeight="SemiBold" Margin="0,12,0,4" Visibility="Collapsed"/>
+                            <TextBlock x:Name="txtTemplateParamsHeader" Text="Parameters" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Visibility="Collapsed"/>
                             <ItemsControl x:Name="itemsTemplateParams" Margin="0,0,0,8">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -571,7 +612,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <TextBlock Text="Expanded WQL" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,4"/>
+                            <TextBlock Text="Expanded WQL" FontSize="11" FontWeight="Bold" Margin="0,4,0,4"/>
                         </StackPanel>
 
                         <TextBox x:Name="txtTemplateExpandedQuery"
@@ -602,24 +643,24 @@
 
                     <!-- LEFT: facet filters -->
                     <DockPanel Grid.Column="0" Margin="0,8,0,0">
-                        <TextBlock DockPanel.Dock="Top" Text="Filters" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBlock DockPanel.Dock="Top" Text="Filters" FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="Subcategory" FontSize="11" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+                                <TextBlock Text="Subcategory" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                                 <ComboBox x:Name="cboCatSubcategory" FontSize="12" Margin="0,0,0,6"/>
-                                <TextBlock Text="Severity" FontSize="11" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+                                <TextBlock Text="Severity" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                                 <ComboBox x:Name="cboCatSeverity" FontSize="12" Margin="0,0,0,6"/>
-                                <TextBlock Text="Status" FontSize="11" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+                                <TextBlock Text="Status" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                                 <ComboBox x:Name="cboCatStatus" FontSize="12" Margin="0,0,0,6"/>
-                                <TextBlock Text="OS scope" FontSize="11" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+                                <TextBlock Text="OS Scope" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                                 <ComboBox x:Name="cboCatOsScope" FontSize="12" Margin="0,0,0,6"/>
-                                <TextBlock Text="CVE ID" FontSize="11" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+                                <TextBlock Text="CVE ID" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                                 <TextBox x:Name="txtCatCve" FontSize="12" Padding="6,4,6,4" Margin="0,0,0,6"
                                          Controls:TextBoxHelper.Watermark="e.g. CVE-2018-3639"/>
-                                <TextBlock Text="Tenable plugin" FontSize="11" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+                                <TextBlock Text="Tenable Plugin" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                                 <TextBox x:Name="txtCatTenable" FontSize="12" Padding="6,4,6,4" Margin="0,0,0,10"
                                          Controls:TextBoxHelper.Watermark="e.g. 96982"/>
-                                <Button x:Name="btnCatClearFilters" Content="Clear filters"
+                                <Button x:Name="btnCatClearFilters" Content="Clear Filters"
                                         Style="{StaticResource SquareInlineButtonStyle}" MinWidth="0"
                                         HorizontalAlignment="Stretch" Margin="0,0,0,0"/>
                             </StackPanel>
@@ -651,7 +692,7 @@
                                 <DataGridTextColumn Header="Status" Width="90" Binding="{Binding Status}"/>
                                 <DataGridTextColumn Header="CVEs" Width="55" Binding="{Binding CveCount}"/>
                                 <DataGridTextColumn Header="Reboot" Width="70" Binding="{Binding RebootDisplay}"/>
-                                <DataGridTextColumn Header="Id" Width="*" Binding="{Binding Id}"/>
+                                <DataGridTextColumn Header="ID" Width="*" Binding="{Binding Id}"/>
                             </DataGrid.Columns>
                         </DataGrid>
 
@@ -668,11 +709,10 @@
                             <Border Grid.Row="0" Padding="0,8,0,8">
                                 <StackPanel Orientation="Horizontal">
                                     <Button x:Name="btnCatDeploy" Content="Deploy..."
-                                            Style="{StaticResource MahApps.Styles.Button.Square.Accent}"
-                                            Height="28" MinWidth="120"
-                                            Controls:ControlsHelper.ContentCharacterCasing="Normal"
+                                            Style="{StaticResource AccentInlineButtonStyle}"
+                                            MinWidth="120"
                                             IsEnabled="False"
-                                            ToolTip="Deploy the selected catalog entry to Configuration Manager"/>
+                                            ToolTip="Deploy the selected catalog entry to the site."/>
                                     <TextBlock x:Name="txtCatSelected" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"
                                                TextTrimming="CharacterEllipsis"
                                                Foreground="{DynamicResource MahApps.Brushes.Gray1}"
@@ -725,11 +765,11 @@
                                           CellStyle="{StaticResource GridCellStyle}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                                        <DataGridTextColumn Header="Ver" Width="55" Binding="{Binding Version}"/>
+                                        <DataGridTextColumn Header="Version" Width="80" Binding="{Binding Version}"/>
                                         <DataGridTextColumn Header="Compliant" Width="90" Binding="{Binding Compliant}"/>
                                         <DataGridTextColumn Header="Non-Compliant" Width="125" Binding="{Binding NonCompliant}"/>
                                         <DataGridTextColumn Header="Targeted" Width="80" Binding="{Binding Targeted}"/>
-                                        <DataGridTextColumn Header="ccm tag" Width="170" Binding="{Binding Tag}"/>
+                                        <DataGridTextColumn Header="CCM Tag" Width="170" Binding="{Binding Tag}"/>
                                         <DataGridTextColumn Header="Last Modified" Width="140" Binding="{Binding Modified}"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -744,20 +784,20 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" x:Name="txtLiveDeplHeader" Text="Deployments -- select a baseline"
-                                               FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
+                                    <TextBlock Grid.Row="0" x:Name="txtLiveDeplHeader" Text="Deployments"
+                                               FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
                                     <Border Grid.Row="1" Padding="0,0,0,6">
                                         <StackPanel Orientation="Horizontal">
                                             <Button x:Name="btnLiveEnableRem"  Content="Enable Remediation"  Style="{StaticResource SquareInlineButtonStyle}" MinWidth="150"
-                                                    ToolTip="Turn enforcement on for the selected deployment(s)"/>
+                                                    ToolTip="Enable remediation on the selected deployments."/>
                                             <Button x:Name="btnLiveDisableRem" Content="Disable Remediation" Style="{StaticResource SquareInlineButtonStyle}" MinWidth="150"
-                                                    ToolTip="Turn enforcement off (detect-only) for the selected deployment(s)"/>
+                                                    ToolTip="Disable remediation on the selected deployments."/>
                                             <Button x:Name="btnLiveRedeploy"   Content="Redeploy"            Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                                    ToolTip="Re-create the selected deployment(s) on the same collection (detect-only)"/>
+                                                    ToolTip="Create the selected deployments again as detect-only."/>
                                             <Button x:Name="btnLiveReassign"   Content="Reassign..."         Style="{StaticResource SquareInlineButtonStyle}" MinWidth="120"
-                                                    ToolTip="Move the selected deployment(s) to a different collection"/>
+                                                    ToolTip="Move the selected deployments to another collection."/>
                                             <Button x:Name="btnLiveDelete"     Content="Delete..."           Style="{StaticResource SquareInlineButtonStyle}" MinWidth="100"
-                                                    ToolTip="Remove the selected deployment(s)"/>
+                                                    ToolTip="Remove the selected deployments."/>
                                         </StackPanel>
                                     </Border>
                                     <DataGrid x:Name="gridLiveDeployments" Grid.Row="2"
@@ -795,20 +835,20 @@
 
                     <DockPanel Grid.Column="0">
                         <StackPanel DockPanel.Dock="Top" Margin="0,8,0,8">
-                            <TextBlock Text="Configuration Item" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                            <TextBlock Text="Configuration Item" FontSize="11" FontWeight="Bold" Margin="0,0,0,4"/>
                             <ComboBox x:Name="cboEditorCI" FontSize="12"/>
                         </StackPanel>
                         <Border DockPanel.Dock="Bottom" Padding="0,8,0,0">
                             <StackPanel Orientation="Horizontal">
                                 <Button x:Name="btnEditorAddSetting" Content="Add Setting..."
                                         Style="{StaticResource SquareInlineButtonStyle}" MinWidth="130"
-                                        ToolTip="Add a registry or script compliance setting to this configuration item"/>
+                                        ToolTip="Add a setting to the configuration item."/>
                                 <Button x:Name="btnEditorEditSetting" Content="Edit Setting..."
                                         Style="{StaticResource SquareInlineButtonStyle}" MinWidth="120"
-                                        ToolTip="Change the selected setting (registry location / value, or script text)"/>
+                                        ToolTip="Change the selected setting."/>
                                 <Button x:Name="btnEditorRemoveSetting" Content="Remove Setting..."
                                         Style="{StaticResource SquareInlineButtonStyle}" MinWidth="150"
-                                        ToolTip="Remove the selected compliance setting from this configuration item"/>
+                                        ToolTip="Remove the selected setting from the configuration item."/>
                             </StackPanel>
                         </Border>
                         <Border BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Gray8}">
@@ -830,7 +870,7 @@
                                   ResizeDirection="Columns"/>
 
                     <DockPanel Grid.Column="2" Margin="8,0,0,0">
-                        <TextBlock DockPanel.Dock="Top" Text="Setting detail" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
+                        <TextBlock DockPanel.Dock="Top" Text="Setting Detail" FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
                         <TextBox x:Name="txtEditorDetail"
                                  Style="{StaticResource DetailTextStyle}"
                                  Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
@@ -857,9 +897,9 @@
                                       CellStyle="{StaticResource GridCellStyle}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Baseline" Width="*" Binding="{Binding Baseline}"/>
-                                    <DataGridTextColumn Header="Catalog Id" Width="170" Binding="{Binding Id}"/>
-                                    <DataGridTextColumn Header="Deployed Ver" Width="110" Binding="{Binding DeployedVersion}"/>
-                                    <DataGridTextColumn Header="Catalog Ver" Width="110" Binding="{Binding CatalogVersion}"/>
+                                    <DataGridTextColumn Header="Catalog ID" Width="170" Binding="{Binding Id}"/>
+                                    <DataGridTextColumn Header="Deployed Version" Width="140" Binding="{Binding DeployedVersion}"/>
+                                    <DataGridTextColumn Header="Catalog Version" Width="130" Binding="{Binding CatalogVersion}"/>
                                     <DataGridTextColumn Header="Status" Width="120" Binding="{Binding Status}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
@@ -885,9 +925,9 @@
                     </TabControl>
                     <Border Grid.Row="1" Padding="0,8,0,0">
                         <StackPanel Orientation="Horizontal">
-                            <Button x:Name="btnAuditExport" Content="Export current tab to CSV..."
+                            <Button x:Name="btnAuditExport" Content="Export Current Tab to CSV..."
                                     Style="{StaticResource SquareInlineButtonStyle}" MinWidth="200"
-                                    ToolTip="Save the rows of the active tab to a CSV file"/>
+                                    ToolTip="Export the active tab to a CSV file."/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -905,7 +945,7 @@
                                                Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
                         <TextBlock x:Name="txtProgressTitle"
                                    Text="Loading..."
-                                   FontSize="18" FontWeight="SemiBold"
+                                   FontSize="18" FontWeight="Bold"
                                    HorizontalAlignment="Center"
                                    Margin="0,14,0,0"/>
                         <TextBlock x:Name="txtProgressStep"
@@ -924,8 +964,8 @@
 
             <Border Grid.Row="4">
                 <DockPanel>
-                    <TextBlock x:Name="lblLogOutput" DockPanel.Dock="Top" Text="LOG OUTPUT"
-                               FontSize="10" FontWeight="SemiBold"
+                    <TextBlock x:Name="lblLogOutput" DockPanel.Dock="Top" Text="Log Output"
+                               FontSize="10" FontWeight="Bold"
                                Margin="8,6,0,4"/>
                     <TextBox x:Name="txtLog"
                              IsReadOnly="True"

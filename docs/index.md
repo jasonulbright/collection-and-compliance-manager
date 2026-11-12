@@ -27,6 +27,7 @@ Collection and Compliance Manager manages Configuration Manager device collectio
 - [Error messages](reference/error-messages.md): message, cause and fix.
 - [Glossary](reference/glossary.md): the terms of the tool.
 - [Catalog schema](CATALOG-SCHEMA.md): the metadata contract of a catalog entry.
+- [Light theme check](reference/light-theme-check.md): the light theme states, with the colors read from the screen.
 - [Capture the images again](reference/capture-images.md): the one command that regenerates the images of this guide.
 
 ## External references
