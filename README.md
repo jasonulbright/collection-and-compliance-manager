@@ -34,7 +34,7 @@ The [user guide](docs/index.md) walks every view, dialog and setting with images
 
 ## Layout
 
-The shell uses a sidebar layout with seven views and an Options modal, grouped into **Collections** and **CI / CB**:
+The shell uses a sidebar layout with seven views and an Options modal, grouped into **Collections** and **CI/CB**:
 
 - **Collections** -- master-detail grid of every device collection: Name, ID, Member Count, Limiting Collection, Refresh Type, Comment. Detail panel tabs: Properties, Direct Members, Query Rules, Include Rules, Exclude Rules. Filter by membership shape or free text.
 - **WQL Editor** -- pick a collection and rule, edit the WQL in the monospace editor, **Validate Query** (syntax-check via `Invoke-CMWmiQuery`), **Preview Results** (match count). Add, Update, or Remove rules.

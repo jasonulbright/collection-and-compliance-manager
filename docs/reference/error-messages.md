@@ -18,10 +18,11 @@ None.
 
 | Message | Where | Cause | Fix |
 |---|---|---|---|
-| `Open Options to configure site code and SMS provider, then refresh.` | Status bar | The site code or the provider is empty. | Set both in **Options > Connection**. |
-| `Refresh: site code and SMS provider must be set in Options first.` | Log | The same. | The same. |
+| `Open Options to configure site code and SMS Provider, then refresh.` | Status bar | The site code or the provider is empty. | Set both in **Options > Connection**. |
+| `Refresh: site code and SMS Provider must be set in Options first.` | Log | The same. | The same. |
 | `ConfigurationManager module not found.` | Log | The console is not installed on this computer, or `SMS_ADMIN_UI_PATH` does not point to the `bin\i386` folder of the console. | Install the console. If it is installed, set `SMS_ADMIN_UI_PATH` to its `bin\i386` folder and start the tool again. |
-| `Refresh failed:` and `Refresh failed.` | Log, status bar | The tool could not connect or read. | Read the log line for the reason. |
+| `Refresh failed: See the log file.` and `Refresh failed.` | Log, status bar | The tool could not connect or read. | Open the newest file in the `Logs` folder. It holds the reason. |
+| `<Action> failed. See the log file.` | Log | A change or a load did not work. The window shows no raw error text. | Open the newest file in the `Logs` folder. It holds the reason. |
 | `Edit Membership: built-in collections are read-only.` | Log | The collection is built-in. | Select a custom collection. |
 | `Remove: built-in collection <ID> cannot be deleted.` | Log | The same. | The same. |
 | `Add direct member: no device was added for "<name>".` | Log | The name does not match one device, or the lookup failed. | Type the exact device name. |

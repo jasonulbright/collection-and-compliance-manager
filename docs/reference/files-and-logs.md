@@ -23,7 +23,7 @@ None.
 | `Logs\CCM-<yyyyMMdd-HHmmss>.log` | The log of one session. Each read, each change and each failure. | During the session. |
 | `Logs\CCM-startup-<yyyyMMdd-HHmmss>.txt` | The PowerShell transcript of the start. | At the start. |
 | `Reports\CCM-Collections-<date>-<time>.csv` or `.html` | An export of the Collections view. | **Export CSV** or **Export HTML**. |
-| `Reports\CCM-drift-<date>-<time>.csv` or `CCM-compliance-<date>-<time>.csv` | An export of an Auditing tab. | **Export current tab to CSV...**. |
+| `Reports\CCM-drift-<date>-<time>.csv` or `CCM-compliance-<date>-<time>.csv` | An export of an Auditing tab. | **Export Current Tab to CSV...**. |
 
 The tool reads `Templates\operational-collections.json`, `Templates\parameterized-templates.json` and the `Catalog` folder. It does not write to them.
 

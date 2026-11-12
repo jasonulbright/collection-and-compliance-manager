@@ -7,7 +7,7 @@
     inline action bar (Refresh, filter, status filter, exports), modal dialogs
     for Options and per-collection actions, log drawer, and status bar. Status
     conveyed via glyph at ThemeForeground (no row-color coloring). Site code
-    and SMS provider configured from the Options sidebar button.
+    and SMS Provider configured from the Options sidebar button.
 
     Requirements:
       - PowerShell 5.1
@@ -283,12 +283,6 @@ Install-TitleBarDragFallback -Window $window
 # =============================================================================
 [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($window, 'Dark.Steel')
 
-# Show-CatalogDeployDialog, Show-AddSettingDialog, Show-EditSettingDialog, and
-# Show-OptionsDialog (below) still read these for their own inline light-theme
-# title bar branch; not consumed by any function this migration deletes.
-$script:TitleBarBlue         = [System.Windows.Media.BrushConverter]::new().ConvertFrom('#0078D4')
-$script:TitleBarBlueInactive = [System.Windows.Media.BrushConverter]::new().ConvertFrom('#4BA3E0')
-
 $script:ViewButtons = @(
     @{ Name = 'Collections'; Button = $btnViewCollections },
     @{ Name = 'WQL Editor';  Button = $btnViewWqlEditor   },
@@ -537,7 +531,7 @@ function Update-StatusBarSummary {
     if ($script:IsConnectedFromBg -and $global:Prefs.SiteCode) {
         $parts += "Connected to $($global:Prefs.SiteCode)"
     } elseif (-not $global:Prefs.SiteCode -or -not $global:Prefs.SMSProvider) {
-        $parts += 'Open Options to configure site code and SMS provider'
+        $parts += 'Open Options to configure site code and SMS Provider'
     } else {
         $parts += 'Ready. Click Refresh.'
     }
@@ -952,8 +946,8 @@ function Invoke-Refresh {
     }
 
     if (-not $global:Prefs.SiteCode -or -not $global:Prefs.SMSProvider) {
-        Add-LogLine 'Refresh: site code and SMS provider must be set in Options first.'
-        Set-StatusText 'Open Options to configure site code and SMS provider, then refresh.'
+        Add-LogLine 'Refresh: site code and SMS Provider must be set in Options first.'
+        Set-StatusText 'Open Options to configure site code and SMS Provider, then refresh.'
         return
     }
 
@@ -1072,7 +1066,7 @@ function Invoke-Refresh {
             }
         }
         catch {
-            $State.ErrorMsg = $_.Exception.Message
+            Write-Log ('Refresh failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.'
         }
         finally {
             $State.Done = $true
@@ -1157,7 +1151,7 @@ function Invoke-Refresh {
             try {
                 if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' }
             } catch {
-                Add-LogLine ('UI-thread CM connect: {0}' -f $_.Exception.Message)
+                Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.'
             }
 
             Add-LogLine ('Refresh complete: {0} collections.' -f @($script:RawCollections).Count)
@@ -1180,7 +1174,7 @@ function Invoke-LoadTemplates {
         $gridParameterizedTemplates.ItemsSource  = $script:ParameterizedTemplates
         Update-StatusBarSummary
     } catch {
-        Add-LogLine ('Template load failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Template load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Template load failed. See the log file.'
     }
 }
 
@@ -1326,7 +1320,7 @@ function Invoke-LoadCatalog {
         Update-Filter
         Update-StatusBarSummary
     } catch {
-        Add-LogLine ('Catalog load failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Catalog load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Catalog load failed. See the log file.'
         Set-StatusText 'Catalog load failed. See log output.'
     }
 }
@@ -1406,6 +1400,7 @@ function Show-CatalogDeployDialog {
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/>
                 <Setter Property="Height"   Value="32"/>
                 <Setter Property="Margin"   Value="0,0,8,0"/>
@@ -1421,18 +1416,18 @@ function Show-CatalogDeployDialog {
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock x:Name="txtDeployTitle" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock x:Name="txtDeployTitle" FontSize="16" FontWeight="Bold"/>
             <TextBlock x:Name="txtDeploySub" FontSize="11" Margin="0,2,0,8"
                        Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="Parameters" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
+                <TextBlock Text="Parameters" FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
                 <StackPanel x:Name="panelForm"/>
-                <TextBlock Text="Dependencies (verified at deploy)" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
+                <TextBlock Text="Dependencies (verified at deploy)" FontSize="11" FontWeight="Bold" Margin="0,14,0,4"/>
                 <StackPanel x:Name="panelDeps"/>
-                <TextBlock Text="Will create" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
+                <TextBlock Text="Will Create" FontSize="11" FontWeight="Bold" Margin="0,14,0,4"/>
                 <TextBlock x:Name="txtProduces" FontSize="12" TextWrapping="Wrap"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             </StackPanel>
@@ -1459,14 +1454,7 @@ function Show-CatalogDeployDialog {
     $dlg.Owner = $window
     Install-TitleBarDragFallback -Window $dlg
 
-    $isDark = [bool]$global:Prefs['DarkMode']
-    if ($isDark) {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Dark.Steel')
-    } else {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Light.Blue')
-        $dlg.WindowTitleBrush          = $script:TitleBarBlue
-        $dlg.NonActiveWindowTitleBrush = $script:TitleBarBlueInactive
-    }
+    Set-DialogTheme -Dialog $dlg
 
     $txtDeployTitle = $dlg.FindName('txtDeployTitle')
     $txtDeploySub   = $dlg.FindName('txtDeploySub')
@@ -1542,7 +1530,7 @@ function Show-CatalogDeployDialog {
                 # Code-built buttons need style + casing set explicitly (wiring-gotchas §3),
                 # else they render default-styled / UPPER-CASED.
                 [MahApps.Metro.Controls.ControlsHelper]::SetContentCharacterCasing($btnC, [System.Windows.Controls.CharacterCasing]::Normal)
-                $btnC.SetResourceReference([System.Windows.FrameworkElement]::StyleProperty, 'MahApps.Styles.Button.Square')
+                $btnC.SetResourceReference([System.Windows.FrameworkElement]::StyleProperty, 'DialogButton')
                 $btnC.Height = 28; $btnC.MinWidth = 80
                 $btnC.Margin = [System.Windows.Thickness]::new(8, 0, 0, 0)
                 $btnC.Tag = @{ Dep = $d; EntryPath = $Entry.EntryPath }
@@ -1617,7 +1605,7 @@ function Invoke-CreateDependency {
                 ForEach-Object { [string]$_ }
             $State.Output = @($out)
             $State.ExitCode = [int]$global:LASTEXITCODE
-        } catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        } catch { Write-Log ('Create dependency failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($creator).AddArgument([string]$global:Prefs.SiteCode).AddArgument([string]$global:Prefs.SMSProvider).AddArgument($state)
     $handle = $ps.BeginInvoke()
 
@@ -1679,7 +1667,7 @@ function Invoke-CatalogDeploy {
                     $State.Tags += [pscustomobject]@{ Baseline = $cb; Tagged = $ok }
                 }
             }
-        } catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        } catch { Write-Log ('Deploy failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($Entry).AddArgument($Values).AddArgument($state)
     $handle = $ps.BeginInvoke()
 
@@ -1742,7 +1730,7 @@ $btnCatDeploy.Add_Click({
     $msg = ("Deploy '{0}'?`r`n`r`nConfiguration Items:`r`n  {1}`r`n`r`nConfiguration Baselines:`r`n  {2}`r`n`r`nMode: {3}`r`nTarget collection(s): {4}" -f `
         $entry.DisplayName, $cis, $cbs, $mode, $(if ($targets.Count) { $targets -join ', ' } else { '(none specified)' }))
 
-    if (Show-ConfirmDialog -Title 'Confirm deploy' -Message $msg -Owner $window) {
+    if (Show-ConfirmDialog -Title 'Confirm Deploy' -Message $msg -Owner $window) {
         Invoke-CatalogDeploy -Entry $entry -Values $values
     }
 })
@@ -1768,8 +1756,8 @@ function Invoke-LoadLive {
     param()
 
     if (-not $global:Prefs.SiteCode -or -not $global:Prefs.SMSProvider) {
-        Add-LogLine 'Live CI/CB: site code and SMS provider must be set in Options first.'
-        Set-StatusText 'Open Options to configure site code and SMS provider, then refresh.'
+        Add-LogLine 'Live CI/CB: site code and SMS Provider must be set in Options first.'
+        Set-StatusText 'Open Options to configure site code and SMS Provider, then refresh.'
         return
     }
 
@@ -1812,7 +1800,7 @@ function Invoke-LoadLive {
                 [pscustomobject]@{ Name = [string]$cb.LocalizedDisplayName; Version = $cb.CIVersion; ComplianceCount = $cb.ComplianceCount; NonComplianceCount = $cb.NonComplianceCount; AssignedCount = $cb.AssignedCount; Description = [string]$cb.LocalizedDescription; Modified = $cb.DateLastModified }
             }
             $State.Result = [pscustomobject]@{ CIs = @($ciRows); CBs = @($cbRows) }
-        } catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        } catch { Write-Log ('Live CI/CB load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($siteCode).AddArgument($smsProvider).AddArgument($script:BgState)
 
     $script:BgInvokeHandle = $script:BgPowerShell.BeginInvoke()
@@ -1872,7 +1860,7 @@ function Invoke-LoadLive {
 
             # Mirror the bg connection into the UI thread for later per-action CM calls.
             try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
-            catch { Add-LogLine ('UI-thread CM connect: {0}' -f $_.Exception.Message) }
+            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
 
             Add-LogLine ('Live CI/CB loaded: {0} items, {1} baselines.' -f @($script:LiveCIs).Count, @($script:LiveCBs).Count)
         }
@@ -1902,7 +1890,7 @@ function Invoke-LoadBaselineDeployments {
     [void]$ps.AddScript({
         param($Name, $State)
         try { $State.Result = @(Get-BaselineDeployments -BaselineName $Name) }
-        catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        catch { Write-Log ('Deployments load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($BaselineName).AddArgument($local)
     $handle = $ps.BeginInvoke()
 
@@ -2001,7 +1989,8 @@ function Invoke-LiveDeploymentAction {
                 }
                 $results += [pscustomobject]@{ Collection = $c; Ok = $true; Error = $null }
             } catch {
-                $results += [pscustomobject]@{ Collection = $c; Ok = $false; Error = $_.Exception.Message }
+                Write-Log ('Live action failed on {0}: {1}' -f $c, $_.Exception.Message) -Level ERROR -Quiet
+                $results += [pscustomobject]@{ Collection = $c; Ok = $false; Error = 'See the log file.' }
             }
         }
         $State.Results = $results
@@ -2040,7 +2029,7 @@ function Invoke-LiveDeploymentBulk {
 
     $newColl = $null
     if ($Action -eq 'Reassign') {
-        $picked = Show-CollectionPickerDialog -Owner $window -Collections $script:Collections -Folders $script:Folders -Title 'Reassign to collection'
+        $picked = Show-CollectionPickerDialog -Owner $window -Collections $script:Collections -Folders $script:Folders -Title 'Reassign to Collection'
         if (-not $picked) { return }
         $newColl = [string]$picked.Name
     }
@@ -2057,7 +2046,7 @@ function Invoke-LiveDeploymentBulk {
     if ($Action -eq 'Reassign') { $msg += ("`r`n`r`nNew collection: {0}  (created detect-only)" -f $newColl) }
     if ($Action -eq 'Redeploy') { $msg += "`r`n`r`nEach is removed and re-created as detect-only." }
 
-    if (-not (Show-ConfirmDialog -Title 'Confirm action' -Message $msg -Owner $window)) { return }
+    if (-not (Show-ConfirmDialog -Title 'Confirm Action' -Message $msg -Owner $window)) { return }
     Invoke-LiveDeploymentAction -Action $Action -Deployments $deps -NewCollectionName $newColl
 }
 
@@ -2084,8 +2073,8 @@ function Invoke-LoadEditorCIs {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Posts a CI list load to the bg runspace and arms a DispatcherTimer.')]
     param()
     if (-not $global:Prefs.SiteCode -or -not $global:Prefs.SMSProvider) {
-        Add-LogLine 'Editor: site code and SMS provider must be set in Options first.'
-        Set-StatusText 'Open Options to configure site code and SMS provider, then refresh.'
+        Add-LogLine 'Editor: site code and SMS Provider must be set in Options first.'
+        Set-StatusText 'Open Options to configure site code and SMS Provider, then refresh.'
         return
     }
     if (Test-BgBusy) { return }
@@ -2111,7 +2100,7 @@ function Invoke-LoadEditorCIs {
             }
             $State.Step = 'Loading configuration items...'
             $State.Result = @(Get-DeployedConfigurationItems | ForEach-Object { [string]$_.LocalizedDisplayName })
-        } catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        } catch { Write-Log ('Editor: CI load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($siteCode).AddArgument($smsProvider).AddArgument($script:BgState)
     $script:BgInvokeHandle = $script:BgPowerShell.BeginInvoke()
     $script:BgTimer = New-Object System.Windows.Threading.DispatcherTimer
@@ -2138,7 +2127,7 @@ function Invoke-LoadEditorCIs {
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
             try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
-            catch { Add-LogLine ('UI-thread CM connect: {0}' -f $_.Exception.Message) }
+            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
             Add-LogLine ('Editor: loaded {0} configuration items.' -f @($cboEditorCI.ItemsSource).Count)
             Update-StatusBarSummary
         }
@@ -2161,7 +2150,7 @@ function Invoke-LoadEditorSettings {
     [void]$ps.AddScript({
         param($Name, $State)
         try { $State.Result = @(Get-ConfigurationItemSettings -ConfigurationItemName $Name) }
-        catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        catch { Write-Log ('Editor: settings load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($ConfigurationItemName).AddArgument($local)
     $handle = $ps.BeginInvoke()
     $timer = New-Object System.Windows.Threading.DispatcherTimer
@@ -2207,7 +2196,7 @@ function Invoke-EditorRemoveSetting {
     [void]$ps.AddScript({
         param($CI, $Setting, $State)
         try { $State.Ok = [bool](Remove-ConfigurationItemSetting -ConfigurationItemName $CI -SettingName $Setting) }
-        catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        catch { Write-Log ('Editor: remove setting failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($ConfigurationItemName).AddArgument($SettingName).AddArgument($local)
     $handle = $ps.BeginInvoke()
     $timer = New-Object System.Windows.Threading.DispatcherTimer
@@ -2254,7 +2243,7 @@ $btnEditorRemoveSetting.Add_Click({
     if (-not $ci -or -not $row) { Add-LogLine 'Editor: select a CI and a setting first.'; return }
     $settingName = [string]$row.SettingName
     $msg = ("Remove setting '{0}' from configuration item '{1}'?`r`n`r`nThis creates a new CI version." -f $settingName, $ci)
-    if (-not (Show-ConfirmDialog -Title 'Remove setting' -Message $msg -Owner $window)) { return }
+    if (-not (Show-ConfirmDialog -Title 'Remove Setting' -Message $msg -Owner $window)) { return }
     Invoke-EditorRemoveSetting -ConfigurationItemName $ci -SettingName $settingName
 })
 
@@ -2284,6 +2273,7 @@ function Show-AddSettingDialog {
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="FieldLabel" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Margin" Value="0,8,0,2"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Gray1}"/>
             </Style>
@@ -2303,12 +2293,21 @@ function Show-AddSettingDialog {
                 <Setter Property="Height" Value="80"/>
                 <Setter Property="Padding" Value="6"/>
             </Style>
+            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MahApps.Styles.ComboBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
             <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -2322,16 +2321,16 @@ function Show-AddSettingDialog {
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="Setting name *" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Setting Name *" Style="{StaticResource FieldLabel}"/>
                 <TextBox x:Name="txtSetName" Style="{StaticResource FieldBox}"/>
 
-                <TextBlock Text="Setting type" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Setting Type" Style="{StaticResource FieldLabel}"/>
                 <ComboBox x:Name="cboSetType" FontSize="12">
                     <ComboBoxItem Content="Registry" IsSelected="True"/>
                     <ComboBoxItem Content="Script"/>
                 </ComboBox>
 
-                <TextBlock Text="Data type" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Data Type" Style="{StaticResource FieldLabel}"/>
                 <ComboBox x:Name="cboSetDataType" FontSize="12">
                     <ComboBoxItem Content="String" IsSelected="True"/>
                     <ComboBoxItem Content="Integer"/>
@@ -2350,36 +2349,36 @@ function Show-AddSettingDialog {
                         <ComboBoxItem Content="CurrentConfig"/>
                         <ComboBoxItem Content="Users"/>
                     </ComboBox>
-                    <TextBlock Text="Key name *  (e.g. SOFTWARE\Vendor\Product)" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Key Name * (example: SOFTWARE\Vendor\Product)" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtSetKeyName" Style="{StaticResource FieldBox}"/>
-                    <TextBlock Text="Value name" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Value Name" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtSetValueName" Style="{StaticResource FieldBox}"/>
                     <CheckBox x:Name="chkSetRemediateDword" Content="Remediate as DWORD" Margin="0,10,0,0"/>
                     <CheckBox x:Name="chkSet64Bit" Content="64-bit registry key" Margin="0,6,0,0"/>
                 </StackPanel>
 
                 <StackPanel x:Name="panelScript" Visibility="Collapsed">
-                    <TextBlock Text="Discovery script language" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Discovery Script Language" Style="{StaticResource FieldLabel}"/>
                     <ComboBox x:Name="cboSetDiscLang" FontSize="12">
                         <ComboBoxItem Content="PowerShell" IsSelected="True"/>
                         <ComboBoxItem Content="VBScript"/>
                         <ComboBoxItem Content="JScript"/>
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
-                    <TextBlock Text="Discovery script *" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Discovery Script *" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtSetDiscScript" Style="{StaticResource ScriptBox}"/>
-                    <TextBlock Text="Remediation script language" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Remediation Script Language" Style="{StaticResource FieldLabel}"/>
                     <ComboBox x:Name="cboSetRemLang" FontSize="12">
                         <ComboBoxItem Content="PowerShell" IsSelected="True"/>
                         <ComboBoxItem Content="VBScript"/>
                         <ComboBoxItem Content="JScript"/>
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
-                    <TextBlock Text="Remediation script (optional)" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Remediation Script (optional)" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtSetRemScript" Style="{StaticResource ScriptBox}"/>
                 </StackPanel>
 
-                <TextBlock Text="Rule name *" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Rule Name *" Style="{StaticResource FieldLabel}"/>
                 <TextBox x:Name="txtSetRuleName" Style="{StaticResource FieldBox}"/>
                 <TextBlock Text="Operator" Style="{StaticResource FieldLabel}"/>
                 <ComboBox x:Name="cboSetOperator" FontSize="12">
@@ -2397,9 +2396,9 @@ function Show-AddSettingDialog {
                     <ComboBoxItem Content="Contains"/>
                     <ComboBoxItem Content="NotContains"/>
                 </ComboBox>
-                <TextBlock Text="Expected value *" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Expected Value *" Style="{StaticResource FieldLabel}"/>
                 <TextBox x:Name="txtSetExpected" Style="{StaticResource FieldBox}"/>
-                <TextBlock Text="Noncompliance severity" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Noncompliance Severity" Style="{StaticResource FieldLabel}"/>
                 <ComboBox x:Name="cboSetSeverity" FontSize="12">
                     <ComboBoxItem Content="None"/>
                     <ComboBoxItem Content="Informational"/>
@@ -2429,12 +2428,7 @@ function Show-AddSettingDialog {
     $dlg = [System.Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $dx))
     $dlg.Owner = $window
     Install-TitleBarDragFallback -Window $dlg
-    if ([bool]$global:Prefs['DarkMode']) {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Dark.Steel')
-    } else {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Light.Blue')
-        $dlg.WindowTitleBrush = $script:TitleBarBlue; $dlg.NonActiveWindowTitleBrush = $script:TitleBarBlueInactive
-    }
+    Set-DialogTheme -Dialog $dlg
 
     $get = { param($n) $dlg.FindName($n) }
     $cboSetType    = & $get 'cboSetType'
@@ -2533,7 +2527,7 @@ function Invoke-EditorAddSetting {
     [void]$ps.AddScript({
         param($CI, $Type, $Params, $State)
         try { Add-ConfigurationItemSetting -ConfigurationItemName $CI -SettingType $Type -Parameters $Params }
-        catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        catch { Write-Log ('Editor: add setting failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($ConfigurationItemName).AddArgument($SettingType).AddArgument($Parameters).AddArgument($local)
     $handle = $ps.BeginInvoke()
     $timer = New-Object System.Windows.Threading.DispatcherTimer
@@ -2593,6 +2587,7 @@ function Show-EditSettingDialog {
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="FieldLabel" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Margin" Value="0,8,0,2"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Gray1}"/>
             </Style>
@@ -2612,12 +2607,21 @@ function Show-EditSettingDialog {
                 <Setter Property="Height" Value="130"/>
                 <Setter Property="Padding" Value="6"/>
             </Style>
+            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MahApps.Styles.ComboBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
             <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -2631,17 +2635,17 @@ function Show-EditSettingDialog {
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock x:Name="txtEditHeader" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <TextBlock x:Name="txtEditHeader" FontSize="13" FontWeight="Bold" Margin="0,0,0,4"/>
                 <TextBlock Text="Current values are pre-filled -- edit any field; only what you change is saved. (Registry key fields: blank = keep.)"
                            FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
 
-                <TextBlock Text="Setting type" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Setting Type" Style="{StaticResource FieldLabel}"/>
                 <ComboBox x:Name="cboEditType" FontSize="12">
                     <ComboBoxItem Content="Registry"/>
                     <ComboBoxItem Content="Script"/>
                 </ComboBox>
 
-                <TextBlock Text="Setting name" Style="{StaticResource FieldLabel}"/>
+                <TextBlock Text="Setting Name" Style="{StaticResource FieldLabel}"/>
                 <TextBox x:Name="txtEditNewName" Style="{StaticResource FieldBox}"/>
 
                 <StackPanel x:Name="panelEditReg">
@@ -2654,14 +2658,14 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="CurrentConfig"/>
                         <ComboBoxItem Content="Users"/>
                     </ComboBox>
-                    <TextBlock Text="Key name (blank = keep)" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Key Name (blank keeps it)" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtEditKeyName" Style="{StaticResource FieldBox}"/>
-                    <TextBlock Text="Value name (blank = keep)" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Value Name (blank keeps it)" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtEditValueName" Style="{StaticResource FieldBox}"/>
                 </StackPanel>
 
                 <StackPanel x:Name="panelEditScript" Visibility="Collapsed">
-                    <TextBlock Text="Discovery script language" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Discovery Script Language" Style="{StaticResource FieldLabel}"/>
                     <ComboBox x:Name="cboEditDiscLang" FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="PowerShell"/>
@@ -2669,9 +2673,9 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="JScript"/>
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
-                    <TextBlock Text="Discovery script" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Discovery Script" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtEditDiscScript" Style="{StaticResource ScriptBox}"/>
-                    <TextBlock Text="Remediation script language" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Remediation Script Language" Style="{StaticResource FieldLabel}"/>
                     <ComboBox x:Name="cboEditRemLang" FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="PowerShell"/>
@@ -2679,7 +2683,7 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="JScript"/>
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
-                    <TextBlock Text="Remediation script" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Remediation Script" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtEditRemScript" Style="{StaticResource ScriptBox}"/>
                 </StackPanel>
             </StackPanel>
@@ -2702,12 +2706,7 @@ function Show-EditSettingDialog {
     $dlg = [System.Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $dx))
     $dlg.Owner = $window
     Install-TitleBarDragFallback -Window $dlg
-    if ([bool]$global:Prefs['DarkMode']) {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Dark.Steel')
-    } else {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Light.Blue')
-        $dlg.WindowTitleBrush = $script:TitleBarBlue; $dlg.NonActiveWindowTitleBrush = $script:TitleBarBlueInactive
-    }
+    Set-DialogTheme -Dialog $dlg
 
     $get = { param($n) $dlg.FindName($n) }
     $cboEditType    = & $get 'cboEditType'
@@ -2800,7 +2799,7 @@ function Invoke-EditorEditSetting {
     [void]$ps.AddScript({
         param($CI, $Setting, $Type, $Changes, $State)
         try { Set-ConfigurationItemSetting -ConfigurationItemName $CI -SettingName $Setting -SettingType $Type -Changes $Changes }
-        catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        catch { Write-Log ('Editor: update setting failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($ConfigurationItemName).AddArgument($SettingName).AddArgument($SettingType).AddArgument($Changes).AddArgument($local)
     $handle = $ps.BeginInvoke()
     $timer = New-Object System.Windows.Threading.DispatcherTimer
@@ -2847,8 +2846,8 @@ function Invoke-LoadAuditing {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Posts the auditing load to the bg runspace and arms a DispatcherTimer.')]
     param()
     if (-not $global:Prefs.SiteCode -or -not $global:Prefs.SMSProvider) {
-        Add-LogLine 'Auditing: site code and SMS provider must be set in Options first.'
-        Set-StatusText 'Open Options to configure site code and SMS provider, then refresh.'
+        Add-LogLine 'Auditing: site code and SMS Provider must be set in Options first.'
+        Set-StatusText 'Open Options to configure site code and SMS Provider, then refresh.'
         return
     }
     if (Test-BgBusy) { return }
@@ -2881,7 +2880,7 @@ function Invoke-LoadAuditing {
             $State.Step = 'Checking evaluation freshness...'
             $freshness = @(Get-EvaluationFreshness)
             $State.Result = [pscustomobject]@{ Drift = $drift; Compliance = $compliance; Freshness = $freshness; HadCatalog = $hasCatalog }
-        } catch { $State.ErrorMsg = $_.Exception.Message } finally { $State.Done = $true }
+        } catch { Write-Log ('Auditing load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' } finally { $State.Done = $true }
     }).AddArgument($siteCode).AddArgument($smsProvider).AddArgument($catalogPath).AddArgument($script:BgState)
     $script:BgInvokeHandle = $script:BgPowerShell.BeginInvoke()
     $script:BgTimer = New-Object System.Windows.Threading.DispatcherTimer
@@ -2927,7 +2926,7 @@ function Invoke-LoadAuditing {
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
             try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
-            catch { Add-LogLine ('UI-thread CM connect: {0}' -f $_.Exception.Message) }
+            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
             $drifted = @($script:AuditDrift | Where-Object { $_.Status -eq 'Drifted' }).Count
             $catNote = if (-not $res.HadCatalog) { ' (drift skipped: set Catalog Path in Options)' } else { '' }
             Add-LogLine ('Auditing loaded: {0} drift rows ({1} drifted), {2} compliance rows.{3}' -f @($script:AuditDrift).Count, $drifted, @($script:AuditCompliance).Count, $catNote)
@@ -2951,7 +2950,7 @@ $btnAuditExport.Add_Click({
         try {
             [void](Export-ComplianceReport -Rows @($rows) -Path $sfd.FileName)
             Add-LogLine ('Exported {0} rows to {1}.' -f @($rows).Count, $sfd.FileName)
-        } catch { Add-LogLine ('Export failed: {0}' -f $_.Exception.Message) }
+        } catch { Write-Log ('Export failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Export failed. See the log file.' }
     }
 })
 
@@ -2975,7 +2974,7 @@ function Invoke-LoadDirectMembers {
         try {
             $State.Result = @(Get-CollectionMembers -CollectionId $CollId)
         } catch {
-            $State.ErrorMsg = $_.Exception.Message
+            Write-Log ('Direct members load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.'
         } finally {
             $State.Done = $true
         }
@@ -3045,7 +3044,7 @@ $btnPreviewWql.Add_Click({
     [void]$ps.AddScript({
         param($Wql, $State)
         try { $State.Result = Invoke-WqlPreview -QueryExpression $Wql }
-        catch { $State.ErrorMsg = $_.Exception.Message }
+        catch { Write-Log ('WQL preview failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; $State.ErrorMsg = 'See the log file.' }
         finally { $State.Done = $true }
     }).AddArgument($wql).AddArgument($local)
     $handle = $ps.BeginInvoke()
@@ -3090,7 +3089,8 @@ $btnAddRule.Add_Click({
         Add-LogLine ('Added rule "{0}" to collection {1}.' -f $name, $coll.Name)
         Invoke-Refresh
     } catch {
-        $txtWqlValidation.Text = ('Add rule failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Add rule failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet
+        $txtWqlValidation.Text = 'Add rule failed. See the log file.'
         Add-LogLine $txtWqlValidation.Text
     }
 })
@@ -3110,7 +3110,8 @@ $btnUpdateRule.Add_Click({
         Add-LogLine ('Updated rule "{0}" -> "{1}" on collection {2}.' -f $oldName, $name, $coll.Name)
         Invoke-Refresh
     } catch {
-        $txtWqlValidation.Text = ('Update rule failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Update rule failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet
+        $txtWqlValidation.Text = 'Update rule failed. See the log file.'
         Add-LogLine $txtWqlValidation.Text
     }
 })
@@ -3130,7 +3131,8 @@ $btnRemoveRule.Add_Click({
         Add-LogLine ('Removed rule "{0}" from collection {1}.' -f $name, $coll.Name)
         Invoke-Refresh
     } catch {
-        $txtWqlValidation.Text = ('Remove rule failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Remove rule failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet
+        $txtWqlValidation.Text = 'Remove rule failed. See the log file.'
         Add-LogLine $txtWqlValidation.Text
     }
 })
@@ -3188,12 +3190,21 @@ function Show-NewCollectionDialog {
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MahApps.Styles.ComboBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
             <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -3206,11 +3217,11 @@ function Show-NewCollectionDialog {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Name" FontSize="11" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtName" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="e.g. Workstations - Pilot Ring"/>
 
-            <TextBlock Text="Limiting Collection" FontSize="11" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -3226,14 +3237,14 @@ function Show-NewCollectionDialog {
                 </Border>
                 <Button x:Name="btnPickLimiting" Grid.Column="1" Content="Browse..."
                         Style="{StaticResource DialogButton}" MinWidth="90" Margin="0"
-                        ToolTip="Browse the folder tree to pick the limiting collection"/>
+                        ToolTip="Pick the limiting collection from the folder tree."/>
             </Grid>
 
-            <TextBlock Text="Comment" FontSize="11" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Comment" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtComment" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Optional"/>
 
-            <TextBlock Text="Refresh Type" FontSize="11" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Refresh Type" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <ComboBox x:Name="cboRefresh" FontSize="12">
                 <ComboBoxItem Content="Manual"/>
                 <ComboBoxItem Content="Periodic"/>
@@ -3297,7 +3308,7 @@ function Show-NewCollectionDialog {
             $dlg.DialogResult = $true
             $dlg.Close()
         } catch {
-            Add-LogLine ('New Collection failed: {0}' -f $_.Exception.Message)
+            Write-Log ('New Collection failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'New Collection failed. See the log file.'
         }
     })
     $btnCancel.Add_Click({ $dlg.DialogResult = $false; $dlg.Close() })
@@ -3337,6 +3348,7 @@ function Show-CopyCollectionDialog {
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -3350,11 +3362,11 @@ function Show-CopyCollectionDialog {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Source" FontSize="11" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBlock x:Name="txtSource" FontSize="13" FontWeight="SemiBold"/>
+            <TextBlock Text="Source" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock x:Name="txtSource" FontSize="13" FontWeight="Bold"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,16,0,0">
-            <TextBlock Text="New Name" FontSize="11" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="New Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtNewName" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Name of the new collection"/>
         </StackPanel>
@@ -3391,7 +3403,7 @@ function Show-CopyCollectionDialog {
             $dlg.DialogResult = $true
             $dlg.Close()
         } catch {
-            Add-LogLine ('Copy failed: {0}' -f $_.Exception.Message)
+            Write-Log ('Copy failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Copy failed. See the log file.'
         }
     })
     $btnCancel.Add_Click({ $dlg.DialogResult = $false; $dlg.Close() })
@@ -3435,6 +3447,21 @@ function Show-EditMembershipDialog {
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
+            <Style x:Key="MemberRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="MemberCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource MahApps.Styles.DataGridCell}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="16,12,16,12">
@@ -3444,17 +3471,18 @@ function Show-EditMembershipDialog {
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="txtCollName" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+        <TextBlock x:Name="txtCollName" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
 
         <DataGrid x:Name="gridMembers" Grid.Row="1" AutoGenerateColumns="False"
                   CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                   SelectionMode="Extended" SelectionUnit="FullRow"
                   Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                  RowStyle="{StaticResource MemberRowStyle}" CellStyle="{StaticResource MemberCellStyle}"
                   RowHeaderWidth="0" BorderThickness="0" FontSize="11">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name"        Width="2*" Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="ResourceID"  Width="120" Binding="{Binding ResourceID}"/>
+                <DataGridTextColumn Header="Resource ID" Width="120" Binding="{Binding ResourceID}"/>
                 <DataGridTextColumn Header="Domain"      Width="*"  Binding="{Binding Domain}"/>
             </DataGrid.Columns>
         </DataGrid>
@@ -3495,7 +3523,7 @@ function Show-EditMembershipDialog {
             $members = @(Get-CollectionMembers -CollectionId $Collection.CollectionID)
             $gridMembers.ItemsSource = $members
         } catch {
-            Add-LogLine ('Edit Membership: load failed: {0}' -f $_.Exception.Message)
+            Write-Log ('Edit Membership: load failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Edit Membership: load failed. See the log file.'
         }
     }
     & $reload
@@ -3512,7 +3540,7 @@ function Show-EditMembershipDialog {
                 Add-LogLine ('Add direct member: no device was added for "{0}". The name must match one device exactly, and the site lookup must work. See the log for the reason.' -f $name)
             }
         } catch {
-            Add-LogLine ('Add direct member failed: {0}' -f $_.Exception.Message)
+            Write-Log ('Add direct member failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Add direct member failed. See the log file.'
         }
     })
 
@@ -3527,7 +3555,7 @@ function Show-EditMembershipDialog {
                 Remove-DirectMember -CollectionId $Collection.CollectionID -ResourceId ([int]$r.ResourceID)
                 Add-LogLine ('Removed "{0}" (ResourceID {1}) from {2}.' -f $r.Name, $r.ResourceID, $Collection.Name)
             } catch {
-                Add-LogLine ('Remove failed for ResourceID {0}: {1}' -f $r.ResourceID, $_.Exception.Message)
+                Write-Log ('Remove failed for ResourceID {0}: {1}' -f $r.ResourceID, $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine ('Remove failed for ResourceID {0}. See the log file.' -f $r.ResourceID)
             }
         }
         & $reload
@@ -3580,6 +3608,7 @@ function Show-ApplyTemplateDialog {
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/><Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -3596,11 +3625,11 @@ function Show-ApplyTemplateDialog {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Template" FontSize="11" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBlock x:Name="txtTemplateName" FontSize="13" FontWeight="SemiBold"/>
+            <TextBlock Text="Template" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock x:Name="txtTemplateName" FontSize="13" FontWeight="Bold"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,12,0,0">
-            <TextBlock Text="Target Collection" FontSize="11" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Target Collection" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -3616,14 +3645,14 @@ function Show-ApplyTemplateDialog {
                 </Border>
                 <Button x:Name="btnPickTarget" Grid.Column="1" Content="Browse..."
                         Style="{StaticResource DialogButton}" MinWidth="90" Margin="0"
-                        ToolTip="Browse the folder tree to pick the target collection"/>
+                        ToolTip="Pick the target collection from the folder tree."/>
             </Grid>
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
-            <TextBlock Text="Rule Name" FontSize="11" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtRuleName" FontSize="12" Padding="6,4,6,4"/>
         </StackPanel>
-        <TextBlock Grid.Row="3" Text="Expanded WQL" FontSize="11" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+        <TextBlock Grid.Row="3" Text="Expanded WQL" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
         <TextBox x:Name="txtExpanded" Grid.Row="4" IsReadOnly="True"
                  AcceptsReturn="True" TextWrapping="NoWrap"
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
@@ -3683,7 +3712,7 @@ function Show-ApplyTemplateDialog {
             $dlg.DialogResult = $true
             $dlg.Close()
         } catch {
-            Add-LogLine ('Apply Template failed: {0}' -f $_.Exception.Message)
+            Write-Log ('Apply Template failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Apply Template failed. See the log file.'
         }
     })
     $btnCancel.Add_Click({ $dlg.DialogResult = $false; $dlg.Close() })
@@ -3727,7 +3756,7 @@ $btnEvaluateColl.Add_Click({
         Invoke-CollectionEvaluation -CollectionId $row.CollectionID
         Add-LogLine ('Triggered membership evaluation for {0}.' -f $row.Name)
     } catch {
-        Add-LogLine ('Evaluate failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Evaluate failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Evaluate failed. See the log file.'
     }
 })
 $btnRemoveColl.Add_Click({
@@ -3747,7 +3776,7 @@ $btnRemoveColl.Add_Click({
             Invoke-Refresh
         }
     } catch {
-        Add-LogLine ('Remove failed: {0}' -f $_.Exception.Message)
+        Write-Log ('Remove failed: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'Remove failed. See the log file.'
     }
 })
 
@@ -3846,6 +3875,7 @@ function Show-OptionsDialog {
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="MinWidth" Value="90"/>
                 <Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
@@ -3876,41 +3906,41 @@ function Show-OptionsDialog {
 
         <Grid Grid.Column="2" Grid.Row="0" Margin="20,16,20,16">
             <StackPanel x:Name="paneConnection" Visibility="Visible">
-                <TextBlock Text="Configuration Manager Connection" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                <TextBlock Text="Site Code" FontSize="11" Margin="0,4,0,2"
+                <TextBlock Text="Configuration Manager Connection" FontSize="13" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock x:Name="lblSiteCode" Text="Site Code" FontSize="14" FontWeight="Bold" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBox x:Name="txtSiteCode" FontSize="12" Padding="6,4,6,4"
                          Controls:TextBoxHelper.Watermark="e.g. P01" Width="120" HorizontalAlignment="Left"/>
-                <TextBlock Text="SMS Provider FQDN" FontSize="11" Margin="0,12,0,2"
+                <TextBlock x:Name="lblSmsProvider" Text="SMS Provider FQDN" FontSize="14" FontWeight="Bold" Margin="0,12,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBox x:Name="txtSmsProvider" FontSize="12" Padding="6,4,6,4"
                          Controls:TextBoxHelper.Watermark="e.g. cm01.contoso.com"/>
-                <TextBlock Text="Used for the CM PSDrive root. Collection and Compliance Manager performs both reads (Get-CMDeviceCollection) and writes (New / Set / Remove) -- the account running this app needs the matching CM permissions."
+                <TextBlock Text="The app reads and changes ConfigMgr objects. The account that runs the app needs the matching ConfigMgr permissions."
                            FontSize="11" TextWrapping="Wrap" Margin="0,16,0,0"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             </StackPanel>
 
             <StackPanel x:Name="paneCatalog" Visibility="Collapsed">
-                <TextBlock Text="CI / CB Catalog" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                <TextBlock Text="Catalog Path" FontSize="11" Margin="0,4,0,2"
+                <TextBlock Text="CI/CB Catalog" FontSize="13" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Text="Catalog Path" FontSize="11" FontWeight="Bold" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <DockPanel LastChildFill="True">
                     <Button x:Name="btnBrowseCatalog" DockPanel.Dock="Right" Content="Browse..."
-                            Width="90" Height="28" Margin="8,0,0,0"
-                            Controls:ControlsHelper.ContentCharacterCasing="Normal"/>
+                            Style="{StaticResource DialogButton}" Width="90" Height="28" Margin="8,0,0,0"
+                            ToolTip="Pick the catalog folder."/>
                     <TextBox x:Name="txtCatalogPath" FontSize="12" Padding="6,4,6,4"
                              Controls:TextBoxHelper.Watermark="Local path to a clone of the CI / CB catalog"/>
                 </DockPanel>
-                <TextBlock Text="Point this at a local clone of the CI / CB catalog -- the folder that holds the subcategory folders (Compliance, Hardening, Configuration, CVE-Remediation). Read on Catalog refresh; nothing is written back."
+                <TextBlock Text="Set the path to a local clone of the CI/CB catalog. The folder holds the subcategory folders: Compliance, Hardening, Configuration and CVE-Remediation. The app only reads the catalog."
                            FontSize="11" TextWrapping="Wrap" Margin="0,16,0,0"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             </StackPanel>
 
             <StackPanel x:Name="paneAbout" Visibility="Collapsed">
-                <TextBlock Text="About" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <TextBlock Text="About" FontSize="13" FontWeight="Bold" Margin="0,0,0,10"/>
                 <TextBlock x:Name="txtAboutVersion" Text="Collection and Compliance Manager v1.0.0"
-                           FontSize="13" FontWeight="SemiBold"/>
-                <TextBlock Text="Browse, create, copy, and remove Configuration Manager device collections. Edit query rules with offline WQL validation and a 1-shot result preview. Apply ready-made operational queries or fill out parameterized templates and add the resulting rule to a target collection."
+                           FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="Create, copy and remove ConfigMgr device collections. Edit query rules with WQL validation and a result preview. Apply a ready-made query template to a collection."
                            FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
                 <TextBlock Text="225 ready-made operational queries plus 20 parameterized templates ship with the app."
                            FontSize="12" TextWrapping="Wrap" Margin="0,12,0,0"/>
@@ -3936,14 +3966,7 @@ function Show-OptionsDialog {
     $dlg.Owner = $window
     Install-TitleBarDragFallback -Window $dlg
 
-    $isDark = [bool]$global:Prefs['DarkMode']
-    if ($isDark) {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Dark.Steel')
-    } else {
-        [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($dlg, 'Light.Blue')
-        $dlg.WindowTitleBrush          = $script:TitleBarBlue
-        $dlg.NonActiveWindowTitleBrush = $script:TitleBarBlueInactive
-    }
+    Set-DialogTheme -Dialog $dlg
 
     $btnCatConnection = $dlg.FindName('btnCatConnection')
     $btnCatCatalog    = $dlg.FindName('btnCatCatalog')

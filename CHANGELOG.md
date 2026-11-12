@@ -1,5 +1,26 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Show white text on every blue background in the light theme: the sidebar buttons, the selected grid rows, the selected list and tree items, the highlighted filter items, the Deploy button and the buttons of the dialogs.
+- Show the Site Code and SMS Provider FQDN titles of the Options dialog in bold at 14 pt, in both themes. The value boxes keep the body style.
+- Show field labels and titles in bold. Use Title Case for section headers, labels, columns and dialog titles.
+- Use one short sentence for each tooltip.
+- Show no raw error text in the window. The log file holds the reason, and the window says to see the log file.
+- Use theme brushes only in the sidebar button styles. The dialogs take the title bar color from the shared theme library.
+
+### Added
+
+- Add the Light theme check page with the colors that the capture read from the screen, and its images.
+- Add ThemeGuard.Tests.ps1. It checks the white text on blue, the equal fonts in both themes, the bold titles, the shared button style, the raw error text and the banned words.
+- Add the -OutDir parameter to the capture tool. The tool now uses its own lab folder and its own task name, and it never deletes C:\guide.
+
+### Changed
+
+- Refresh the vendored SuiteCommon library to release 2026.11.11.0080 (commit fd630f3).
+
 ## [2026.11.07.0016] - 2026-11-07
 
 ## 1 shared library refresh and window tests that cannot steal focus

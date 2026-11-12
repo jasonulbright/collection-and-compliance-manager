@@ -22,10 +22,10 @@ Describe 'Main window layout' {
 }
 
 Describe 'Template grid' {
-    It 'gives the Params column enough width for its header' {
-        $nodeColumn = $script:xmlWindow.SelectSingleNode("//w:DataGridTextColumn[@Header='Params']", $script:nsWpf)
+    It 'gives the Parameters column enough width for its header' {
+        $nodeColumn = $script:xmlWindow.SelectSingleNode("//w:DataGridTextColumn[@Header='Parameters']", $script:nsWpf)
         $nodeColumn | Should -Not -BeNullOrEmpty
-        [int]$nodeColumn.GetAttribute('Width') | Should -BeGreaterOrEqual 75
+        [int]$nodeColumn.GetAttribute('Width') | Should -BeGreaterOrEqual 100
     }
 }
 
