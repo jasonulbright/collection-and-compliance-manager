@@ -69,7 +69,7 @@
             <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
                 <Setter Property="Margin" Value="12,14,0,6"/>
                 <Setter Property="FontSize" Value="11"/>
-                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Gray1}"/>
             </Style>
 
@@ -282,7 +282,7 @@
 
             <Border Grid.Row="0" Background="{DynamicResource MahApps.Brushes.Gray10}" Padding="16,12,16,10">
                 <StackPanel>
-                    <TextBlock x:Name="txtModuleTitle" Text="Collections" FontSize="18" FontWeight="Bold"/>
+                    <TextBlock x:Name="txtModuleTitle" Text="Collections" FontSize="18" FontWeight="SemiBold"/>
                     <TextBlock x:Name="txtModuleSubtitle"
                                Text="Configure Site / Provider in Options, then click Refresh."
                                FontSize="11"
@@ -500,7 +500,7 @@
                                    Text="Pick a collection from the tree on the left."
                                    TextTrimming="CharacterEllipsis"/>
 
-                        <TextBlock Grid.Row="1" Text="Rules in This Collection" FontSize="11" FontWeight="Bold" Margin="0,4,0,4"/>
+                        <TextBlock Grid.Row="1" Text="Rules in This Collection" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,4"/>
                         <Border Grid.Row="2" BorderThickness="1"
                                 BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
@@ -599,7 +599,7 @@
                             <TextBlock x:Name="txtTemplateLimiting" FontSize="12"
                                        Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
 
-                            <TextBlock x:Name="txtTemplateParamsHeader" Text="Parameters" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Visibility="Collapsed"/>
+                            <TextBlock x:Name="txtTemplateParamsHeader" Text="Parameters" FontSize="11" FontWeight="SemiBold" Margin="0,12,0,4" Visibility="Collapsed"/>
                             <ItemsControl x:Name="itemsTemplateParams" Margin="0,0,0,8">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -643,7 +643,7 @@
 
                     <!-- LEFT: facet filters -->
                     <DockPanel Grid.Column="0" Margin="0,8,0,0">
-                        <TextBlock DockPanel.Dock="Top" Text="Filters" FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock DockPanel.Dock="Top" Text="Filters" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <TextBlock Text="Subcategory" FontSize="11" FontWeight="Bold" Margin="0,4,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -785,7 +785,7 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" x:Name="txtLiveDeplHeader" Text="Deployments"
-                                               FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
+                                               FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
                                     <Border Grid.Row="1" Padding="0,0,0,6">
                                         <StackPanel Orientation="Horizontal">
                                             <Button x:Name="btnLiveEnableRem"  Content="Enable Remediation"  Style="{StaticResource SquareInlineButtonStyle}" MinWidth="150"
@@ -945,7 +945,7 @@
                                                Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
                         <TextBlock x:Name="txtProgressTitle"
                                    Text="Loading..."
-                                   FontSize="18" FontWeight="Bold"
+                                   FontSize="18" FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    Margin="0,14,0,0"/>
                         <TextBlock x:Name="txtProgressStep"
@@ -965,7 +965,7 @@
             <Border Grid.Row="4">
                 <DockPanel>
                     <TextBlock x:Name="lblLogOutput" DockPanel.Dock="Top" Text="Log Output"
-                               FontSize="10" FontWeight="Bold"
+                               FontSize="10" FontWeight="SemiBold"
                                Margin="8,6,0,4"/>
                     <TextBox x:Name="txtLog"
                              IsReadOnly="True"

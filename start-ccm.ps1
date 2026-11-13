@@ -1426,18 +1426,18 @@ function Show-CatalogDeployDialog {
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock x:Name="txtDeployTitle" FontSize="16" FontWeight="Bold"/>
+            <TextBlock x:Name="txtDeployTitle" FontSize="16" FontWeight="SemiBold"/>
             <TextBlock x:Name="txtDeploySub" FontSize="11" Margin="0,2,0,8"
                        Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock Text="Parameters" FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
+                <TextBlock Text="Parameters" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
                 <StackPanel x:Name="panelForm"/>
-                <TextBlock Text="Dependencies (verified at deploy)" FontSize="11" FontWeight="Bold" Margin="0,14,0,4"/>
+                <TextBlock Text="Dependencies (verified at deploy)" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
                 <StackPanel x:Name="panelDeps"/>
-                <TextBlock Text="Will Create" FontSize="11" FontWeight="Bold" Margin="0,14,0,4"/>
+                <TextBlock Text="Will Create" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
                 <TextBlock x:Name="txtProduces" FontSize="12" TextWrapping="Wrap"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             </StackPanel>
@@ -2627,7 +2627,7 @@ function Show-EditSettingDialog {
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock x:Name="txtEditHeader" FontSize="13" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBlock x:Name="txtEditHeader" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,4"/>
                 <TextBlock Text="Current values are pre-filled -- edit any field; only what you change is saved. (Registry key fields: blank = keep.)"
                            FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
 
@@ -3337,7 +3337,7 @@ function Show-CopyCollectionDialog {
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <TextBlock Text="Source" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBlock x:Name="txtSource" FontSize="13" FontWeight="Bold"/>
+            <TextBlock x:Name="txtSource" FontSize="13" FontWeight="SemiBold"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,16,0,0">
             <TextBlock Text="New Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -3442,7 +3442,7 @@ function Show-EditMembershipDialog {
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="txtCollName" FontSize="14" FontWeight="Bold" Margin="0,0,0,12"/>
+        <TextBlock x:Name="txtCollName" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
 
         <DataGrid x:Name="gridMembers" Grid.Row="1" AutoGenerateColumns="False"
                   CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
@@ -3588,7 +3588,7 @@ function Show-ApplyTemplateDialog {
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <TextBlock Text="Template" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBlock x:Name="txtTemplateName" FontSize="13" FontWeight="Bold"/>
+            <TextBlock x:Name="txtTemplateName" FontSize="13" FontWeight="SemiBold"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,12,0,0">
             <TextBlock Text="Target Collection" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -3857,7 +3857,7 @@ function Show-OptionsDialog {
 
         <Grid Grid.Column="2" Grid.Row="0" Margin="20,16,20,16">
             <StackPanel x:Name="paneConnection" Visibility="Visible">
-                <TextBlock Text="Configuration Manager Connection" FontSize="13" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Text="Configuration Manager Connection" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
                 <TextBlock x:Name="lblSiteCode" Text="Site Code" FontSize="14" FontWeight="Bold" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBox x:Name="txtSiteCode" FontSize="12" Padding="6,4,6,4"
@@ -3872,7 +3872,7 @@ function Show-OptionsDialog {
             </StackPanel>
 
             <StackPanel x:Name="paneCatalog" Visibility="Collapsed">
-                <TextBlock Text="CI/CB Catalog" FontSize="13" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Text="CI/CB Catalog" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
                 <TextBlock Text="Catalog Path" FontSize="11" FontWeight="Bold" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <DockPanel LastChildFill="True">
@@ -3888,9 +3888,9 @@ function Show-OptionsDialog {
             </StackPanel>
 
             <StackPanel x:Name="paneAbout" Visibility="Collapsed">
-                <TextBlock Text="About" FontSize="13" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Text="About" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
                 <TextBlock x:Name="txtAboutVersion" Text="Collection and Compliance Manager v1.0.0"
-                           FontSize="13" FontWeight="Bold"/>
+                           FontSize="13" FontWeight="SemiBold"/>
                 <TextBlock Text="Create, copy and remove ConfigMgr device collections. Edit query rules with WQL validation and a result preview. Apply a ready-made query template to a collection."
                            FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
                 <TextBlock Text="225 ready-made operational queries plus 20 parameterized templates ship with the app."
