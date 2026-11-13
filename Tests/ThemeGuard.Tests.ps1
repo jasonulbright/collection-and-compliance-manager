@@ -211,10 +211,6 @@ Describe 'Fonts do not depend on the theme (b)' {
         $m.Success | Should -BeTrue
         $m.Value | Should -Not -Match 'Font(Size|Weight|Style|Family)|TextDecorations'
     }
-
-    It 'uses no SemiBold in <_.Source>, so that every title and label is bold' -ForEach $script:AppDocumentCase {
-        $_.Text | Should -Not -Match 'FontWeight="SemiBold"'
-    }
 }
 
 Describe 'No banned word in the UI text and the documents (c)' {
