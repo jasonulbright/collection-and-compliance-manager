@@ -29,7 +29,7 @@ The [user guide](docs/index.md) walks every view, dialog and setting with images
    ```powershell
    powershell -ExecutionPolicy Bypass -File start-ccm.ps1
    ```
-2. Click the **Options** button on the sidebar and set your Site Code and SMS Provider.
+2. Click the **Options** button on the sidebar and set your Site Code and SMS Provider. The footer then shows the site at the right end, for example `Site MCM · cm01.contoso.com`. The footer is read-only. Click the site text to open Options.
 3. Click **Refresh** to load every device collection.
 
 ## Layout

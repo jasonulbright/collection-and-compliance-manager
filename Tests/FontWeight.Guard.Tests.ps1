@@ -29,7 +29,7 @@ BeforeAll {
     # ---- Per-app configuration ------------------------------------------------
     # The exact text of a label that names a value field shown as read-only text.
     $script:AllowedTitleText = @(
-        'Description', 'Limiting Collection', 'Expanded WQL', 'Source', 'Template', 'Target Collection', 'Site Code', 'SMS Provider'
+        'Description', 'Limiting Collection', 'Expanded WQL', 'Source', 'Template', 'Target Collection'
     )
     # The key of a style that only field titles take.
     $script:AllowedTitleStyleKey = @('FieldLabel')
