@@ -277,7 +277,7 @@ function Sync-FooterSite {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Updates an in-window TextBlock only; no external state.')]
     param()
     try { Update-SuiteFooter -Window $window -SiteCode ([string]$global:Prefs.SiteCode) -SiteServer ([string]$global:Prefs.SMSProvider) }
-    catch { Add-LogLine ('Footer: {0}' -f $_.Exception.Message) }
+    catch { Write-Log ('Footer: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The footer failed. The log file has the details.' }
 }
 
 # =============================================================================
@@ -4046,7 +4046,7 @@ $window.Add_Loaded({
     Update-ActionBarVisibility
     Update-StatusBarSummary
     try { [void](Initialize-SuiteFooter -Window $window -StatusName 'txtStatus' -OnOpenOptions { Show-OptionsDialog }) }
-    catch { Add-LogLine ('Footer: {0}' -f $_.Exception.Message) }
+    catch { Write-Log ('Footer: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The footer failed. The log file has the details.' }
     Sync-FooterSite
     Add-LogLine 'Collection and Compliance Manager ready. Configure Site / Provider in Options, then click Refresh.'
 
