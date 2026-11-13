@@ -273,6 +273,13 @@ function Set-StatusText {
     $txtStatus.Text = $Text
 }
 
+function Sync-FooterSite {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Updates an in-window TextBlock only; no external state.')]
+    param()
+    try { Update-SuiteFooter -Window $window -SiteCode ([string]$global:Prefs.SiteCode) -SiteServer ([string]$global:Prefs.SMSProvider) }
+    catch { Write-Log ('Footer: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The footer failed. The log file has the details.' }
+}
+
 # =============================================================================
 # Title-bar drag fallback. PS51-WPF-033. SuiteCommon owns the hook.
 # =============================================================================
@@ -1139,6 +1146,7 @@ function Invoke-Refresh {
 
             Update-Filter
             Update-StatusBarSummary
+            Sync-FooterSite
 
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
@@ -1865,6 +1873,7 @@ function Invoke-LoadLive {
             $txtLiveDeplHeader.Text = 'Deployments -- select a baseline'
             Update-Filter
             Update-StatusBarSummary
+            Sync-FooterSite
 
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
@@ -2141,6 +2150,7 @@ function Invoke-LoadEditorCIs {
             catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
             Add-LogLine ('Editor: loaded {0} configuration items.' -f @($cboEditorCI.ItemsSource).Count)
             Update-StatusBarSummary
+            Sync-FooterSite
         }
     })
     $script:BgTimer.Start()
@@ -2916,6 +2926,7 @@ function Invoke-LoadAuditing {
                 })
             Update-Filter
             Update-StatusBarSummary
+            Sync-FooterSite
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
             try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
@@ -3976,6 +3987,7 @@ function Show-OptionsDialog {
         $global:Prefs.SMSProvider = $newProvider
         $global:Prefs.CatalogPath = ([string]$txtCatalogPath.Text).Trim()
         Save-CmPreferences -Prefs $global:Prefs
+        Sync-FooterSite
 
         if ($connectionChanged) {
             Dispose-BgWork
@@ -4033,6 +4045,9 @@ $window.Add_Loaded({
 
     Update-ActionBarVisibility
     Update-StatusBarSummary
+    try { [void](Initialize-SuiteFooter -Window $window -StatusName 'txtStatus' -OnOpenOptions { Show-OptionsDialog }) }
+    catch { Write-Log ('Footer: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The footer failed. The log file has the details.' }
+    Sync-FooterSite
     Add-LogLine 'Collection and Compliance Manager ready. Configure Site / Provider in Options, then click Refresh.'
 
     # Auto-load templates so the Templates view is populated on first switch

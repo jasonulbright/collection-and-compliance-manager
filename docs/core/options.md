@@ -27,6 +27,10 @@ Select **Options** in the sidebar.
 
 ![The Connection page](../images/options-connection.png)
 
+### Site in the footer
+
+The footer of the main window shows the site on the right, for example `Site MCM · cm01.contoso.com`. It shows `Site not set` while the site code or the provider is empty. The footer is read-only. Select the site text to open Options. You change the site code and the provider only here.
+
 ### Catalog
 
 Type the **Catalog Path** or select **Browse...**. The folder holds the subcategory folders of the catalog. The default is the `Catalog` folder beside the script.
