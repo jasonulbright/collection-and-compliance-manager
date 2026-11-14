@@ -31,9 +31,9 @@ function Get-KnownContrastDefect {
                 'btnRemoveRule:DisabledText', 'btnUpdateRule:DisabledText', 'btnValidateWql:DisabledText',
                 'btnViewAuditing:DisabledText', 'btnViewCatalog:DisabledText', 'btnViewCollections:DisabledText',
                 'btnViewEditor:DisabledText', 'btnViewLive:DisabledText', 'btnViewTemplates:DisabledText',
-                'btnViewWqlEditor:DisabledText', 'text:Deploy...', 'titlebar:inactive',
-                'txtCatDetail:DisabledBorder', 'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder',
-                'txtEditorDetail:EnabledBorder', 'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
+                'btnViewWqlEditor:DisabledText', 'text:Deploy...', 'txtCatDetail:DisabledBorder',
+                'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder',
+                'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
                 'txtWqlEditor:DisabledBorder', 'txtWqlEditor:EnabledBorder'
             )
         }
@@ -48,22 +48,14 @@ function Get-KnownContrastDefect {
                 'btnRemoveColl:DisabledText', 'btnRemoveRule:DisabledText', 'btnUpdateRule:DisabledText',
                 'btnValidateWql:DisabledText', 'btnViewAuditing:DisabledText', 'btnViewCatalog:DisabledText',
                 'btnViewCollections:DisabledText', 'btnViewEditor:DisabledText', 'btnViewLive:DisabledText',
-                'btnViewTemplates:DisabledText', 'btnViewWqlEditor:DisabledText', 'cboCatOsScope:DisabledBorder',
-                'cboCatOsScope:DisabledText', 'cboCatOsScope:EnabledBorder', 'cboCatOsScope:EnabledText',
-                'cboCatSeverity:DisabledBorder', 'cboCatSeverity:DisabledText', 'cboCatSeverity:EnabledBorder',
-                'cboCatSeverity:EnabledText', 'cboCatStatus:DisabledBorder', 'cboCatStatus:DisabledText',
-                'cboCatStatus:EnabledBorder', 'cboCatStatus:EnabledText', 'cboCatSubcategory:DisabledBorder',
-                'cboCatSubcategory:DisabledText', 'cboCatSubcategory:EnabledBorder', 'cboCatSubcategory:EnabledText',
-                'cboCollectionFilter:DisabledBorder', 'cboCollectionFilter:DisabledText', 'cboCollectionFilter:EnabledBorder',
-                'cboCollectionFilter:EnabledText', 'cboEditorCI:DisabledBorder', 'cboEditorCI:DisabledText',
-                'cboEditorCI:EnabledBorder', 'cboEditorCI:EnabledText', 'text:Deploy...',
-                'titlebar:inactive', 'txtCatCve:DisabledBorder', 'txtCatCve:EnabledBorder',
-                'txtCatDetail:DisabledBorder', 'txtCatDetail:EnabledBorder', 'txtCatTenable:DisabledBorder',
-                'txtCatTenable:EnabledBorder', 'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder',
-                'txtFilter:DisabledBorder', 'txtFilter:EnabledBorder', 'txtRuleName:DisabledBorder',
-                'txtRuleName:EnabledBorder', 'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
-                'txtWqlEditor:DisabledBorder', 'txtWqlEditor:EnabledBorder', 'txtWqlTreeFilter:DisabledBorder',
-                'txtWqlTreeFilter:EnabledBorder'
+                'btnViewTemplates:DisabledText', 'btnViewWqlEditor:DisabledText', 'cboCatOsScope:DisabledText',
+                'cboCatOsScope:EnabledText', 'cboCatSeverity:DisabledText', 'cboCatSeverity:EnabledText',
+                'cboCatStatus:DisabledText', 'cboCatStatus:EnabledText', 'cboCatSubcategory:DisabledText',
+                'cboCatSubcategory:EnabledText', 'cboCollectionFilter:DisabledText', 'cboCollectionFilter:EnabledText',
+                'cboEditorCI:DisabledText', 'cboEditorCI:EnabledText', 'text:Deploy...', 'txtCatDetail:DisabledBorder',
+                'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder',
+                'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
+                'txtWqlEditor:DisabledBorder', 'txtWqlEditor:EnabledBorder'
             )
         }
     }
