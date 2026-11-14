@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Space the WQL Editor on a 4 and 8 px grid and label the query box.
+- Show button borders at 1 px in gray, with no heavy black border.
+- Space the dialog labels on the 4 px grid; size New Collection to its content.
+- Show the details pane in the UI font, with a Type column header.
+- Add tests for the WQL spacing, the dialog chrome and the button style.
+- Add guards for muted text brushes and the dialog theme call.
+
 ## [2026.11.14.0020] - 2026-11-14
 
 ## 13 new entries in the shipped version lists

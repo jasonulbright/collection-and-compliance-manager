@@ -692,12 +692,12 @@ $gridCollections.Add_SelectionChanged({
     }
 
     $lines = @(
-        ('Name:                 {0}' -f $row.Name),
-        ('Collection ID:        {0}' -f $row.CollectionID),
-        ('Member Count:         {0}' -f $row.MemberCount),
-        ('Limiting Collection:  {0}' -f $row.LimitingCollection),
-        ('Refresh Type:         {0}' -f $row.RefreshType),
-        ('Built-in:             {0}' -f $row.IsBuiltIn),
+        ('Name: {0}' -f $row.Name),
+        ('Collection ID: {0}' -f $row.CollectionID),
+        ('Member Count: {0}' -f $row.MemberCount),
+        ('Limiting Collection: {0}' -f $row.LimitingCollection),
+        ('Refresh Type: {0}' -f $row.RefreshType),
+        ('Built-in: {0}' -f $row.IsBuiltIn),
         '',
         'Comment:',
         $row.Comment
@@ -1382,13 +1382,15 @@ $script:DialogButtonStyleXaml = @'
             <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Gray10}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray2}"/>
+                <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="MinWidth" Value="90"/>
                 <Setter Property="Height" Value="32"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
@@ -1455,7 +1457,7 @@ function Show-CatalogDeployDialog {
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button x:Name="btnDeploy"       Content="Deploy" Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-                    <Button x:Name="btnDeployCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+                    <Button x:Name="btnDeployCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
                 </StackPanel>
                 <TextBlock x:Name="txtDeployErr" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"
                            Visibility="Collapsed"
@@ -2425,7 +2427,7 @@ function Show-AddSettingDialog {
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button x:Name="btnAddOk"     Content="Add"    Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-                    <Button x:Name="btnAddCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+                    <Button x:Name="btnAddCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
                 </StackPanel>
                 <TextBlock x:Name="txtAddErr" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"
                            Visibility="Collapsed" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -2694,7 +2696,7 @@ function Show-EditSettingDialog {
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button x:Name="btnEditOk"     Content="Save"   Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-                    <Button x:Name="btnEditCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+                    <Button x:Name="btnEditCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
                 </StackPanel>
                 <TextBlock x:Name="txtEditErr" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"
                            Visibility="Collapsed" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -3179,7 +3181,7 @@ function Show-NewCollectionDialog {
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     Title="New Collection"
-    Width="540" Height="380"
+    Width="540" SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
     TitleCharacterCasing="Normal"
     GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
@@ -3211,11 +3213,11 @@ function Show-NewCollectionDialog {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtName" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="e.g. Workstations - Pilot Ring"/>
 
-            <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -3234,11 +3236,11 @@ function Show-NewCollectionDialog {
                         ToolTip="Pick the limiting collection from the folder tree."/>
             </Grid>
 
-            <TextBlock Text="Comment" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Comment" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtComment" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Optional"/>
 
-            <TextBlock Text="Refresh Type" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Refresh Type" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <ComboBox x:Name="cboRefresh" FontSize="12">
                 <ComboBoxItem Content="Manual"/>
                 <ComboBoxItem Content="Periodic"/>
@@ -3248,7 +3250,7 @@ function Show-NewCollectionDialog {
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button x:Name="btnOk"     Content="Create" Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-            <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+            <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0"        IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Controls:MetroWindow>
@@ -3347,17 +3349,17 @@ function Show-CopyCollectionDialog {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Source" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Source" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBlock x:Name="txtSource" FontSize="13" FontWeight="SemiBold"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,16,0,0">
-            <TextBlock Text="New Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="New Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtNewName" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Name of the new collection"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button x:Name="btnOk"     Content="Copy"   Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-            <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+            <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Controls:MetroWindow>
@@ -3478,7 +3480,7 @@ function Show-EditMembershipDialog {
         </StackPanel>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button x:Name="btnClose" Content="Close" Style="{StaticResource DialogButton}" IsCancel="True"/>
+            <Button x:Name="btnClose" Content="Close" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Controls:MetroWindow>
@@ -3598,11 +3600,11 @@ function Show-ApplyTemplateDialog {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Template" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Template" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBlock x:Name="txtTemplateName" FontSize="13" FontWeight="SemiBold"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,12,0,0">
-            <TextBlock Text="Target Collection" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Target Collection" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -3622,10 +3624,10 @@ function Show-ApplyTemplateDialog {
             </Grid>
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
-            <TextBlock Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+            <TextBlock Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtRuleName" FontSize="12" Padding="6,4,6,4"/>
         </StackPanel>
-        <TextBlock Grid.Row="3" Text="Expanded WQL" FontSize="11" FontWeight="Bold" Margin="0,12,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
+        <TextBlock Grid.Row="3" Text="Expanded WQL" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
         <TextBox x:Name="txtExpanded" Grid.Row="4" IsReadOnly="True"
                  AcceptsReturn="True" TextWrapping="NoWrap"
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
@@ -3636,7 +3638,7 @@ function Show-ApplyTemplateDialog {
                  BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"/>
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button x:Name="btnOk"     Content="Apply"  Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-            <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+            <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Controls:MetroWindow>
@@ -3841,6 +3843,8 @@ function Show-OptionsDialog {
                 <Setter Property="FontSize" Value="13"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
                 <Setter Property="Margin" Value="0"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray2}"/>
             </Style>
             <!--DIALOG_BUTTON_STYLES-->
         </ResourceDictionary>
@@ -3884,7 +3888,7 @@ function Show-OptionsDialog {
 
             <StackPanel x:Name="paneCatalog" Visibility="Collapsed">
                 <TextBlock Text="CI/CB Catalog" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                <TextBlock Text="Catalog Path" FontSize="11" FontWeight="Bold" Margin="0,4,0,2"
+                <TextBlock Text="Catalog Path" FontSize="11" FontWeight="Bold" Margin="0,4,0,4"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <DockPanel LastChildFill="True">
                     <Button x:Name="btnBrowseCatalog" DockPanel.Dock="Right" Content="Browse..."
@@ -3915,7 +3919,7 @@ function Show-OptionsDialog {
         <Border Grid.Row="1" Grid.ColumnSpan="3" Padding="16,12,16,12">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="btnOk"     Content="OK"     Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
-                <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}"        IsCancel="True"/>
+                <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
             </StackPanel>
         </Border>
     </Grid>

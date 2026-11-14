@@ -45,3 +45,37 @@ Describe 'Editor status bar' {
         $strScript | Should -Match "(?s)Editor: loaded \{0\} configuration items\.'[^\r\n]*\r?\n\s*Update-StatusBarSummary"
     }
 }
+
+Describe 'WQL Editor layout (XAML)' {
+    BeforeAll {
+        try { $script:nsWpf.AddNamespace('x', 'http://schemas.microsoft.com/winfx/2006/xaml') } catch { $null = $_ }
+        $script:view = $script:xmlWindow.SelectSingleNode("//w:Grid[@x:Name='viewWqlEditor']", $script:nsWpf)
+    }
+
+    It 'finds the view' { $script:view | Should -Not -BeNullOrEmpty }
+
+    It 'gives the right pane a minimum width and a star-sized editor row with a minimum height' {
+        $cols = @($script:view.SelectSingleNode("w:Grid.ColumnDefinitions", $script:nsWpf).ChildNodes)
+        [int]$cols[2].GetAttribute('MinWidth') | Should -BeGreaterOrEqual 360
+        $rowsNode = $script:view.SelectSingleNode('.//w:Grid.RowDefinitions', $script:nsWpf)
+        $edRows = @($rowsNode.ChildNodes | Where-Object { $_.GetAttribute('Height') -match '\*$' })
+        $edRows.Count | Should -BeGreaterOrEqual 2
+        foreach ($r in $edRows) { [int]$r.GetAttribute("MinHeight") | Should -BeGreaterOrEqual 72 }
+    }
+
+    It 'puts every margin of the view on the 4 px grid' {
+        foreach ($node in $script:view.SelectNodes('.//*[@Margin]')) {
+            foreach ($attr in 'Margin') {
+                $v = $node.GetAttribute($attr)
+                if (-not $v) { continue }
+                foreach ($n in ($v -split '[,\s]+' | Where-Object { $_ })) {
+                    ([double]$n % 4) | Should -Be 0 -Because ('{0}="{1}" on {2}' -f $attr, $v, $node.LocalName)
+                }
+            }
+        }
+    }
+
+    It 'labels the query box' {
+        $script:view.SelectSingleNode(".//w:TextBlock[@Text='Query']", $script:nsWpf) | Should -Not -BeNullOrEmpty
+    }
+}
