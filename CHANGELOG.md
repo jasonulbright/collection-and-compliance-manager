@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [2026.11.14.0021] - 2026-11-14
+
+## 6 fixes for spacing, dialogs and buttons
+
 ### Fixed
 
 - Space the WQL Editor on a 4 and 8 px grid and label the query box.
