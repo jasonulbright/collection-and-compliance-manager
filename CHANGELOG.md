@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add a window test for the hover, focus and pressed states of the buttons.
+
 ## [2026.11.14.0021] - 2026-11-14
 
 ## 6 fixes for spacing, dialogs and buttons
