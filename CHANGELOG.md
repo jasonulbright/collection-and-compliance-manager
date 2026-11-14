@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Refresh the shipped version lists to Microsoft sources of 2026-11-14: ConfigMgr 2211, 2603 and 2609 client versions, the 2309 client build fix (9122), Microsoft 365 Apps builds 2601 and 2604 to 2610, Windows 11 26H1 and 26H2.
+- Name 2609 in the Not Latest client version query.
+
+### Added
+
+- Test the template and catalog lists against a reference table, and fail on a missing field or an unknown build.
+- Add the page docs/VERSION-REFRESH.md with the refresh steps.
+
 ## [2026.11.14.0019] - 2026-11-14
 
 ## 3 fixes for contrast, shared styles and window tests

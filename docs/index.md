@@ -10,7 +10,7 @@ Collection and Compliance Manager manages Configuration Manager device collectio
 
 - [Collections](core/collections.md): the collection grid, the detail tabs, New Collection, Copy, Edit Membership, Evaluate and Remove.
 - [WQL Editor](core/wql-editor.md): pick a collection, edit a query rule, Validate Query and Preview Results.
-- [Templates](core/templates.md): 225 operational and 20 parameterized queries, Copy to WQL Editor and Apply to Collection.
+- [Templates](core/templates.md): 238 operational and 20 parameterized queries, Copy to WQL Editor and Apply to Collection.
 - [Catalog](core/catalog.md): the bundled catalog of configuration items and baselines, and Deploy.
 - [Live CI/CB](core/live-cicb.md): the configuration items and baselines of the site, and the actions on baseline deployments.
 - [Editor](core/editor.md): the registry and script settings of a configuration item.
@@ -29,6 +29,7 @@ Collection and Compliance Manager manages Configuration Manager device collectio
 - [Catalog schema](CATALOG-SCHEMA.md): the metadata contract of a catalog entry.
 - [Light theme check](reference/light-theme-check.md): the light theme states, with the colors read from the screen.
 - [Capture the images again](reference/capture-images.md): the one command that regenerates the images of this guide.
+- [Refresh the version lists](VERSION-REFRESH.md): where each shipped version list lives and which Microsoft page gives the newest value.
 
 ## External references
 

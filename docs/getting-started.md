@@ -27,7 +27,7 @@ Use it to create or copy collections, to write and test WQL query rules, to appl
 powershell -ExecutionPolicy Bypass -File start-ccm.ps1
 ```
 
-The window opens on the Collections view. The window of the first start is empty. The templates load from disk at the start: the log shows `Loaded 225 operational + 20 parameterized templates.`
+The window opens on the Collections view. The window of the first start is empty. The templates load from disk at the start: the log shows `Loaded 238 operational + 20 parameterized templates.`
 
 ![The window at the first start](images/start-first-run.png)
 
