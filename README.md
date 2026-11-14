@@ -7,7 +7,7 @@
 
 Manage Configuration Manager device collections, WQL rules, and compliance configuration items / baselines. Skip the slow console -- load collections into a local grid, edit WQL in a fast monospace editor, browse and deploy a catalog of pre-made CI/CB hardening baselines, edit live compliance settings, and audit drift.
 
-Ships with a template library (225 operational queries + 20 parameterized WQL templates) and a bundled CI/CB catalog of 16 ready-made hardening / compliance baselines.
+Ships with a template library (238 operational queries + 20 parameterized WQL templates) and a bundled CI/CB catalog of 16 ready-made hardening / compliance baselines.
 
 ![Collections view](screenshot_collections.png)
 
@@ -124,7 +124,7 @@ collection-and-compliance-manager/
 |  +- CCMCommon.psd1                         # Module manifest
 |  \- CCMCommon.psm1                         # Business logic (53 functions)
 +- Templates/
-|  +- operational-collections.json           # 225 ready-made queries
+|  +- operational-collections.json           # 238 ready-made queries
 |  \- parameterized-templates.json           # 20 parameterized templates
 +- Catalog/                                  # Bundled CI/CB catalog (16 entries: metadata.psd1 + builder)
 |  +- Compliance/  +- Configuration/  +- CVE-Remediation/  \- Hardening/

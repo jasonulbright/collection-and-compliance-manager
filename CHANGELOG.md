@@ -11,6 +11,21 @@
 - Add tests for the WQL spacing, the dialog chrome and the button style.
 - Add guards for muted text brushes and the dialog theme call.
 
+## [2026.11.14.0020] - 2026-11-14
+
+## 13 new entries in the shipped version lists
+
+### Added
+
+- Add ConfigMgr client versions 2211, 2603 and 2609.
+- Add Microsoft 365 Apps builds 2601 and 2604 to 2610.
+- Add Windows 11 versions 26H1 and 26H2.
+- Point the Not Latest client query at version 2609.
+
+### Fixed
+
+- Fix the client build of ConfigMgr version 2309.
+
 ## [2026.11.14.0019] - 2026-11-14
 
 ## 3 fixes for contrast, shared styles and window tests

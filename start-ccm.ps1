@@ -18,7 +18,7 @@
 
 .NOTES
     ScriptName : start-ccm.ps1
-    Version    : 2026.11.14.0019
+    Version    : 2026.11.14.0020
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification='Per feedback_ps_wpf_handler_rules.md and PS51-WPF-001..003: flat-.ps1 GetNewClosure strips $script: scope. $global: survives closure scope-strip and keeps shared mutable state reachable from closure-captured handlers.')]
@@ -338,7 +338,7 @@ $toggleTheme.Add_Toggled({
 $script:ViewMeta = @{
     'Collections' = @{ Title = 'Collections'; Subtitle = 'All device collections in the site. Configure Site / Provider in Options, then click Refresh.' }
     'WQL Editor'  = @{ Title = 'WQL Editor';  Subtitle = 'Edit query rules on a selected collection. Validate syntax and preview matches before committing.' }
-    'Templates'   = @{ Title = 'Templates';   Subtitle = '225 ready-made operational queries plus 20 parameterized templates. Apply to a collection or copy into the WQL Editor.' }
+    'Templates'   = @{ Title = 'Templates';   Subtitle = '238 ready-made operational queries plus 20 parameterized templates. Apply to a collection or copy into the WQL Editor.' }
     'Catalog'     = @{ Title = 'Catalog';     Subtitle = 'Configuration Item / Baseline catalog from a local clone. Set the Catalog Path in Options, then click Reload Catalog.' }
     'Live CI/CB'  = @{ Title = 'Live CI/CB';  Subtitle = 'Configuration items and baselines on the live site. Select a baseline to see its deployments. Click Refresh to (re)load.' }
     'Editor'      = @{ Title = 'Editor';      Subtitle = 'Edit the compliance settings of a configuration item. Refresh to load CIs, pick one, then view / remove its settings.' }
@@ -3908,7 +3908,7 @@ function Show-OptionsDialog {
                            FontSize="13" FontWeight="SemiBold"/>
                 <TextBlock Text="Create, copy and remove ConfigMgr device collections. Edit query rules with WQL validation and a result preview. Apply a ready-made query template to a collection."
                            FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
-                <TextBlock Text="225 ready-made operational queries plus 20 parameterized templates ship with the app."
+                <TextBlock Text="238 ready-made operational queries plus 20 parameterized templates ship with the app."
                            FontSize="12" TextWrapping="Wrap" Margin="0,12,0,0"/>
                 <TextBlock Text="Author: Jason Ulbright. License: MIT."
                            FontSize="11" Margin="0,16,0,0"
