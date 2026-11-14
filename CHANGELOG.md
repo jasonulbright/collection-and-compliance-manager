@@ -2,9 +2,14 @@
 
 ## [Unreleased]
 
+## [2026.11.14.0023] - 2026-11-14
+
+## 12 files made plain ASCII
+
 ### Fixed
 
-- Make the PowerShell sources and the files they read plain ASCII, and add the encoding guard.
+- Remove the BOM and every non-ASCII character from sources, tests and docs.
+- Add the encoding guard test for all repository files.
 
 ## [2026.11.14.0022] - 2026-11-14
 
