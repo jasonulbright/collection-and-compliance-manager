@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Make the PowerShell sources and the files they read plain ASCII, and add the encoding guard.
+
 ### Added
 
 - Add a window test for the hover, focus and pressed states of the buttons.
@@ -50,7 +54,7 @@
 
 ### Added
 
-- Show the site code and the SMS Provider in the footer as one text, for example `Site MCM · cm01.contoso.com`. The footer shows `Site not set` while a value is empty. Select the text to open Options.
+- Show the site code and the SMS Provider in the footer as one text, for example `Site MCM - cm01.contoso.com`. The footer shows `Site not set` while a value is empty. Select the text to open Options.
 - Add a guard test for the footer: one status element, no font setting on it, the footer calls, and no editable site field outside Options.
 
 ### Changed

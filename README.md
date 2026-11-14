@@ -29,7 +29,7 @@ The [user guide](docs/index.md) walks every view, dialog and setting with images
    ```powershell
    powershell -ExecutionPolicy Bypass -File start-ccm.ps1
    ```
-2. Click the **Options** button on the sidebar and set your Site Code and SMS Provider. The footer then shows the site at the right end, for example `Site MCM · cm01.contoso.com`. The footer is read-only. Click the site text to open Options.
+2. Click the **Options** button on the sidebar and set your Site Code and SMS Provider. The footer then shows the site at the right end, for example `Site MCM - cm01.contoso.com`. The footer is read-only. Click the site text to open Options.
 3. Click **Refresh** to load every device collection.
 
 ## Layout
@@ -85,33 +85,33 @@ The shell uses a sidebar layout with seven views and an Options modal, grouped i
 
 ## Bundled CI/CB Catalog
 
-Ships under `Catalog/` (auto-loaded). Each entry is a `metadata.psd1` + builder that creates the named Configuration Item(s) and Baseline(s) on your site. † = reboot required.
+Ships under `Catalog/` (auto-loaded). Each entry is a `metadata.psd1` + builder that creates the named Configuration Item(s) and Baseline(s) on your site. "(reboot)" marks an entry that needs a reboot.
 
 ![CI/CB Catalog view](screenshot_ci_catalog.png)
 
 **Compliance**
-- **Autorun/Autoplay Disable** — `NoDriveTypeAutoRun = 255`; kills removable-media / mapped-share autorun.
-- **PowerShell Script Block Logging** — `EnableScriptBlockLogging = 1` (event 4104); detective control.
-- **RDP NLA + TLS Required** — `UserAuthentication = 1`, `SecurityLayer = 2`; removes pre-auth RDP surface.
-- **SMBv1 Disable (server)** — `LanmanServer\SMB1 = 0`.
-- **TLS Legacy Disable (SCHANNEL + .NET 4.x)** † — disables SSL 2/3, TLS 1.0/1.1, enables TLS 1.2, forces .NET 4.x strong crypto (24 DWORDs).
-- **UAC Remote Restriction** — `LocalAccountTokenFilterPolicy = 0`; blocks Pass-the-Hash lateral movement.
-- **Windows Installer AlwaysInstallElevated Disable** — `HKLM = 0`; removes an MSI→SYSTEM LPE primitive.
+- **Autorun/Autoplay Disable** - `NoDriveTypeAutoRun = 255`; kills removable-media / mapped-share autorun.
+- **PowerShell Script Block Logging** - `EnableScriptBlockLogging = 1` (event 4104); detective control.
+- **RDP NLA + TLS Required** - `UserAuthentication = 1`, `SecurityLayer = 2`; removes pre-auth RDP surface.
+- **SMBv1 Disable (server)** - `LanmanServer\SMB1 = 0`.
+- **TLS Legacy Disable (SCHANNEL + .NET 4.x)** (reboot) - disables SSL 2/3, TLS 1.0/1.1, enables TLS 1.2, forces .NET 4.x strong crypto (24 DWORDs).
+- **UAC Remote Restriction** - `LocalAccountTokenFilterPolicy = 0`; blocks Pass-the-Hash lateral movement.
+- **Windows Installer AlwaysInstallElevated Disable** - `HKLM = 0`; removes an MSI->SYSTEM LPE primitive.
 
 **Configuration**
-- **Acrobat All Tools Pane Fix** † — Adobe workaround (`bGenCoverPagesLabelStrings = 1`); retire when patched.
-- **Delivery Optimization Download Mode** — `DODownloadMode` (clients = 0, servers = 99); one CI/CB per OS class.
+- **Acrobat All Tools Pane Fix** (reboot) - Adobe workaround (`bGenCoverPagesLabelStrings = 1`); retire when patched.
+- **Delivery Optimization Download Mode** - `DODownloadMode` (clients = 0, servers = 99); one CI/CB per OS class.
 
 **CVE-Remediation**
-- **CPU Speculative Execution Mitigations (Intel + AMD, Bundled)** † — bitmask enforcement of `FeatureSettingsOverride`; vendor auto-detected, one CI/CB per Hyper-Threading variant. Covers Spectre/Meltdown/SSBD/L1TF/MDS/TAA/SRBDS, Intel BHI, AMD BTC + Inception.
+- **CPU Speculative Execution Mitigations (Intel + AMD, Bundled)** (reboot) - bitmask enforcement of `FeatureSettingsOverride`; vendor auto-detected, one CI/CB per Hyper-Threading variant. Covers Spectre/Meltdown/SSBD/L1TF/MDS/TAA/SRBDS, Intel BHI, AMD BTC + Inception.
 
 **Hardening**
-- **Anonymous Enumeration Restrictions** — `RestrictAnonymous`/`RestrictAnonymousSAM = 1`, `EveryoneIncludesAnonymous = 0`.
-- **LLMNR Disable** — blocks Responder-style name-resolution poisoning.
-- **LSA Protection (RunAsPPL)** † — `RunAsPPL = 1`; LSASS as PPL, blocks most credential dumping.
-- **NTLM LmCompatibilityLevel** — `= 5` (NTLMv2-only; refuse LM & NTLMv1).
-- **SMB Signing Required** — `RequireSecuritySignature = 1` (client + server); defeats SMB relay.
-- **WDigest Credential Caching Disable** — `UseLogonCredential = 0`; blocks Mimikatz wdigest cleartext recovery.
+- **Anonymous Enumeration Restrictions** - `RestrictAnonymous`/`RestrictAnonymousSAM = 1`, `EveryoneIncludesAnonymous = 0`.
+- **LLMNR Disable** - blocks Responder-style name-resolution poisoning.
+- **LSA Protection (RunAsPPL)** (reboot) - `RunAsPPL = 1`; LSASS as PPL, blocks most credential dumping.
+- **NTLM LmCompatibilityLevel** - `= 5` (NTLMv2-only; refuse LM & NTLMv1).
+- **SMB Signing Required** - `RequireSecuritySignature = 1` (client + server); defeats SMB relay.
+- **WDigest Credential Caching Disable** - `UseLogonCredential = 0`; blocks Mimikatz wdigest cleartext recovery.
 
 ## Project Structure
 
