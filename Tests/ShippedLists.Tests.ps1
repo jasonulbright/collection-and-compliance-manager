@@ -95,7 +95,14 @@ Describe 'ConfigMgr client versions' {
         $t = @($script:Operational | Where-Object { $_.Name -like 'Clients Version | Not Latest (*' })
         $t.Count | Should -Be 1
         $t[0].Name | Should -Be "Clients Version | Not Latest ($newest)"
-        $t[0].Query | Should -BeLike "*'5.00.$($script:Ref.ConfigMgrClient.Versions[$newest]).10%'*"
+        $t[0].Query | Should -BeLike "*ClientVersion not like '5.00.$($script:Ref.ConfigMgrClient.Versions[$newest]).10%'*"
+    }
+
+    It 'has no Clients Version template with a name that the checks cannot read' {
+        $bad = foreach ($t in $script:Operational) {
+            if ($t.Category -eq 'Clients Version' -and $t.Name -notmatch '^Clients Version \| (\d{4}|R2 .+|Not Latest \(\d{4}\))$') { $t.Name }
+        }
+        @($bad) | Should -BeNullOrEmpty
     }
 }
 
@@ -175,6 +182,12 @@ Describe 'Windows builds' {
         $names = @($script:Operational | ForEach-Object Name)
         $bad = foreach ($label in $script:Ref.WindowsServerBuild.Builds.Keys) { if ("Servers | $label" -notin $names) { $label } }
         @($bad | Sort-Object) | Should -BeNullOrEmpty
+    }
+
+    It 'has a template for the newest Windows 10 build and Windows Server build' {
+        $names = @($script:Operational | ForEach-Object Name)
+        $names | Should -Contain "Workstations | $($script:Ref.Newest.Windows10Build)"
+        $names | Should -Contain "Servers | $($script:Ref.Newest.ServerBuild)"
     }
 
     It 'has a template for the newest Windows 11 build' {
