@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Main window of Collection and Compliance Manager, a tool that manages Configuration Manager device collections, WQL rules and compliance baselines.
 
@@ -420,11 +420,11 @@ $window.Dispatcher.Add_UnhandledException({
 })
 
 # =============================================================================
-# Glyph mapping per brand: ✓/✗/⋯/⚠ at ThemeForeground (no colored fills).
+# Glyph mapping per brand: U+2713/U+2717/U+22EF/U+26A0 at ThemeForeground (no colored fills).
 # =============================================================================
 function Get-CollectionTypeGlyph {
     param($Collection)
-    if ($Collection.IsBuiltIn) { return [char]0x22EF }   # ⋯ system-managed, read-only
+    if ($Collection.IsBuiltIn) { return [char]0x22EF }   # U+22EF system-managed, read-only
     return ''
 }
 
@@ -441,7 +441,7 @@ $script:OperationalTemplates    = @()
 $script:ParameterizedTemplates  = @()
 
 $script:CatalogIndex            = @()       # decorated catalog entries (with grid display fields)
-$global:CatalogFilterSuppress   = $false    # raised around programmatic facet mutation (wiring-gotchas §0)
+$global:CatalogFilterSuppress   = $false    # raised around programmatic facet mutation (wiring-gotchas section 0)
 
 $script:LiveCIs                 = @()       # shaped Configuration Item rows
 $script:LiveCBs                 = @()       # shaped Configuration Baseline rows
@@ -1548,7 +1548,7 @@ function Show-CatalogDeployDialog {
             if ($canCreate) {
                 $btnC = New-Object System.Windows.Controls.Button
                 $btnC.Content = 'Create'
-                # Code-built buttons need style + casing set explicitly (wiring-gotchas §3),
+                # Code-built buttons need style + casing set explicitly (wiring-gotchas section 3),
                 # else they render default-styled / UPPER-CASED.
                 [MahApps.Metro.Controls.ControlsHelper]::SetContentCharacterCasing($btnC, [System.Windows.Controls.CharacterCasing]::Normal)
                 $btnC.SetResourceReference([System.Windows.FrameworkElement]::StyleProperty, 'DialogButton')

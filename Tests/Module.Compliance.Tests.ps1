@@ -1,4 +1,4 @@
-﻿#Requires -Modules Pester
+#Requires -Modules Pester
 # Catalog metadata rules, builder arguments, drift tags, baseline and configuration item
 # actions, compliance summary, freshness, drift report, exports. ConfigMgr cmdlets are
 # stubs and mocks. Covers success, failure, partial failure, -WhatIf and hostile input.
@@ -232,7 +232,7 @@ Describe 'Drift tag' {
         @{ Existing = 'Text [ccm:a@0.9.0]';        Expected = 'Text [ccm:a@1.0.0]' }
         @{ Existing = 'Text [ccm:x@1][ccm:y@2]';   Expected = 'Text [ccm:a@1.0.0]' }
         @{ Existing = '[ccm:a@0.1]';               Expected = '[ccm:a@1.0.0]' }
-        @{ Existing = 'Ünï [text] 日本';           Expected = 'Ünï [text] 日本 [ccm:a@1.0.0]' }
+        @{ Existing = ('' + [char]0x00DC + 'n' + [char]0x00EF + ' [text] ' + [char]0x65E5 + [char]0x672C);           Expected = ('' + [char]0x00DC + 'n' + [char]0x00EF + ' [text] ' + [char]0x65E5 + [char]0x672C + ' [ccm:a@1.0.0]') }
     ) {
         Get-DriftTaggedDescription -Existing $Existing -Id 'a' -Version '1.0.0' | Should -BeExactly $Expected
     }
