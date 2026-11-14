@@ -87,7 +87,7 @@ BeforeAll {
                 Set-DialogTheme -Dialog $d -IsDark $Arguments.Dark
                 $d.Show(); Wait-Layout $d
                 $title = $d.Title
-                $tbText = if ($Arguments.Dark) { [System.Windows.Media.Colors]::White } else { [System.Windows.Media.Colors]::White }
+                $tbText = if ($d.TitleForeground -is [System.Windows.Media.SolidColorBrush]) { $d.TitleForeground.Color } else { [System.Windows.Media.Colors]::White }
                 $act = $d.WindowTitleBrush
                 $out.Dialogs += [pscustomobject]@{
                     Title = $title; Index = $i
@@ -110,7 +110,11 @@ AfterAll {
 Describe 'Chrome <Theme>' -ForEach $script:ThemeCases -Skip:(-not $script:WindowGuard.Allowed) {
     BeforeAll { $script:M = $script:Measured[$Theme] }
 
-    It 'finds the dialogs' { @($script:M.Dialogs).Count | Should -BeGreaterThan 0 }
+    It 'finds every dialog of the script' {
+        $funcs = @([regex]::Matches((Get-Content -LiteralPath (Join-Path $script:Root $script:AppConfig.Shell) -Raw), '(?m)^function Show-\w*Dialog\b'))
+        $funcs.Count | Should -BeGreaterThan 0
+        @($script:M.Dialogs).Count | Should -BeGreaterOrEqual $funcs.Count
+    }
 
     It 'gives every dialog the title bar brush of the main window' {
         $bad = @($script:M.Dialogs | Where-Object { $_.Active -ne $script:M.MainTitle -or $_.Inactive -ne $script:M.MainTitleInactive } |

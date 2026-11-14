@@ -185,6 +185,12 @@
                 <Setter Property="Padding" Value="8"/>
             </Style>
 
+            <!-- Monospace detail text, only for padded columns and Format-List output (catalog and editor detail). -->
+            <Style x:Key="DetailMonoStyle" TargetType="TextBox" BasedOn="{StaticResource DetailTextStyle}">
+                <Setter Property="FontFamily" Value="Cascadia Code, Consolas, Courier New"/>
+                <Setter Property="FontSize" Value="11"/>
+            </Style>
+
             <Style x:Key="WqlEditorStyle" TargetType="TextBox">
                 <Setter Property="AcceptsReturn" Value="True"/>
                 <Setter Property="TextWrapping" Value="NoWrap"/>
@@ -725,7 +731,7 @@
                             </Border>
 
                             <TextBox x:Name="txtCatDetail" Grid.Row="1"
-                                     Style="{StaticResource DetailTextStyle}"
+                                     Style="{StaticResource DetailMonoStyle}"
                                      Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                      Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                      BorderThickness="1"
@@ -876,7 +882,7 @@
                     <DockPanel Grid.Column="2" Margin="8,0,0,0">
                         <TextBlock DockPanel.Dock="Top" Text="Setting Detail" FontSize="11" FontWeight="Bold" Margin="0,8,0,4"/>
                         <TextBox x:Name="txtEditorDetail"
-                                 Style="{StaticResource DetailTextStyle}"
+                                 Style="{StaticResource DetailMonoStyle}"
                                  Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                  Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                  BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"

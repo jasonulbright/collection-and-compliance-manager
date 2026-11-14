@@ -13,7 +13,7 @@
 BeforeDiscovery {
     $script:Root = Split-Path -Path $PSScriptRoot -Parent
     $script:OwnFiles = @(Get-ChildItem -LiteralPath $script:Root -Recurse -File -Include '*.xaml', '*.ps1', '*.psm1' |
-            Where-Object { $_.FullName -notmatch '[\\/](Lib|Tests|\.git|\.claude|docs|tools|node_modules)[\\/]' } |
+            Where-Object { $_.FullName.Substring($script:Root.Length) -notmatch'[\\/](Lib|Tests|\.git|\.claude|docs|tools|node_modules)[\\/]' } |
             ForEach-Object { @{ Path = $_.FullName; Name = $_.FullName.Substring($script:Root.Length + 1) } })
     $script:ScriptFiles = @($script:OwnFiles | Where-Object { $_.Name -like '*.ps1' -or $_.Name -like '*.psm1' })
 }
@@ -44,11 +44,12 @@ Describe 'Dialog theme' {
             while ($assign -and $assign -isnot [System.Management.Automation.Language.AssignmentStatementAst]) { $assign = $assign.Parent }
             if (-not $assign) { continue }
             $var = $assign.Left.Extent.Text
-            if ($var -notmatch '(?i)dlg|dialog') { continue }
+            if ($var -notmatch '(?i)dlg|dialog|popup') { continue }
             $owner = $funcs | Where-Object { $_.Extent.StartOffset -le $l.Extent.StartOffset -and $_.Extent.EndOffset -ge $l.Extent.EndOffset } |
                 Sort-Object { $_.Extent.EndOffset - $_.Extent.StartOffset } | Select-Object -First 1
-            $scope = if ($owner) { $owner.Extent.Text } else { $ast.Extent.Text }
-            if ($scope -notmatch 'Set-DialogTheme') { $missing += ('{0} (line {1})' -f $var, $l.Extent.StartLineNumber) }
+            $scopeAst = if ($owner) { $owner } else { $ast }
+            $themed = @($scopeAst.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] -and $n.GetCommandName() -eq 'Set-DialogTheme' -and $n.Extent.Text -match [regex]::Escape($var) }, $true))
+            if ($themed.Count -eq 0) { $missing += ('{0} (line {1})' -f $var, $l.Extent.StartLineNumber) }
         }
         $missing | Should -BeNullOrEmpty -Because 'call Set-DialogTheme instead of ChangeTheme on the dialog'
     }
