@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Set the caption text and button templates of the message box and confirm dialog.
+- Retake all 77 guide images and the README images with the dark inactive caption text.
+
 ## [2026.11.15.0025] - 2026-11-15
 
 ## 77 guide images retaken, 2 README images mapped
