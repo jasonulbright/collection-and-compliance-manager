@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [2026.11.15.0026] - 2026-11-15
+
+## 77 guide images retaken with dark inactive caption text
+
 ### Fixed
 
 - Set the caption text and button templates of the message box and confirm dialog.
