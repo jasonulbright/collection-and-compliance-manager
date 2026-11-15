@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [2026.11.15.0025] - 2026-11-15
+
+## 77 guide images retaken, 2 README images mapped
+
 ### Fixed
 
 - Keep accent and neutral buttons blue or neutral when hovered or pressed, no black pressed state.
