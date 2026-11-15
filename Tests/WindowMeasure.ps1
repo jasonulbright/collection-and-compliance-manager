@@ -99,6 +99,7 @@ $script:MeasureFunctions = {
                 Tag = $Tag; Name = $name; Text = $text.Substring(0, [math]::Min(40, $text.Length))
                 Size = $e.FontSize; Bold = ($e.FontWeight.ToOpenTypeWeight() -ge 700)
                 Foreground = $fgc.ToString(); Backdrop = $backdrop.ToString()
+                Enabled = [bool]$e.IsEnabled
                 Ratio = [math]::Round((Get-ContrastRatio $fgc $backdrop), 2)
             }
         }
