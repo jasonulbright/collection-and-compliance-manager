@@ -7,6 +7,10 @@
 - Keep accent and neutral buttons blue or neutral when hovered or pressed, no black pressed state.
 - Check dialog bodies, input colors and title bar text against the theme in both themes.
 
+### Changed
+
+- Retake all 77 guide images and map the 2 README images to the capture.
+
 ## [2026.11.15.0024] - 2026-11-15
 
 ## 76 guide images retaken with bordered dialog buttons

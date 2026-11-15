@@ -30,6 +30,7 @@ Use it after a change that alters the window, and before a release.
 2. Wait for the command to end. It prints a warning for each step that failed.
 3. Open every changed image and check it. Look for clipped text, empty grids and stale version strings.
 4. Run the documentation test: `Invoke-Pester .\Tests\Documentation.Tests.ps1`.
+5. Run `.\tools\guide-capture\Sync-ReadmeImages.ps1`. It copies the guide images that the README shows (`tools\guide-capture\readme-images.json`) over the README image files. The test `Tests\Readme.Images.Guard.Tests.ps1` fails when they differ.
 
 A second run inside the command does the missing-console test on a copy of the tool whose module lookup returns nothing.
 
