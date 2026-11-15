@@ -191,7 +191,8 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
         $m = ($script:Measured['{0}|1440x900' -f $Theme] | Where-Object View -eq $View)
         $m.Text.Count | Should -BeGreaterThan 3
         $known = @(Get-KnownContrastDefect -Theme $Theme)
-        $bad = $m.Text | Where-Object { $min = if (Test-LargeText $_) { 3.0 } else { 4.5 }; $_.Ratio -lt $min -and ($known -notcontains ('text:{0}' -f $_.Text)) }
+        # A disabled control is exempt from the text rule (WCAG 1.4.3); Get-DimmedControlOffender checks that it looks dimmed.
+        $bad = $m.Text | Where-Object { $min = if (Test-LargeText $_) { 3.0 } else { 4.5 }; $_.Enabled -ne $false -and $_.Ratio -lt $min -and ($known -notcontains ('text:{0}' -f $_.Text)) }
         $bad | ForEach-Object { '{0} "{1}" {2} on {3} = {4}' -f $_.Name, $_.Text, $_.Foreground, $_.Backdrop, $_.Ratio } | Should -BeNullOrEmpty
     }
     It 'keeps the title text readable on the active title bar' {
@@ -206,5 +207,10 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
         $fixed = @($known | Where-Object { $found -notcontains $_ })
         $new | Should -BeNullOrEmpty -Because ('a new contrast violation appeared: ' + ($new -join ', '))
         $fixed | Should -BeNullOrEmpty -Because ('a known defect is fixed: remove it from Get-KnownContrastDefect: ' + ($fixed -join ', '))
+    }
+
+    It 'shows every disabled control clearly dimmed but readable' {
+        $offender = @(Get-DimmedControlOffender -Views @($script:Measured['{0}|1440x900' -f $Theme]))
+        $offender | Should -BeNullOrEmpty -Because ('a disabled control does not look dimmed (enabled / disabled >= 1.25, disabled >= 1.5): ' + ($offender -join '; '))
     }
 }

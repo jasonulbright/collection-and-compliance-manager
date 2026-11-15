@@ -98,6 +98,23 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <!-- A disabled box dims by opacity 0.5, like the shared buttons. WCAG 1.4.3 exempts it from the 4.5:1 text rule. The border color repeats what SuiteCommon adds to a window without an own style. -->
+            <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray2}"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray2}"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
 
             <Style x:Key="SquareInlineButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
                 <Setter Property="Template" Value="{DynamicResource SuiteNeutralButtonTemplate}"/>
@@ -185,6 +202,11 @@
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="8"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <!-- Monospace detail text, only for padded columns and Format-List output (catalog and editor detail). -->
@@ -201,6 +223,11 @@
                 <Setter Property="FontFamily" Value="Cascadia Code, Consolas, Courier New"/>
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Padding" Value="8"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
             <Style x:Key="TabHeaderText" TargetType="TextBlock">
                 <Style.Triggers>
