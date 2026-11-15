@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
     Pester 5.x window test for the compact 1080p density. The main window is opened off screen, in both themes, at
-    the design size of a maximized 1080p work area (1920x1032) and at 1024x720, and measured:
+    the work area of the session (1920x1032 on a 1080p screen at 100 percent) and at 1024x720, and measured:
     sidebar buttons, inline buttons, single-line boxes, grid rows and headers, and the width that the content uses.
     The visible run prints the work area of the session (SystemParameters.WorkArea).
 #>
@@ -13,7 +13,8 @@ BeforeDiscovery {
     $script:WindowGuard = Test-WindowTestsAllowed
     if (-not $script:WindowGuard.Allowed -and -not $env:SUITE_WINDOW_GUARD_REPORTED) { Write-Host ('Window tests skipped: {0}.' -f $script:WindowGuard.Reason) }
     $script:Cases = @(foreach ($dark in $true, $false) {
-            foreach ($size in @(@(1024, 720), @(1920, 1032))) {
+            $design = Get-DesignSize
+            foreach ($size in @(@(1024, 720), @($design.W, $design.H))) {
                 @{ Dark = $dark; Theme = $(if ($dark) { 'dark' } else { 'light' }); W = $size[0]; H = $size[1]; Size = ('{0}x{1}' -f $size[0], $size[1]) }
             }
         })
@@ -24,13 +25,14 @@ BeforeAll {
     $script:WindowGuard = Test-WindowTestsAllowed
     if (-not $script:WindowGuard.Allowed) { return }
     . "$PSScriptRoot\WindowConfig.ps1"
+    $script:Design = Get-DesignSize
     Add-Type -AssemblyName PresentationFramework
     $wa = [System.Windows.SystemParameters]::WorkArea
     Write-Host ('Work area of this session: {0}x{1}' -f $wa.Width, $wa.Height)
     $script:Measured = @{}
     foreach ($case in @(
-            @{ Dark = $true; W = 1024; H = 720 }, @{ Dark = $true; W = 1920; H = 1032 },
-            @{ Dark = $false; W = 1024; H = 720 }, @{ Dark = $false; W = 1920; H = 1032 })) {
+            @{ Dark = $true; W = 1024; H = 720 }, @{ Dark = $true; W = $script:Design.W; H = $script:Design.H },
+            @{ Dark = $false; W = 1024; H = 720 }, @{ Dark = $false; W = $script:Design.W; H = $script:Design.H })) {
         $key = '{0}|{1}x{2}' -f $(if ($case.Dark) { 'dark' } else { 'light' }), $case.W, $case.H
         $case.Config = $script:AppConfig
         $script:Measured[$key] = Invoke-WpfSta -Arguments $case -Script {
