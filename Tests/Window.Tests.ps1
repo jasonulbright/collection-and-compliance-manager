@@ -1,7 +1,7 @@
 #Requires -Modules Pester
 # Window tests. The main window and the dialogs that the script builds from XAML
 # text are opened off screen on an STA thread, in both themes and at 1024x720 and
-# 1440x900, and measured. The app-specific names live in WindowConfig.ps1.
+# 1920x1032, and measured. The app-specific names live in WindowConfig.ps1.
 
 BeforeDiscovery {
     . "$PSScriptRoot\WindowConfig.ps1"
@@ -19,7 +19,7 @@ BeforeDiscovery {
     }
     else {
         $script:Matrix = foreach ($dark in $true, $false) {
-            foreach ($size in @(@(1024, 720), @(1440, 900))) {
+            foreach ($size in @(@(1024, 720), @(1920, 1032))) {
                 @{ Dark = $dark; Theme = $(if ($dark) { 'dark' } else { 'light' }); W = $size[0]; H = $size[1]; Size = ('{0}x{1}' -f $size[0], $size[1]) }
             }
         }
@@ -66,15 +66,15 @@ BeforeAll {
 
     $script:Measured = @{}
     foreach ($case in @(
-            @{ Dark = $true; W = 1024; H = 720 }, @{ Dark = $true; W = 1440; H = 900 },
-            @{ Dark = $false; W = 1024; H = 720 }, @{ Dark = $false; W = 1440; H = 900 })) {
+            @{ Dark = $true; W = 1024; H = 720 }, @{ Dark = $true; W = 1920; H = 1032 },
+            @{ Dark = $false; W = 1024; H = 720 }, @{ Dark = $false; W = 1920; H = 1032 })) {
         $key = '{0}|{1}x{2}' -f $(if ($case.Dark) { 'dark' } else { 'light' }), $case.W, $case.H
         $case.Config = $script:AppConfig
         $script:Measured[$key] = Invoke-WpfSta -Arguments $case -Script {
             $cfg = $Arguments.Config
             $w = Open-TestWindow -XamlPath (Join-Path $Root $cfg.Xaml) -Dark $Arguments.Dark -Width $Arguments.W -Height $Arguments.H
-            # Contrast is read only at 1440x900. Clipped text and off-screen controls are read at both sizes.
-            $full = $Arguments.W -ge 1440
+            # Contrast is read only at 1920x1032. Clipped text and off-screen controls are read at both sizes.
+            $full = $Arguments.W -ge 1920
             $out = @()
             foreach ($view in $cfg.Views) {
                 foreach ($v in $cfg.Views) { $w.FindName($v.Container).Visibility = if ($v.Name -eq $view.Name) { 'Visible' } else { 'Collapsed' } }
@@ -188,7 +188,7 @@ Describe 'Layout <Theme> <Size>' -ForEach $script:Matrix -Skip:(-not $script:Win
 
 Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }) -Skip:(-not $script:WindowGuard.Allowed) {
     It 'shows every text at 4.5:1 (3:1 for large text) in the <View> view, except the listed known defects' -ForEach $script:ViewCases {
-        $m = ($script:Measured['{0}|1440x900' -f $Theme] | Where-Object View -eq $View)
+        $m = ($script:Measured['{0}|1920x1032' -f $Theme] | Where-Object View -eq $View)
         $m.Text.Count | Should -BeGreaterThan 3
         $known = @(Get-KnownContrastDefect -Theme $Theme)
         # A disabled control is exempt from the text rule (WCAG 1.4.3); Get-DimmedControlOffender checks that it looks dimmed.
@@ -196,13 +196,13 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
         $bad | ForEach-Object { '{0} "{1}" {2} on {3} = {4}' -f $_.Name, $_.Text, $_.Foreground, $_.Backdrop, $_.Ratio } | Should -BeNullOrEmpty
     }
     It 'keeps the title text readable on the active title bar' {
-        $tb = ($script:Measured['{0}|1440x900' -f $Theme] | Select-Object -First 1).TitleBar
+        $tb = ($script:Measured['{0}|1920x1032' -f $Theme] | Select-Object -First 1).TitleBar
         $tb.Active | Should -BeGreaterOrEqual 4.5
     }
 
     It 'meets the standard on every control, except the listed known defects' {
         $known = Get-KnownContrastDefect -Theme $Theme
-        $found = @(Get-ContrastViolationKey -Views @($script:Measured['{0}|1440x900' -f $Theme]))
+        $found = @(Get-ContrastViolationKey -Views @($script:Measured['{0}|1920x1032' -f $Theme]))
         $new = @($found | Where-Object { $known -notcontains $_ })
         $fixed = @($known | Where-Object { $found -notcontains $_ })
         $new | Should -BeNullOrEmpty -Because ('a new contrast violation appeared: ' + ($new -join ', '))
@@ -210,7 +210,7 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
     }
 
     It 'shows every disabled control clearly dimmed but readable' {
-        $offender = @(Get-DimmedControlOffender -Views @($script:Measured['{0}|1440x900' -f $Theme]))
+        $offender = @(Get-DimmedControlOffender -Views @($script:Measured['{0}|1920x1032' -f $Theme]))
         $offender | Should -BeNullOrEmpty -Because ('a disabled control does not look dimmed (enabled / disabled >= 1.25, disabled >= 1.5): ' + ($offender -join '; '))
     }
 }

@@ -6,7 +6,7 @@ if ($patched -eq $t) { throw 'The module lookup function was not found. The miss
 Set-Content -LiteralPath $f -Value $patched -Encoding UTF8
 Remove-Item Env:SMS_ADMIN_UI_PATH -ErrorAction SilentlyContinue
 $win = Start-App 'start-ccm.ps1' 'Collection and Compliance Manager'
-Size-Win $win 1440 900
+Maximize-Win $win
 $win = Find-Top 'Collection and Compliance Manager' 10
 Invoke-El (Get-El $win 'btnRefresh'); Start-Sleep -Seconds 6
 Shot $win 'console-missing-refresh'

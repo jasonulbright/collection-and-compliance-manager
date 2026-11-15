@@ -39,7 +39,7 @@ $script:HarnessBootstrap = {
     Import-Module (Join-Path $Root 'Lib\SuiteCommon\SuiteCommon.psd1') -Global -DisableNameChecking
 
     function Open-TestWindow {
-        param([string]$XamlPath, [bool]$Dark = $true, [double]$Width = 1440, [double]$Height = 900)
+        param([string]$XamlPath, [bool]$Dark = $true, [double]$Width = 1920, [double]$Height = 1032)
         [xml]$xaml = Get-Content -LiteralPath $XamlPath -Raw
         $reader = New-Object System.Xml.XmlNodeReader $xaml
         $w = [System.Windows.Markup.XamlReader]::Load($reader)

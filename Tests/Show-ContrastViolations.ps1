@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Run it when the window test reports a new or a fixed violation, to see the
-    current list. Opens the window off screen at 1440x900, as Window.Tests.ps1 does.
+    current list. Opens the window off screen at 1920x1032, as Window.Tests.ps1 does.
 #>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification='Console tool.')]
 param()

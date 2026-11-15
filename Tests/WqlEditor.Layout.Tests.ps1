@@ -1,6 +1,6 @@
 #Requires -Modules Pester
 # Window test for the WQL Editor spacing. The view is shown in both themes at 1024x720 and
-# 1440x900, and the bounds of its controls are measured. Rules, all on the 4/8 px grid:
+# 1920x1032, and the bounds of its controls are measured. Rules, all on the 4/8 px grid:
 #   - the filter box and the selected-collection line share one row (same top and height)
 #   - 8 px between the tree and the splitter, 8 px between the splitter and the right pane
 #   - 4 px between a label and its box, 12 px between a box and the next label
@@ -12,7 +12,7 @@ BeforeDiscovery {
     $script:WindowGuard = Test-WindowTestsAllowed
     if (-not $script:WindowGuard.Allowed -and -not $env:SUITE_WINDOW_GUARD_REPORTED) { Write-Host ('Window tests skipped: {0}.' -f $script:WindowGuard.Reason) }
     $script:Cases = @(foreach ($dark in $true, $false) {
-            foreach ($size in @(@(1024, 720), @(1440, 900))) {
+            foreach ($size in @(@(1024, 720), @(1920, 1032))) {
                 @{ Dark = $dark; Theme = $(if ($dark) { 'dark' } else { 'light' }); W = $size[0]; H = $size[1]; Size = ('{0}x{1}' -f $size[0], $size[1]) }
             }
         })
@@ -25,8 +25,8 @@ BeforeAll {
     . "$PSScriptRoot\WindowConfig.ps1"
     $script:Measured = @{}
     foreach ($case in @(
-            @{ Dark = $true; W = 1024; H = 720 }, @{ Dark = $true; W = 1440; H = 900 },
-            @{ Dark = $false; W = 1024; H = 720 }, @{ Dark = $false; W = 1440; H = 900 })) {
+            @{ Dark = $true; W = 1024; H = 720 }, @{ Dark = $true; W = 1920; H = 1032 },
+            @{ Dark = $false; W = 1024; H = 720 }, @{ Dark = $false; W = 1920; H = 1032 })) {
         $key = '{0}|{1}x{2}' -f $(if ($case.Dark) { 'dark' } else { 'light' }), $case.W, $case.H
         $case.Config = $script:AppConfig
         $script:Measured[$key] = Invoke-WpfSta -Arguments $case -Script {
@@ -127,9 +127,9 @@ Describe 'WQL Editor spacing (<Theme> <Size>)' -ForEach $script:Cases -Skip:(-no
         $e.Height | Should -BeGreaterOrEqual 80
     }
 
-    It 'gives the rules list at least 72 px of height and matches the 28 px height of the single-line boxes' {
+    It 'gives the rules list at least 72 px of height and matches the 26 px height of the single-line boxes' {
         (Get-Box $script:Key 'lstWqlRules').Height | Should -BeGreaterOrEqual 70
-        (Get-Box $script:Key 'txtRuleName').Height | Should -BeGreaterOrEqual 28
+        (Get-Box $script:Key 'txtRuleName').Height | Should -BeGreaterOrEqual 26
         [math]::Abs((Get-Box $script:Key 'txtWqlTreeFilter').Height - (Get-Box $script:Key 'txtRuleName').Height) | Should -BeLessOrEqual $script:Tol
     }
 

@@ -1,5 +1,5 @@
 $win = Start-App 'start-ccm.ps1' 'Collection and Compliance Manager'
-Size-Win $win 1440 900
+Maximize-Win $win
 $win = Find-Top 'Collection and Compliance Manager' 10
 function Idle([string]$id = 'btnRefresh', [int]$sec = 300) { Start-Sleep -Seconds 2; $null = Wait-Until { $b = Get-El $win $id -Quiet; $b -and $b.Current.IsEnabled } $sec; Start-Sleep -Seconds 2 }
 function Rows($grid) { @((Get-El $win $grid).FindAll('Descendants', (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::DataItem)))) }
