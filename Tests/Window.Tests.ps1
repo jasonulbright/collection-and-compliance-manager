@@ -204,7 +204,7 @@ Describe 'Contrast <Theme>' -ForEach @(@{ Theme = 'dark' }, @{ Theme = 'light' }
         $found = @(Get-ContrastViolationKey -Views @($script:Measured['{0}|1440x900' -f $Theme]))
         $new = @($found | Where-Object { $known -notcontains $_ })
         $fixed = @($known | Where-Object { $found -notcontains $_ })
-        $new | Should -BeNullOrEmpty -Because 'a new contrast violation appeared'
-        $fixed | Should -BeNullOrEmpty -Because 'a known defect is fixed: remove it from Get-KnownContrastDefect'
+        $new | Should -BeNullOrEmpty -Because ('a new contrast violation appeared: ' + ($new -join ', '))
+        $fixed | Should -BeNullOrEmpty -Because ('a known defect is fixed: remove it from Get-KnownContrastDefect: ' + ($fixed -join ', '))
     }
 }

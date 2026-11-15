@@ -1380,6 +1380,7 @@ $btnCatClearFilters.Add_Click({
 $script:DialogButtonStyleXaml = @'
             <!-- The two dialog button styles, defined once for every dialog. The primary style is DialogAccentButton: white text on the accent blue. The one secondary style is DialogButton: a gray fill, the theme text color and a visible border. Cancel and Browse use it. -->
             <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
+                <Setter Property="Template" Value="{DynamicResource SuiteNeutralButtonTemplate}"/>
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Gray10}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray2}"/>
@@ -1390,6 +1391,7 @@ $script:DialogButtonStyleXaml = @'
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
             </Style>
             <Style x:Key="DialogAccentButton" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+                <Setter Property="Template" Value="{DynamicResource SuiteAccentButtonTemplate}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
@@ -3837,6 +3839,7 @@ function Show-OptionsDialog {
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="CategoryRowStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
+                <Setter Property="Template" Value="{DynamicResource SuiteNeutralButtonTemplate}"/>
                 <Setter Property="Height" Value="36"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
                 <Setter Property="Padding" Value="14,0,14,0"/>
