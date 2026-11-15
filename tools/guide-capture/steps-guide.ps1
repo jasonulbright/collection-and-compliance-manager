@@ -118,6 +118,8 @@ Section 'light' {
   Toggle-El (Get-El $win 'toggleTheme'); Start-Sleep -Seconds 1
   foreach ($v in @(@('Collections', 'light-collections'), @('Templates', 'light-templates'), @('Catalog', 'light-catalog'), @('Live', 'light-live'))) { Invoke-El (Get-El $win ('btnView' + $v[0])); Start-Sleep -Seconds 2; Shot $win $v[1] }
   Invoke-El (Get-El $win 'btnOptions'); $d = Find-Last 'Options' 10; Shot $d 'light-options'; Focus-Win $d; Send-Keys '{ESC}'; Start-Sleep -Seconds 1
+  # The Editor dialog in the light theme: the body follows the theme (owner report: it came up dark).
+  Invoke-El (Get-El $win 'btnViewEditor'); Start-Sleep -Seconds 2; Dlg 'btnEditorAddSetting' 'light-dialog-editor-add-setting'
 }
 # Evidence for the light theme: every blue background must carry white text, also when the pointer is over a
 # control, when the button is down and when the control is disabled. A step that fails logs WARN and goes on.
