@@ -43,7 +43,7 @@ Section 'exports' {
 }
 Section 'dialogs' {
   Dlg 'btnNewCollection' 'dialog-new-collection'
-  if (Select-Row 'gridCollections' 'All Workstations') { Shot $win 'collection-custom-selected' }
+  if (Select-Row 'gridCollections' 'All Servers') { Shot $win 'collection-custom-selected' }
   Dlg 'btnCopyCollection' 'dialog-copy-collection'
   Dlg 'btnEditMembership' 'dialog-edit-membership'
 }
@@ -54,7 +54,7 @@ Section 'blocked on built-in' {
 Section 'remove confirm' {
   # The confirmation is captured and answered No. Nothing is removed.
   # The step stops when the intended row is not selected or the confirmation does not show.
-  if (-not (Select-Row 'gridCollections' 'All Workstations')) { return }
+  if (-not (Select-Row 'gridCollections' 'All Servers')) { return }
   Invoke-El (Get-El $win 'btnRemoveColl'); Start-Sleep -Seconds 2
   $no = Get-El $win 'No' -Quiet
   if (-not $no) { Log 'ERROR: the Remove confirmation did not show. Nothing was answered.'; return }
@@ -70,8 +70,8 @@ Section 'filters' {
 Section 'wql' {
   Invoke-El (Get-El $win 'btnViewWqlEditor'); Start-Sleep -Seconds 2; Shot $win 'wql-editor'
   $c = New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::TreeItem)
-  $it = @((Get-El $win 'treeWqlCollections').FindAll('Descendants', $c)) | Where-Object { $_.Current.Name -like '*All Workstations*' } | Select-Object -First 1
-  if (-not $it) { $c2 = New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::ListItem); $it = @((Get-El $win 'treeWqlCollections').FindAll('Descendants', $c2)) | Where-Object { $_.Current.Name -like '*All Workstations*' } | Select-Object -First 1 }
+  $it = @((Get-El $win 'treeWqlCollections').FindAll('Descendants', $c)) | Where-Object { $_.Current.Name -like '*All Servers*' } | Select-Object -First 1
+  if (-not $it) { $c2 = New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::ListItem); $it = @((Get-El $win 'treeWqlCollections').FindAll('Descendants', $c2)) | Where-Object { $_.Current.Name -like '*All Servers*' } | Select-Object -First 1 }
   Log ('tree item: ' + $it.Current.Name); Select-El $it; Start-Sleep -Seconds 2; Shot $win 'wql-collection-picked'
   $l = (Get-El $win 'lstWqlRules').FindFirst('Descendants', (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::ListItem)))
   if ($l) { Select-El $l; Start-Sleep -Seconds 1; Shot $win 'wql-rule-selected' }
@@ -131,8 +131,8 @@ function Sample-States($El, [string]$Name, $Scope) {
 Section 'light states' {
   Extra 'collections' {
     Invoke-El (Get-El $win 'btnViewCollections'); Start-Sleep -Seconds 1
-    if (Select-Row 'gridCollections' 'All Workstations') {
-      Shot $win 'light-collection-selected'; Sample-El (Find-Row 'gridCollections' 'All Workstations') 'grid selected row'
+    if (Select-Row 'gridCollections' 'All Servers') {
+      Shot $win 'light-collection-selected'; Sample-El (Find-Row 'gridCollections' 'All Servers') 'grid selected row'
     }
     Sample-States (Get-El $win 'btnExportCsv') 'inline-button' $win
     Sample-El (Get-El $win 'btnViewCollections') 'sidebar active'
@@ -149,15 +149,16 @@ Section 'light states' {
     Sample-States (Get-El $d 'btnOk') 'dialog-accent-button' $d
     CloseDlg $d
   }
-  Extra 'copy dialog' { $d = OpenDlg 'btnCopyCollection' 'Copy Collection'; Shot $d 'light-dialog-copy-collection'; CloseDlg $d }
+  Extra 'copy dialog' { Select-Row 'gridCollections' 'All Servers' | Out-Null; $d = OpenDlg 'btnCopyCollection' 'Copy Collection'; Shot $d 'light-dialog-copy-collection'; CloseDlg $d }
   Extra 'membership dialog' {
+    Select-Row 'gridCollections' 'All Servers' | Out-Null
     $d = OpenDlg 'btnEditMembership' 'Edit Membership'; Start-Sleep -Seconds 2
     $row = @((Get-El $d 'gridMembers').FindAll('Descendants', (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::DataItem)))) | Select-Object -First 1
     if ($row) { Select-El $row; Start-Sleep -Milliseconds 600; Sample-El $row 'members grid selected row' } else { Log 'WARN extra membership dialog: no member row' }
     Shot $d 'light-dialog-edit-membership'; CloseDlg $d
   }
   Extra 'remove confirmation' {
-    Select-Row 'gridCollections' 'All Workstations' | Out-Null
+    Select-Row 'gridCollections' 'All Servers' | Out-Null
     Invoke-El (Get-El $win 'btnRemoveColl'); Start-Sleep -Seconds 2
     $no = Get-El $win 'No' -Quiet
     if ($no) { Shot $win 'light-dialog-remove-collection'; Invoke-El $no; Start-Sleep -Seconds 2 } else { Log 'WARN extra remove confirmation: the confirmation did not show'; Send-Keys '{ESC}'; Start-Sleep -Seconds 1 }
@@ -166,7 +167,7 @@ Section 'light states' {
     Invoke-El (Get-El $win 'btnViewWqlEditor'); Start-Sleep -Seconds 2
     $tree = Get-El $win 'treeWqlCollections' -Quiet
     $it = $null
-    if ($tree) { $it = @($tree.FindAll('Descendants', (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::TreeItem)))) | Where-Object { $_.Current.Name -like '*All Workstations*' } | Select-Object -First 1 }
+    if ($tree) { $it = @($tree.FindAll('Descendants', (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::TreeItem)))) | Where-Object { $_.Current.Name -like '*All Servers*' } | Select-Object -First 1 }
     if ($it) { Select-El $it; Start-Sleep -Seconds 2; Sample-El $it 'collection tree selected item' } else { Log 'WARN extra wql: no tree item' }
     $lst = Get-El $win 'lstWqlRules' -Quiet
     $l = $null

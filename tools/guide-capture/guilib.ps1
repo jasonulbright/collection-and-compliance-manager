@@ -78,7 +78,16 @@ function Stop-App([string]$Script) {
     $target = Join-Path $appDir $Script
     Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -like "*$target*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 }
-function Section([string]$Name, [scriptblock]$Body) { Log ('== ' + $Name); try { & $Body } catch { Log ('ERROR in ' + $Name + ': ' + $_.Exception.Message + ' @ ' + $_.InvocationInfo.ScriptLineNumber) } }
+function Section([string]$Name, [scriptblock]$Body) {
+    Log ('== ' + $Name)
+    # A transient UI Automation fault (E_UNEXPECTED, Unrecognized error) runs the step again, at most twice.
+    for ($try = 1; $try -le 3; $try++) {
+        try { & $Body; return } catch {
+            if ($try -lt 3 -and $_.Exception.Message -match 'E_UNEXPECTED|Unrecognized error') { Log ('RETRY ' + $Name + ': transient UI Automation fault'); Start-Sleep -Seconds 5; continue }
+            Log ('ERROR in ' + $Name + ': ' + $_.Exception.Message + ' @ ' + $_.InvocationInfo.ScriptLineNumber); return
+        }
+    }
+}
 function Find-All([string]$Name) {
     $cond = New-Object System.Windows.Automation.AndCondition((New-Object System.Windows.Automation.PropertyCondition($AE::NameProperty, $Name)), (New-Object System.Windows.Automation.PropertyCondition($AE::ControlTypeProperty, [System.Windows.Automation.ControlType]::Window)))
     @($root.FindAll('Descendants', $cond))
