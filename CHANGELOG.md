@@ -2,11 +2,14 @@
 
 ## [Unreleased]
 
+## [2026.11.15.0024] - 2026-11-15
+
+## 76 guide images retaken with bordered dialog buttons
+
 ### Changed
 
-- Take the measurement of the button state and dialog chrome window tests from SuiteCommon (Get-SuiteButtonStateReport, Get-SuiteWindowChrome), and sync the vendored SuiteCommon.
-
-- Sync SuiteCommon for bordered dialog buttons and retake all 76 guide images.
+- Sync SuiteCommon: dialog buttons get 1 px borders; retake all 76 guide images.
+- Measure button states and dialog chrome in window tests through SuiteCommon.
 
 ## [2026.11.14.0023] - 2026-11-14
 
