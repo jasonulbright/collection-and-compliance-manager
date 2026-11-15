@@ -70,6 +70,8 @@ A selected row, list item or tree item shows white text on the accent blue. A bu
 
 ![The WQL Editor with a selected collection and rule](../images/light-wql-selected.png)
 
+![The Add Setting dialog](../images/light-dialog-editor-add-setting.png)
+
 ![A selected template](../images/light-template-selected.png)
 
 ![The Deploy dialog](../images/light-dialog-catalog-deploy.png)
