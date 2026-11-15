@@ -6,6 +6,8 @@
 
 - Take the measurement of the button state and dialog chrome window tests from SuiteCommon (Get-SuiteButtonStateReport, Get-SuiteWindowChrome), and sync the vendored SuiteCommon.
 
+- Sync SuiteCommon for bordered dialog buttons and retake all 76 guide images.
+
 ## [2026.11.14.0023] - 2026-11-14
 
 ## 12 files made plain ASCII
