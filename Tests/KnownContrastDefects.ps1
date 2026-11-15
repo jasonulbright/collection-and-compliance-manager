@@ -22,18 +22,11 @@ function Get-KnownContrastDefect {
     switch ($Theme) {
         'dark' {
             @(
-                'btnAddRule:DisabledText', 'btnApplyTemplate:DisabledText', 'btnAuditExport:DisabledText',
-                'btnCatClearFilters:DisabledText', 'btnCatDeploy:DisabledText', 'btnCopyCollection:DisabledText',
-                'btnCopyToWqlEditor:DisabledText', 'btnEditMembership:DisabledText', 'btnEditorAddSetting:DisabledText',
-                'btnEditorEditSetting:DisabledText', 'btnEditorRemoveSetting:DisabledText', 'btnEvaluateColl:DisabledText',
-                'btnExportCsv:DisabledText', 'btnExportHtml:DisabledText', 'btnNewCollection:DisabledText',
-                'btnPreviewWql:DisabledText', 'btnRefresh:DisabledText', 'btnRemoveColl:DisabledText',
-                'btnRemoveRule:DisabledText', 'btnUpdateRule:DisabledText', 'btnValidateWql:DisabledText',
-                'btnViewAuditing:DisabledText', 'btnViewCatalog:DisabledText', 'btnViewCollections:DisabledText',
-                'btnViewEditor:DisabledText', 'btnViewLive:DisabledText', 'btnViewTemplates:DisabledText',
-                'btnViewWqlEditor:DisabledText', 'text:Deploy...', 'txtCatDetail:DisabledBorder',
-                'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder', 'txtEditorDetail:EnabledBorder',
-                'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
+                'btnCatDeploy:DisabledText', 'btnViewAuditing:DisabledText', 'btnViewCatalog:DisabledText',
+                'btnViewCollections:DisabledText', 'btnViewEditor:DisabledText', 'btnViewLive:DisabledText',
+                'btnViewTemplates:DisabledText', 'btnViewWqlEditor:DisabledText', 'text:Deploy...',
+                'txtCatDetail:DisabledBorder', 'txtCatDetail:EnabledBorder', 'txtEditorDetail:DisabledBorder',
+                'txtEditorDetail:EnabledBorder', 'txtTemplateExpandedQuery:DisabledBorder', 'txtTemplateExpandedQuery:EnabledBorder',
                 'txtWqlEditor:DisabledBorder', 'txtWqlEditor:EnabledBorder'
             )
         }
