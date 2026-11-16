@@ -75,7 +75,7 @@ BeforeAll {
             $cfg = $Arguments.Config
             $w = Open-TestWindow -XamlPath (Join-Path $Root $cfg.Xaml) -Dark $Arguments.Dark -Width $Arguments.W -Height $Arguments.H
             # Contrast is read only at the design size (the work area). Clipped text and off-screen controls are read at both sizes.
-            $full = $Arguments.W -gt 1024
+            $full = -not ($Arguments.W -eq 1024 -and $Arguments.H -eq 720)
             $out = @()
             foreach ($view in $cfg.Views) {
                 foreach ($v in $cfg.Views) { $w.FindName($v.Container).Visibility = if ($v.Name -eq $view.Name) { 'Visible' } else { 'Collapsed' } }

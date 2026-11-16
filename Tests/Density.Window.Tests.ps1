@@ -44,10 +44,10 @@ BeforeAll {
                     foreach ($v in $cfg.Views) { $w.FindName($v.Container).Visibility = if ($v.Name -eq $view.Name) { 'Visible' } else { 'Collapsed' } }
                     Wait-Layout $w
                     $c = $w.FindName($view.Container)
-                    $inline = @(foreach ($el in (Get-VisualDescendants $c)) { if ($el -is [System.Windows.Controls.Button] -and $d.Style -and (Test-VisibleInTree $d) -and $el.Name) { [pscustomobject]@{ Name = $el.Name; Height = $el.ActualHeight } } })
-                    $boxes = @(foreach ($el in (Get-VisualDescendants $c)) { if ($el -is [System.Windows.Controls.TextBox] -and $el.Name -in 'txtWqlTreeFilter', 'txtRuleName', 'txtFilter', 'txtCatCve', 'txtCatTenable' -and (Test-VisibleInTree $d)) { [pscustomobject]@{ Name = $el.Name; Height = $el.ActualHeight } } })
+                    $inline = @(foreach ($el in (Get-VisualDescendants $c)) { if ($el -is [System.Windows.Controls.Button] -and $el.Style -and (Test-VisibleInTree $el) -and $el.Name) { [pscustomobject]@{ Name = $el.Name; Height = $el.ActualHeight } } })
+                    $boxes = @(foreach ($el in (Get-VisualDescendants $c)) { if ($el -is [System.Windows.Controls.TextBox] -and $el.Name -in 'txtWqlTreeFilter', 'txtRuleName', 'txtFilter', 'txtCatCve', 'txtCatTenable' -and (Test-VisibleInTree $el)) { [pscustomobject]@{ Name = $el.Name; Height = $el.ActualHeight } } })
                     $grids = @(foreach ($el in (Get-VisualDescendants $c)) {
-                            if ($el -is [System.Windows.Controls.DataGrid] -and (Test-VisibleInTree $d)) {
+                            if ($el -is [System.Windows.Controls.DataGrid] -and (Test-VisibleInTree $el)) {
                                 $hdr = $null; foreach ($x in (Get-VisualDescendants $el)) { if ($x -is [System.Windows.Controls.Primitives.DataGridColumnHeadersPresenter]) { $hdr = $x; break } }
                                 $row = $null; foreach ($x in (Get-VisualDescendants $el)) { if ($x -is [System.Windows.Controls.DataGridRow]) { $row = $x; break } }
                                 [pscustomobject]@{ Name = $el.Name; Width = $el.ActualWidth; HeaderHeight = $(if ($hdr) { $hdr.ActualHeight } else { $null }); RowHeight = $(if ($row) { $row.ActualHeight } else { $null }) }
