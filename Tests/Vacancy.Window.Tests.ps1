@@ -50,11 +50,11 @@ BeforeAll {
                 $vcRootPos = $vcRoot.TransformToAncestor($vcWin).Transform([System.Windows.Point]::new(0, 0))
                 $vcPanes = @()
                 # Panes: the cells of the view grid, and the cells of every grid directly inside those cells.
-                $vcCells = New-Object System.Collections.Generic.List[object]
-                foreach ($vcChild in $vcRoot.Children) { if ($vcChild -is [System.Windows.FrameworkElement]) { $vcCells.Add($vcChild) } }
-                foreach ($vcCell in @($vcCells)) {
+                $vcCells = @()
+                foreach ($vcChild in $vcRoot.Children) { if ($vcChild -is [System.Windows.FrameworkElement]) { $vcCells += $vcChild } }
+                foreach ($vcCell in @($vcCells | Where-Object { $true })) {
                     $vcInner = if ($vcCell -is [System.Windows.Controls.Border]) { $vcCell.Child } else { $vcCell }
-                    foreach ($vcG in @($vcInner)) { if ($vcG -is [System.Windows.Controls.Grid]) { foreach ($vcChild in $vcG.Children) { if ($vcChild -is [System.Windows.FrameworkElement]) { $vcCells.Add($vcChild) } } } }
+                    foreach ($vcG in @($vcInner)) { if ($vcG -is [System.Windows.Controls.Grid]) { foreach ($vcChild in $vcG.Children) { if ($vcChild -is [System.Windows.FrameworkElement]) { $vcCells += $vcChild } } } }
                 }
                 foreach ($vcCell in $vcCells) {
                     if (-not (Test-VisibleInTree $vcCell) -or $vcCell.ActualHeight -le 8 -or $vcCell -is [System.Windows.Controls.Primitives.Thumb] -or $vcCell -is [System.Windows.Controls.GridSplitter]) { continue }
