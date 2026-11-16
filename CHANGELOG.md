@@ -6,6 +6,8 @@
 
 - Compact density for a 1080p work area: 36 px sidebar, 26 px controls, 24 px rows.
 - Open maximized on first start; capture the maximized window, the work area of a 1080p screen.
+- Share free height between grids and lower panes; move catalog filters to a top bar.
+- Add a window test: no pane leaves over 120 px of height vacant.
 - Guide capture reports a verdict and lists guide images that no capture run produced.
 - Retake all 77 guide images at the maximized 1080p work area, both themes.
 
