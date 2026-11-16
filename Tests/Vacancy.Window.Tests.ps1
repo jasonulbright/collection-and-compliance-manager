@@ -42,6 +42,7 @@ BeforeAll {
                 $vcEl -is [System.Windows.Controls.TabControl] -or ($vcEl -is [System.Windows.Controls.TextBlock] -and -not [string]::IsNullOrWhiteSpace($vcEl.Text))
             }
             $vcAll = @()
+            try {
             foreach ($vcView in $vcCfg.Views) {
                 foreach ($vcV in $vcCfg.Views) { $vcWin.FindName($vcV.Container).Visibility = if ($vcV.Name -eq $vcView.Name) { 'Visible' } else { 'Collapsed' } }
                 Wait-Layout $vcWin
@@ -72,6 +73,7 @@ BeforeAll {
                     })
                 $vcAll += [pscustomobject]@{ View = $vcView.Name; Width = $vcRoot.ActualWidth; Height = $vcRoot.ActualHeight; Panes = $vcPanes; Grids = $vcGrids }
             }
+            } catch { $vcAll += [pscustomobject]@{ View = 'ERROR'; Width = 0; Height = 0; Panes = @(); Grids = @(); Error = ('{0} @ {1}' -f $_.Exception.Message, $_.InvocationInfo.ScriptLineNumber) } }
             $vcWin.Close()
             $vcAll
         }
@@ -83,6 +85,12 @@ AfterAll {
 }
 
 Describe 'Vacant area <Theme>' -ForEach $script:Cases -Skip:(-not $script:WindowGuard.Allowed) {
+    It 'measures every view' {
+        $err = @($script:Measured[$Theme] | Where-Object View -eq 'ERROR' | ForEach-Object { $_.Error })
+        $err | Should -BeNullOrEmpty -Because ($err -join '; ')
+        @($script:Measured[$Theme]).Count | Should -Be 7
+    }
+
     It 'leaves no pane with more than 120 px of vacant height in the <View> view' -ForEach @(
         @{ View = 'Collections' }, @{ View = 'WQL Editor' }, @{ View = 'Templates' }, @{ View = 'Catalog' }, @{ View = 'Live CI/CB' }, @{ View = 'Editor' }, @{ View = 'Auditing' }) {
         $m = $script:Measured[$Theme] | Where-Object View -eq $View
