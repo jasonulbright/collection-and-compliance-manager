@@ -36,28 +36,28 @@ BeforeAll {
         $key = '{0}|{1}x{2}' -f $(if ($case.Dark) { 'dark' } else { 'light' }), $case.W, $case.H
         $case.Config = $script:AppConfig
         $script:Measured[$key] = Invoke-WpfSta -Arguments $case -Script {
-            $cfg = $Arguments.Config
-            $w = Open-TestWindow -XamlPath (Join-Path $Root $cfg.Xaml) -Dark $Arguments.Dark -Width $Arguments.W -Height $Arguments.H
-            Wait-Layout $w
-            $sidebar = @(foreach ($v in $cfg.Views) { $b = $w.FindName($v.Button); $p = $b.TransformToAncestor($w).Transform([System.Windows.Point]::new(0, 0)); [pscustomobject]@{ Name = $v.Button; Top = $p.Y; Bottom = $p.Y + $b.ActualHeight; Height = $b.ActualHeight } })
-            $views = @(foreach ($view in $cfg.Views) {
-                    foreach ($v in $cfg.Views) { $w.FindName($v.Container).Visibility = if ($v.Name -eq $view.Name) { 'Visible' } else { 'Collapsed' } }
-                    Wait-Layout $w
-                    $c = $w.FindName($view.Container)
-                    $inline = @(foreach ($el in (Get-VisualDescendants $c)) { if ($el -is [System.Windows.Controls.Button] -and $el.Style -and (Test-VisibleInTree $el) -and $el.Name) { [pscustomobject]@{ Name = $el.Name; Height = $el.ActualHeight } } })
-                    $boxes = @(foreach ($el in (Get-VisualDescendants $c)) { if ($el -is [System.Windows.Controls.TextBox] -and $el.Name -in 'txtWqlTreeFilter', 'txtRuleName', 'txtFilter', 'txtCatCve', 'txtCatTenable' -and (Test-VisibleInTree $el)) { [pscustomobject]@{ Name = $el.Name; Height = $el.ActualHeight } } })
-                    $grids = @(foreach ($el in (Get-VisualDescendants $c)) {
-                            if ($el -is [System.Windows.Controls.DataGrid] -and (Test-VisibleInTree $el)) {
-                                $hdr = $null; foreach ($x in (Get-VisualDescendants $el)) { if ($x -is [System.Windows.Controls.Primitives.DataGridColumnHeadersPresenter]) { $hdr = $x; break } }
-                                $row = $null; foreach ($x in (Get-VisualDescendants $el)) { if ($x -is [System.Windows.Controls.DataGridRow]) { $row = $x; break } }
-                                [pscustomobject]@{ Name = $el.Name; Width = $el.ActualWidth; HeaderHeight = $(if ($hdr) { $hdr.ActualHeight } else { $null }); RowHeight = $(if ($row) { $row.ActualHeight } else { $null }) }
+            $dsCfg = $Arguments.Config
+            $dsW = Open-TestWindow -XamlPath (Join-Path $Root $dsCfg.Xaml) -Dark $Arguments.Dark -Width $Arguments.W -Height $Arguments.H
+            Wait-Layout $dsW
+            $dsSidebar = @(foreach ($dsV in $dsCfg.Views) { $dsB = $dsW.FindName($dsV.Button); $dsP = $dsB.TransformToAncestor($dsW).Transform([System.Windows.Point]::new(0, 0)); [pscustomobject]@{ Name = $dsV.Button; Top = $dsP.Y; Bottom = $dsP.Y + $dsB.ActualHeight; Height = $dsB.ActualHeight } })
+            $dsViews = @(foreach ($dsView in $dsCfg.Views) {
+                    foreach ($dsV in $dsCfg.Views) { $dsW.FindName($dsV.Container).Visibility = if ($dsV.Name -eq $dsView.Name) { 'Visible' } else { 'Collapsed' } }
+                    Wait-Layout $dsW
+                    $dsC = $dsW.FindName($dsView.Container)
+                    $dsInline = @(foreach ($dsEl in (Get-VisualDescendants $dsC)) { if ($dsEl -is [System.Windows.Controls.Button] -and $dsEl.Style -and (Test-VisibleInTree $dsEl) -and $dsEl.Name) { [pscustomobject]@{ Name = $dsEl.Name; Height = $dsEl.ActualHeight } } })
+                    $dsBoxes = @(foreach ($dsEl in (Get-VisualDescendants $dsC)) { if ($dsEl -is [System.Windows.Controls.TextBox] -and $dsEl.Name -in 'txtWqlTreeFilter', 'txtRuleName', 'txtFilter', 'txtCatCve', 'txtCatTenable' -and (Test-VisibleInTree $dsEl)) { [pscustomobject]@{ Name = $dsEl.Name; Height = $dsEl.ActualHeight } } })
+                    $dsGrids = @(foreach ($dsEl in (Get-VisualDescendants $dsC)) {
+                            if ($dsEl -is [System.Windows.Controls.DataGrid] -and (Test-VisibleInTree $dsEl)) {
+                                $dsHdr = $null; foreach ($dsX in (Get-VisualDescendants $dsEl)) { if ($dsX -is [System.Windows.Controls.Primitives.DataGridColumnHeadersPresenter]) { $dsHdr = $dsX; break } }
+                                $dsRow = $null; foreach ($dsX in (Get-VisualDescendants $dsEl)) { if ($dsX -is [System.Windows.Controls.DataGridRow]) { $dsRow = $dsX; break } }
+                                [pscustomobject]@{ Name = $dsEl.Name; Width = $dsEl.ActualWidth; HeaderHeight = $(if ($dsHdr) { $dsHdr.ActualHeight } else { $null }); RowHeight = $(if ($dsRow) { $dsRow.ActualHeight } else { $null }) }
                             }
                         })
-                    [pscustomobject]@{ View = $view.Name; Width = $c.ActualWidth; Height = $c.ActualHeight; Buttons = $inline; Boxes = $boxes; Grids = $grids }
+                    [pscustomobject]@{ View = $dsView.Name; Width = $dsC.ActualWidth; Height = $dsC.ActualHeight; Buttons = $dsInline; Boxes = $dsBoxes; Grids = $dsGrids }
                 })
-            $out = [pscustomobject]@{ Width = $w.ActualWidth; Height = $w.ActualHeight; Sidebar = $sidebar; Views = $views }
-            $w.Close()
-            $out
+            $dsOut = [pscustomobject]@{ Width = $dsW.ActualWidth; Height = $dsW.ActualHeight; Sidebar = $dsSidebar; Views = $dsViews }
+            $dsW.Close()
+            $dsOut
         }
     }
 }
