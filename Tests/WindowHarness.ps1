@@ -20,7 +20,9 @@ if (-not (Test-Path variable:global:HarnessSession)) { $global:HarnessSession = 
 function Get-DesignSize {
     Add-Type -AssemblyName PresentationFramework -ErrorAction SilentlyContinue
     $wa = [System.Windows.SystemParameters]::WorkArea
-    [pscustomobject]@{ W = [int]$wa.Width; H = [int]$wa.Height; Key = ('{0}x{1}' -f [int]$wa.Width, [int]$wa.Height) }
+    # A session with a work area as small as the 1024x720 minimum-size case (a CI runner) gets a floor of 1280x800, so that the two cases differ.
+    $w = [Math]::Max(1280, [int]$wa.Width); $h = [Math]::Max(800, [int]$wa.Height)
+    [pscustomobject]@{ W = $w; H = $h; Key = ('{0}x{1}' -f $w, $h) }
 }
 
 # The guard for every test that opens a window. Window tests run only when the
@@ -56,7 +58,7 @@ $script:HarnessBootstrap = {
         $visible = ($env:SUITE_VISIBLE_WINDOWS -eq '1')
         $w.Left = $(if ($visible) { 80 } else { -32000 }); $w.Top = $(if ($visible) { 80 } else { -32000 })
         $w.ShowInTaskbar = $visible
-        if ($Width -le 0 -or $Height -le 0) { $wa = [System.Windows.SystemParameters]::WorkArea; $Width = [int]$wa.Width; $Height = [int]$wa.Height }
+        if ($Width -le 0 -or $Height -le 0) { $wa = [System.Windows.SystemParameters]::WorkArea; $Width = [Math]::Max(1280, [int]$wa.Width); $Height = [Math]::Max(800, [int]$wa.Height) }
     $w.Width = $Width; $w.Height = $Height
         [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($w, $(if ($Dark) { 'Dark.Steel' } else { 'Light.Blue' }))
         $w.Show()
