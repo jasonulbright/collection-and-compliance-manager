@@ -78,6 +78,7 @@ BeforeAll {
             $vcAll
         }
     }
+    foreach ($vcT in 'dark', 'light') { foreach ($vcM in @($script:Measured[$vcT] | Where-Object View -ne 'ERROR')) { Write-Host ('Vacancy {0} {1}: panes {2}, largest vacant height {3} px, largest dead grid width {4} px' -f $vcT, $vcM.View, @($vcM.Panes).Count, [math]::Round((@($vcM.Panes | ForEach-Object { $_.VacantHeight }) + 0 | Measure-Object -Maximum).Maximum), [math]::Round((@($vcM.Grids | ForEach-Object { $_.VacantWidth }) + 0 | Measure-Object -Maximum).Maximum)) } }
 }
 
 AfterAll {
