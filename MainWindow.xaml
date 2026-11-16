@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     Title="Collection and Compliance Manager"
-    Width="1320" Height="820"
+    Width="1920" Height="1032"
     MinWidth="1024" MinHeight="640"
     WindowStartupLocation="CenterScreen"
     TitleCharacterCasing="Normal"
@@ -50,8 +50,8 @@
 
             <Style x:Key="ViewButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Square}">
                 <Setter Property="Template" Value="{StaticResource SidebarButtonTemplate}"/>
-                <Setter Property="Height" Value="42"/>
-                <Setter Property="Margin" Value="8,3,8,3"/>
+                <Setter Property="Height" Value="36"/>
+                <Setter Property="Margin" Value="8,2,8,2"/>
                 <Setter Property="Padding" Value="12,0,12,0"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
                 <Setter Property="FontSize" Value="13"/>
@@ -120,7 +120,7 @@
                 <Setter Property="Template" Value="{DynamicResource SuiteNeutralButtonTemplate}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray2}"/>
-                <Setter Property="Height" Value="28"/>
+                <Setter Property="Height" Value="26"/>
                 <Setter Property="MinWidth" Value="100"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -140,7 +140,7 @@
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.AccentBase}"/>
-                <Setter Property="Height" Value="28"/>
+                <Setter Property="Height" Value="26"/>
                 <Setter Property="MinWidth" Value="100"/>
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
@@ -172,7 +172,8 @@
                 <Setter Property="GridLinesVisibility" Value="Horizontal"/>
                 <Setter Property="RowHeaderWidth" Value="0"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="ColumnHeaderHeight" Value="30"/>
+                <Setter Property="ColumnHeaderHeight" Value="26"/>
+                <Setter Property="RowHeight" Value="24"/>
                 <Setter Property="FontSize" Value="11"/>
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ThemeBackground}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
@@ -503,7 +504,7 @@
 
                     <!-- LEFT: full-height collection tree (folder hierarchy) -->
                     <DockPanel Grid.Column="0" Margin="0,0,8,0">
-                        <TextBox x:Name="txtWqlTreeFilter" DockPanel.Dock="Top" FontSize="12" Padding="6,4,6,4" Margin="0,8,0,8" Height="28"
+                        <TextBox x:Name="txtWqlTreeFilter" DockPanel.Dock="Top" FontSize="12" Padding="6,4,6,4" Margin="0,8,0,8" Height="26"
                                  Controls:TextBoxHelper.Watermark="Filter collections by name or ID..."/>
                         <Border BorderThickness="1"
                                 BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
@@ -548,7 +549,7 @@
                         </Border>
 
                         <TextBlock Grid.Row="3" Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,12,0,4"/>
-                        <TextBox x:Name="txtRuleName" Grid.Row="4" FontSize="12" Padding="6,4,6,4" Height="28"/>
+                        <TextBox x:Name="txtRuleName" Grid.Row="4" FontSize="12" Padding="6,4,6,4" Height="26"/>
 
                         <TextBlock Grid.Row="5" Text="Query" FontSize="11" FontWeight="Bold" Margin="0,12,0,4"/>
                         <TextBox x:Name="txtWqlEditor" Grid.Row="6" Style="{StaticResource WqlEditorStyle}"
