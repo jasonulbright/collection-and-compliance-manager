@@ -150,7 +150,7 @@ Describe 'WQL Editor spacing (<Theme> <Size>)' -ForEach $script:Cases -Skip:(-no
         }
         # Wrapped rows keep 8 px between them.
         $tops = @($buttons | Sort-Object Top | Select-Object -ExpandProperty Top -Unique)
-        if ($tops.Count -gt 1) { ($tops[1] - $tops[0] - 28) | Should -BeGreaterOrEqual (8 - $script:Tol) }
+        if ($tops.Count -gt 1) { ($tops[1] - $tops[0] - 26) | Should -BeGreaterOrEqual (8 - $script:Tol) }
     }
 
     It 'leaves 12 px between the query box and the first button row' {

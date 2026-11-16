@@ -56,7 +56,7 @@ $script:HarnessBootstrap = {
         $visible = ($env:SUITE_VISIBLE_WINDOWS -eq '1')
         $w.Left = $(if ($visible) { 80 } else { -32000 }); $w.Top = $(if ($visible) { 80 } else { -32000 })
         $w.ShowInTaskbar = $visible
-        if ($Width -le 0 -or $Height -le 0) { $d = Get-DesignSize; $Width = $d.W; $Height = $d.H }
+        if ($Width -le 0 -or $Height -le 0) { $wa = [System.Windows.SystemParameters]::WorkArea; $Width = [int]$wa.Width; $Height = [int]$wa.Height }
     $w.Width = $Width; $w.Height = $Height
         [void][ControlzEx.Theming.ThemeManager]::Current.ChangeTheme($w, $(if ($Dark) { 'Dark.Steel' } else { 'Light.Blue' }))
         $w.Show()
