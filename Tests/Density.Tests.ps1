@@ -53,3 +53,11 @@ Describe 'Compact density at 1080p' {
         }
     }
 }
+
+Describe 'No fixed-size pane that leaves vacant area (XAML)' {
+    It 'gives no row or column of the main window a fixed size of 100 px or more, except the sidebar, the log pane and the WQL tree' {
+        $fixed = @($script:Xaml.SelectNodes('//w:RowDefinition[@Height] | //w:ColumnDefinition[@Width]', $script:Ns) | ForEach-Object { $v = if ($_.HasAttribute('Height')) { $_.GetAttribute('Height') } else { $_.GetAttribute('Width') }; if ($v -match '^\d+$' -and [double]$v -ge 100) { $v } })
+        # 230: the sidebar column. 160: the log pane row. 380: the collection tree of the WQL Editor, a navigation list that takes the full height. A list, grid or box shares the free space with star sizes.
+        @($fixed | Where-Object { $_ -notin '230', '160', '380' }) | Should -BeNullOrEmpty -Because ('fixed sizes: ' + ($fixed -join ', '))
+    }
+}
