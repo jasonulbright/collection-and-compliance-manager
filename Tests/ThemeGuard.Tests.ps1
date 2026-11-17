@@ -566,3 +566,23 @@ Describe 'No hard-coded color in a style or a template' {
         ($found -join ' ') | Should -Not -Match 'AccentBase'
     }
 }
+
+Describe 'Titles are in Title Case (D-12)' {
+    It 'recognizes Title Case' {
+        Test-TitleCase 'Remove From Collection...' | Should -BeTrue
+        Test-TitleCase 'Export CSV' | Should -BeTrue
+        Test-TitleCase 'Configuration Manager Connection' | Should -BeTrue
+        Test-TitleCase 'Status issues' | Should -BeFalse
+        Test-TitleCase 'Export csv' | Should -BeFalse
+    }
+
+    It 'has Title Case for every button, header and window title in <_.Source>' -ForEach $script:AppDocumentCase {
+        @(Get-XamlTitle -Text $_.Text | Where-Object { -not (Test-TitleCase $_) }) | Should -BeNullOrEmpty
+    }
+
+    It 'finds titles to check in the main window and in the dialogs' {
+        $docs = @($script:XamlDocs | Where-Object { $_.Source -notlike 'SuiteCommon.psm1*' })
+        @(Get-XamlTitle -Text @($docs | Where-Object { $_.Source -eq 'MainWindow.xaml' })[0].Text).Count | Should -BeGreaterThan 10
+        @($docs | Where-Object { $_.Source -like '*here-string*' }).Count | Should -BeGreaterOrEqual 1
+    }
+}
