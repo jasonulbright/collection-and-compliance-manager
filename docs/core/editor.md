@@ -39,7 +39,7 @@ Use it to add or correct a registry or script setting of a configuration item.
 
 1. Select **Add Setting...**. The dialog `Add Setting` opens.
 2. Type the setting name. Select the setting type, **Registry** or **Script**. For a registry setting, select the data type and the hive, type the key name and the value name, and set **Remediate as DWORD** and **64-bit registry key** if needed.
-3. Type the rule name, select the operator, type the expected value, select the noncompliance severity and set **Remediate noncompliance** if needed.
+3. Type the rule name, select the operator, type the expected value, select the noncompliance severity and set **Remediate Noncompliance** if needed.
 4. Select **Add**. The log shows `Editor: adding <type> setting "<name>" to "<item>"...`
 
 ![The Add Setting dialog](../images/dialog-editor-add-setting.png)

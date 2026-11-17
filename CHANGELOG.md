@@ -16,6 +16,10 @@
 - Vendor the SuiteCommon dialogs that take ThemedButtonStyle.
 - Vendor SuiteCommon with the atomic settings save: the settings file is written to a temp file and replaced in one step, so a failed write cannot leave it truncated.
 
+### Added
+
+- Add the Title Case guard (D-12), the button style guard and the capture lock test; drop Ascii.Guard.Tests.ps1, which Encoding.Guard.Tests.ps1 covers in full.
+
 ## [2026.11.15.0027] - 2026-11-15
 
 ## 13 disabled controls now dim

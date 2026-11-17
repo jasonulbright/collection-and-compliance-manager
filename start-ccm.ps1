@@ -1447,7 +1447,7 @@ function Show-CatalogDeployDialog {
             <StackPanel>
                 <TextBlock Text="Parameters" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,4"/>
                 <StackPanel x:Name="panelForm"/>
-                <TextBlock Text="Dependencies (verified at deploy)" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
+                <TextBlock Text="Dependencies (Verified at Deploy)" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
                 <StackPanel x:Name="panelDeps"/>
                 <TextBlock Text="Will Create" FontSize="11" FontWeight="SemiBold" Margin="0,14,0,4"/>
                 <TextBlock x:Name="txtProduces" FontSize="12" TextWrapping="Wrap"
@@ -2369,7 +2369,7 @@ function Show-AddSettingDialog {
                     <TextBlock Text="Value Name" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtSetValueName" Style="{StaticResource FieldBox}"/>
                     <CheckBox x:Name="chkSetRemediateDword" Content="Remediate as DWORD" Margin="0,10,0,0"/>
-                    <CheckBox x:Name="chkSet64Bit" Content="64-bit registry key" Margin="0,6,0,0"/>
+                    <CheckBox x:Name="chkSet64Bit" Content="64-Bit Registry Key" Margin="0,6,0,0"/>
                 </StackPanel>
 
                 <StackPanel x:Name="panelScript" Visibility="Collapsed">
@@ -2421,8 +2421,8 @@ function Show-AddSettingDialog {
                     <ComboBoxItem Content="Critical"/>
                     <ComboBoxItem Content="CriticalWithEvent"/>
                 </ComboBox>
-                <CheckBox x:Name="chkSetRemediate" Content="Remediate noncompliance" Margin="0,10,0,0"/>
-                <CheckBox x:Name="chkSetReport" Content="Report noncompliance" Margin="0,6,0,0"/>
+                <CheckBox x:Name="chkSetRemediate" Content="Remediate Noncompliance" Margin="0,10,0,0"/>
+                <CheckBox x:Name="chkSetReport" Content="Report Noncompliance" Margin="0,6,0,0"/>
             </StackPanel>
         </ScrollViewer>
         <Border Grid.Row="1" Padding="0,12,0,0">
