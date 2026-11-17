@@ -11,6 +11,10 @@
 - Guide capture reports a verdict and lists guide images that no capture run produced.
 - Retake all 77 guide images at the maximized 1080p work area, both themes.
 
+### Fixed
+
+- Vendor the SuiteCommon dialogs that take ThemedButtonStyle.
+
 ## [2026.11.15.0027] - 2026-11-15
 
 ## 13 disabled controls now dim
