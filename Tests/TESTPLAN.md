@@ -35,4 +35,3 @@ Window guard: `Window.Tests.ps1` opens windows only when the environment variabl
 - The dialogs are not shown with data, so their layout and contrast are not measured.
 - The connect and refresh handlers, the dialogs' button logic and the WQL tree run inside the window with a site. The lab run covers the module calls that they make, not the clicks.
 - Configuration item settings creation (`Add-ConfigurationItemSetting`) is not run in the lab. It runs only in the mocked tests.
-- The settings save in SuiteCommon is not atomic. The fix belongs in `app-packager-suite`.
