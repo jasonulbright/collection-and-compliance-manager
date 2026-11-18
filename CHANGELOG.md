@@ -7,6 +7,10 @@
 - The window text, log messages, catalog help and guide now use ConfigMgr terms.
 - The window text and the guide use the word select for actions.
 
+### Fixed
+
+- The guide capture tool stops only the processes that it started, by process id. It no longer stops PowerShell processes by command-line pattern, which could end the window of another session. A new guard test fails when a tool script stops a process by a pattern.
+
 ## [2026.11.18.0028] - 2026-11-18
 
 ## 14 changes: ranged member loads, Cancel, 1080p layout
