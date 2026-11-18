@@ -47,7 +47,7 @@ Use it to find baselines that are older than the catalog, and to find collection
 
 | Message or symptom | Cause | Fix |
 |---|---|---|
-| `Auditing load failed:` | The read failed. | Read the log. |
+| `Auditing load failed:` | The read failed. | Review the log. |
 | The Drift tab is empty. | No baseline has a ccm tag. | Deploy an entry from [Catalog](catalog.md). |
 
 ## Links

@@ -323,7 +323,7 @@
                 <StackPanel>
                     <TextBlock x:Name="txtModuleTitle" Text="Collections" FontSize="18" FontWeight="SemiBold"/>
                     <TextBlock x:Name="txtModuleSubtitle"
-                               Text="Configure Site / Provider in Options, then click Refresh."
+                               Text="Configure Site / Provider in Options, then select Refresh."
                                FontSize="11"
                                TextWrapping="Wrap"
                                Foreground="{DynamicResource MahApps.Brushes.Gray1}"
@@ -687,8 +687,8 @@
                         <StackPanel Width="120" Margin="0,0,8,0"><TextBlock Text="Severity" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><ComboBox x:Name="cboCatSeverity" FontSize="12"/></StackPanel>
                         <StackPanel Width="120" Margin="0,0,8,0"><TextBlock Text="Status" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><ComboBox x:Name="cboCatStatus" FontSize="12"/></StackPanel>
                         <StackPanel Width="144" Margin="0,0,8,0"><TextBlock Text="OS Scope" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><ComboBox x:Name="cboCatOsScope" FontSize="12"/></StackPanel>
-                        <StackPanel Width="168" Margin="0,0,8,0"><TextBlock Text="CVE ID" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><TextBox x:Name="txtCatCve" FontSize="12" Padding="6,4,6,4" Controls:TextBoxHelper.Watermark="e.g. CVE-2018-3639"/></StackPanel>
-                        <StackPanel Width="144" Margin="0,0,8,0"><TextBlock Text="Tenable Plugin" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><TextBox x:Name="txtCatTenable" FontSize="12" Padding="6,4,6,4" Controls:TextBoxHelper.Watermark="e.g. 96982"/></StackPanel>
+                        <StackPanel Width="168" Margin="0,0,8,0"><TextBlock Text="CVE ID" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><TextBox x:Name="txtCatCve" FontSize="12" Padding="6,4,6,4" Controls:TextBoxHelper.Watermark="Example: CVE-2018-3639"/></StackPanel>
+                        <StackPanel Width="144" Margin="0,0,8,0"><TextBlock Text="Tenable Plugin" FontSize="11" FontWeight="Bold" Margin="0,0,0,2" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/><TextBox x:Name="txtCatTenable" FontSize="12" Padding="6,4,6,4" Controls:TextBoxHelper.Watermark="Example: 96982"/></StackPanel>
                         <StackPanel Width="120" Margin="0,0,8,0" VerticalAlignment="Bottom"><Button x:Name="btnCatClearFilters" Content="Clear Filters" Style="{StaticResource SquareInlineButtonStyle}" MinWidth="0" HorizontalAlignment="Stretch" Margin="0,0,0,0"/></StackPanel>
                     </WrapPanel>
 

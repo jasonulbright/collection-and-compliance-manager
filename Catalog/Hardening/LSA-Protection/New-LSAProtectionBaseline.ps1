@@ -16,7 +16,7 @@
     almost always missed -- it ships disabled and there is no nag to turn it on.
 
     REBOOT REQUIRED: protection engages on the next boot. Configuration Manager will remediate the value
-    but the host is not actually protected until it restarts. Validate driver/plugin
+    but the host is not protected until it restarts. Validate driver/plugin
     compatibility (some smartcard / AV LSA plugins must be PPL-signed) before broad
     enforcement.
 
@@ -24,7 +24,7 @@
     Configuration Manager site code.
 
 .PARAMETER SiteServer
-    Configuration Manager site server FQDN.
+    FQDN of the SMS Provider computer.
 
 .PARAMETER CollectionName
     If specified, deploys the baseline to this collection daily with remediation enabled.
@@ -61,7 +61,7 @@ if (-not (Get-Module ConfigurationManager -ErrorAction SilentlyContinue)) {
         Import-Module $modulePath
     }
     else {
-        throw "ConfigurationManager module not found. Run this from a machine with the Configuration Manager admin console installed."
+        throw "ConfigurationManager module not found. Run this from a computer that has the Configuration Manager console installed."
     }
 }
 

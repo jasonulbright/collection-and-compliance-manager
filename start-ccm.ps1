@@ -6,7 +6,7 @@
     Sidebar navigation across three views (Collections, WQL Editor, Templates),
     inline action bar (Refresh, filter, status filter, exports), modal dialogs
     for Options and per-collection actions, log drawer, and status bar. Status
-    conveyed via glyph at ThemeForeground (no row-color coloring). Site code
+    conveyed by a glyph at ThemeForeground (no row-color coloring). Site code
     and SMS Provider configured from the Options sidebar button.
 
     Requirements:
@@ -337,13 +337,13 @@ $toggleTheme.Add_Toggled({
 # View switching.
 # =============================================================================
 $script:ViewMeta = @{
-    'Collections' = @{ Title = 'Collections'; Subtitle = 'All device collections in the site. Configure Site / Provider in Options, then click Refresh.' }
+    'Collections' = @{ Title = 'Collections'; Subtitle = 'All device collections in the site. Configure Site / Provider in Options, then select Refresh.' }
     'WQL Editor'  = @{ Title = 'WQL Editor';  Subtitle = 'Edit query rules on a selected collection. Validate syntax and preview matches before committing.' }
     'Templates'   = @{ Title = 'Templates';   Subtitle = '238 ready-made operational queries plus 20 parameterized templates. Apply to a collection or copy into the WQL Editor.' }
-    'Catalog'     = @{ Title = 'Catalog';     Subtitle = 'Configuration Item / Baseline catalog from a local clone. Set the Catalog Path in Options, then click Reload Catalog.' }
-    'Live CI/CB'  = @{ Title = 'Live CI/CB';  Subtitle = 'Configuration items and baselines on the live site. Select a baseline to see its deployments. Click Refresh to (re)load.' }
+    'Catalog'     = @{ Title = 'Catalog';     Subtitle = 'Configuration Item / Baseline catalog from a local clone. Set the Catalog Path in Options, then select Reload Catalog.' }
+    'Live CI/CB'  = @{ Title = 'Live CI/CB';  Subtitle = 'Configuration items and baselines on the live site. Select a baseline to see its deployments. Select Refresh to load or reload.' }
     'Editor'      = @{ Title = 'Editor';      Subtitle = 'Edit the compliance settings of a configuration item. Refresh to load CIs, pick one, then view / remove its settings.' }
-    'Auditing'    = @{ Title = 'Auditing';    Subtitle = 'Drift (deployed [ccm:] tag vs catalog version), compliance summary, and evaluation freshness. Refresh to (re)load; export to CSV.' }
+    'Auditing'    = @{ Title = 'Auditing';    Subtitle = 'Drift (deployed [ccm:] tag vs catalog version), compliance summary, and evaluation freshness. Refresh to load or reload; export to CSV.' }
 }
 
 function Set-ActiveView {
@@ -541,7 +541,7 @@ function Update-StatusBarSummary {
     } elseif (-not $global:Prefs.SiteCode -or -not $global:Prefs.SMSProvider) {
         $parts += 'Open Options to configure site code and SMS Provider'
     } else {
-        $parts += 'Ready. Click Refresh.'
+        $parts += 'Ready. Select Refresh.'
     }
     if ($script:RawCollections -and @($script:RawCollections).Count -gt 0) {
         $parts += ('{0} collections' -f @($script:RawCollections).Count)
@@ -898,7 +898,7 @@ function Test-BgBusy {
     # leaving the UI showing a stale "loading" / disabled state. Refuse to start a new one
     # while the runspace is busy. ($script:BgRunspace is $null before the first job.)
     if ($script:BgRunspace -and $script:BgRunspace.RunspaceAvailability -eq 'Busy') {
-        Add-LogLine 'A background operation is still running -- please wait for it to finish.'
+        Add-LogLine 'A background operation is still running. Wait for it to finish.'
         return $true
     }
     return $false
@@ -1178,7 +1178,7 @@ function Invoke-Refresh {
             # Membership) resolve. CM cmdlets require the current location to
             # be the site PSDrive, and Set-Location is per-runspace.
             try {
-                if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' }
+                if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' }
             } catch {
                 Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.'
             }
@@ -1635,7 +1635,7 @@ function Invoke-CreateDependency {
 
     if (Test-BgBusy) { return }
     Initialize-BgRunspace
-    Add-LogLine ('Creating dependency ''{0}'' via {1}...' -f $Dependency.Name, (Split-Path -Leaf $creator))
+    Add-LogLine ('Creating dependency ''{0}'' with {1}...' -f $Dependency.Name, (Split-Path -Leaf $creator))
     Set-StatusText ('Creating dependency {0}...' -f $Dependency.Name)
 
     $state = [hashtable]::Synchronized(@{ Done = $false; Output = @(); ExitCode = $null; ErrorMsg = $null })
@@ -1675,7 +1675,7 @@ function Invoke-CatalogDeploy {
     param([Parameter(Mandatory)]$Entry, [Parameter(Mandatory)][hashtable]$Values)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Deploy: click Refresh first to connect (needed for dependency checks and baseline tagging).'
+        Add-LogLine 'Deploy: select Refresh first to connect (needed for dependency checks and baseline tagging).'
         Set-StatusText 'Deploy needs a site connection -- Refresh first.'
         return
     }
@@ -1905,7 +1905,7 @@ function Invoke-LoadLive {
             $btnRefresh.IsEnabled = $true
 
             # Mirror the bg connection into the UI thread for later per-action CM calls.
-            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
+            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' } }
             catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
 
             Add-LogLine ('Live CI/CB loaded: {0} items, {1} baselines.' -f @($script:LiveCIs).Count, @($script:LiveCBs).Count)
@@ -1919,7 +1919,7 @@ function Invoke-LoadBaselineDeployments {
     param([Parameter(Mandatory)][string]$BaselineName)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Live CI/CB: refresh first to establish a CM connection.'
+        Add-LogLine 'Live CI/CB: refresh first to connect to the site.'
         return
     }
     # Stamp the selection token BEFORE the busy-guard: if a load for the previous baseline is
@@ -2173,7 +2173,7 @@ function Invoke-LoadEditorCIs {
             $cboEditorCI.ItemsSource = @($script:BgState.Result | Sort-Object)
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
-            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
+            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' } }
             catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
             Add-LogLine ('Editor: loaded {0} configuration items.' -f @($cboEditorCI.ItemsSource).Count)
             Update-StatusBarSummary
@@ -2186,7 +2186,7 @@ function Invoke-LoadEditorCIs {
 function Invoke-LoadEditorSettings {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Posts a one-shot setting fetch to the bg runspace.')]
     param([Parameter(Mandatory)][string]$ConfigurationItemName)
-    if (-not $script:IsConnectedFromBg) { Add-LogLine 'Editor: reload CIs first to establish a CM connection.'; return }
+    if (-not $script:IsConnectedFromBg) { Add-LogLine 'Editor: reload CIs first to connect to the site.'; return }
     # Stamp the selection token before the busy-guard (see Invoke-LoadBaselineDeployments).
     $gridEditorSettings.Tag = $ConfigurationItemName
     if (Test-BgBusy) { return }
@@ -2957,7 +2957,7 @@ function Invoke-LoadAuditing {
             Sync-FooterSite
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
-            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'UI-thread CM connect returned failure; per-action CM calls may fail until the next refresh.' } }
+            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' } }
             catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
             $drifted = @($script:AuditDrift | Where-Object { $_.Status -eq 'Drifted' }).Count
             $catNote = if (-not $res.HadCatalog) { ' (drift skipped: set Catalog Path in Options)' } else { '' }
@@ -3000,7 +3000,7 @@ function Invoke-LoadDirectMembers {
     param([Parameter(Mandatory)][string]$CollectionID)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Direct members: refresh first to establish a CM connection.'
+        Add-LogLine 'Direct members: refresh first to connect to the site.'
         return
     }
 
@@ -3060,7 +3060,7 @@ $btnPreviewWql.Add_Click({
         return
     }
     if (-not $script:IsConnectedFromBg) {
-        $txtWqlValidation.Text = 'Refresh first to establish a CM connection.'
+        $txtWqlValidation.Text = 'Refresh first to connect to the site.'
         return
     }
     $txtWqlValidation.Text = 'Previewing...'
@@ -3193,7 +3193,7 @@ function Show-NewCollectionDialog {
     param()
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'New Collection: refresh first to establish a CM connection.'
+        Add-LogLine 'New Collection: refresh first to connect to the site.'
         return $false
     }
 
@@ -3237,7 +3237,7 @@ function Show-NewCollectionDialog {
         <StackPanel Grid.Row="0">
             <TextBlock Text="Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <TextBox x:Name="txtName" FontSize="12" Padding="6,4,6,4"
-                     Controls:TextBoxHelper.Watermark="e.g. Workstations - Pilot Ring"/>
+                     Controls:TextBoxHelper.Watermark="Example: Workstations - Pilot Ring"/>
 
             <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
             <Grid>
@@ -3469,7 +3469,7 @@ function Show-EditMembershipDialog {
     param([Parameter(Mandatory)]$Collection)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Edit Membership: refresh first to establish a CM connection.'
+        Add-LogLine 'Edit Membership: refresh first to connect to the site.'
         return $false
     }
 
@@ -3658,7 +3658,7 @@ function Show-ApplyTemplateDialog {
         return $false
     }
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Apply Template: refresh first to establish a CM connection.'
+        Add-LogLine 'Apply Template: refresh first to connect to the site.'
         return $false
     }
 
@@ -3821,7 +3821,7 @@ $btnEvaluateColl.Add_Click({
         return
     }
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Evaluate: refresh first to establish a CM connection.'
+        Add-LogLine 'Evaluate: refresh first to connect to the site.'
         return
     }
     try {
@@ -3973,11 +3973,11 @@ function Show-OptionsDialog {
                 <TextBlock x:Name="lblSiteCode" Text="Site Code" FontSize="14" FontWeight="Bold" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBox x:Name="txtSiteCode" FontSize="12" Padding="6,4,6,4"
-                         Controls:TextBoxHelper.Watermark="e.g. P01" Width="120" HorizontalAlignment="Left"/>
+                         Controls:TextBoxHelper.Watermark="Example: P01" Width="120" HorizontalAlignment="Left"/>
                 <TextBlock x:Name="lblSmsProvider" Text="SMS Provider FQDN" FontSize="14" FontWeight="Bold" Margin="0,12,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBox x:Name="txtSmsProvider" FontSize="12" Padding="6,4,6,4"
-                         Controls:TextBoxHelper.Watermark="e.g. cm01.contoso.com"/>
+                         Controls:TextBoxHelper.Watermark="Example: cm01.contoso.com"/>
                 <TextBlock Text="The app reads and changes ConfigMgr objects. The account that runs the app needs the matching ConfigMgr permissions."
                            FontSize="11" TextWrapping="Wrap" Margin="0,16,0,0"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -4153,7 +4153,7 @@ $window.Add_Loaded({
     try { [void](Initialize-SuiteFooter -Window $window -StatusName 'txtStatus' -OnOpenOptions { Show-OptionsDialog }) }
     catch { Write-Log ('Footer: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The footer failed. The log file has the details.' }
     Sync-FooterSite
-    Add-LogLine 'Collection and Compliance Manager ready. Configure Site / Provider in Options, then click Refresh.'
+    Add-LogLine 'Collection and Compliance Manager ready. Configure Site / Provider in Options, then select Refresh.'
 
     # Auto-load templates so the Templates view is populated on first switch
     # without requiring a ConfigMgr connection.

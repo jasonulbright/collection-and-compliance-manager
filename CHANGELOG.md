@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Use ConfigMgr terms in the window text, the log messages, the catalog help and the guide.
+- Use the word select in the window text and the guide.
+
 ## [2026.11.18.0028] - 2026-11-18
 
 ## 14 changes: ranged member loads, Cancel, 1080p layout

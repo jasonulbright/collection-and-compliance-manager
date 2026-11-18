@@ -27,7 +27,7 @@ Use it to see what is on the site, to see how a baseline is deployed, and to cha
 
 ![The Configuration Items tab](../images/live-cis.png)
 
-### Read the baselines
+### View the baselines
 
 1. Select the **Configuration Baselines** tab.
 2. Select a baseline. The deployments of the baseline show below with the counts.
@@ -61,7 +61,7 @@ This guide selected a baseline and read it. It did not use the deployment button
 
 | Message or symptom | Cause | Fix |
 |---|---|---|
-| `Live CI/CB load failed:` | The read failed. | Read the log. Check the connection. |
+| `Live CI/CB load failed:` | The read failed. | Review the log. Check the connection. |
 | The deployment buttons are disabled. | No deployment is selected. | Select a baseline and a deployment. |
 
 ## Links

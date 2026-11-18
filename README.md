@@ -29,52 +29,52 @@ The [user guide](docs/index.md) walks every view, dialog and setting with images
    ```powershell
    powershell -ExecutionPolicy Bypass -File start-ccm.ps1
    ```
-2. Click the **Options** button on the sidebar and set your Site Code and SMS Provider. The footer then shows the site at the right end, for example `Site MCM - cm01.contoso.com`. The footer is read-only. Click the site text to open Options.
-3. Click **Refresh** to load every device collection.
+2. Select the **Options** button on the sidebar and set your Site Code and SMS Provider. The footer then shows the site at the right end, for example `Site MCM - cm01.contoso.com`. The footer is read-only. Select the site text to open Options.
+3. Select **Refresh** to load every device collection.
 
 ## Layout
 
 The shell uses a sidebar layout with seven views and an Options modal, grouped into **Collections** and **CI/CB**:
 
 - **Collections** -- master-detail grid of every device collection: Name, ID, Member Count, Limiting Collection, Refresh Type, Comment. Detail panel tabs: Properties, Direct Members, Query Rules, Include Rules, Exclude Rules. Filter by membership shape or free text.
-- **WQL Editor** -- pick a collection and rule, edit the WQL in the monospace editor, **Validate Query** (syntax-check via `Invoke-CMWmiQuery`), **Preview Results** (match count). Add, Update, or Remove rules.
+- **WQL Editor** -- pick a collection and rule, edit the WQL in the monospace editor, **Validate Query** (syntax check with `Invoke-CMWmiQuery`), **Preview Results** (match count). Add, Update, or Remove rules.
 - **Templates** -- Operational + Parameterized tabs. Pick a template, fill parameters live, then **Copy to WQL Editor** or **Apply to Collection**.
 - **Catalog** -- browse the bundled CI/CB catalog (`.\Catalog`); filter by subcategory / OS / CVE / Tenable plugin; deploy an entry (renders a form from its metadata, checks dependencies, confirms, runs the builder, and tags the baseline `[ccm:<id>@<version>]`).
 - **Live CI/CB** -- the configuration items and baselines on the connected site. CI grid (Name, Version, In Baseline, # Settings, Modified). CB grid (Name, Compliant / Non-Compliant / Targeted, # Deployments, ccm tag). Select a baseline to see its per-collection deployments (counts + Enforcement) and bulk-act: Enable/Disable Remediation, Redeploy, Reassign, Delete.
 - **Editor** -- pick a CI, view its settings, and Add / Edit / Remove registry or script compliance settings. Edit pre-fills current values (script body + language) and applies only what you change.
-- **Auditing** -- Drift tab (deployed baseline version vs. catalog) and Compliance tab (per-collection compliance summary + evaluation freshness); export either to CSV.
+- **Auditing** -- Drift tab (deployed baseline version compared with the catalog) and Compliance tab (per-collection compliance summary + evaluation freshness); export either to CSV.
 
 ## Workflows
 
 ### Create or copy a collection
 
-1. **Collections** view -> **New Collection**. Pick name, limiting collection, comment, refresh type. Click Create.
-2. To clone an existing one: select the source row, click **Copy...**, name the clone, click Copy.
+1. **Collections** view -> **New Collection**. Enter the name, limiting collection, comment, refresh type. Select **Create**.
+2. To clone an existing one: select the source row, select **Copy...**, name the clone, select **Copy**.
 
 ### Edit direct membership
 
 1. Select a collection on the **Collections** view.
-2. Click **Edit Membership...** to open the modal: add devices by name (auto-resolves Resource ID), remove selected members in bulk with confirmation.
+2. Select **Edit Membership...** to open the modal: add devices by name (auto-resolves Resource ID), remove selected members in bulk with confirmation.
 
 ### Author a new WQL rule
 
 1. Switch to **WQL Editor** view.
 2. Pick a target collection.
-3. Type or paste the WQL. Click **Validate Query** to syntax-check.
-4. Click **Preview Results** to count matches.
-5. Type a rule name and click **Add Rule**.
+3. Type or paste the WQL. Select **Validate Query** to syntax-check.
+4. Select **Preview Results** to count matches.
+5. Type a rule name and select **Add Rule**.
 
 ### Apply a ready-made template
 
 1. Switch to **Templates** view -> **Operational** tab.
-2. Pick a template (e.g., "Workstations | Windows 11 24H2"). The expanded WQL appears in the right pane.
-3. Click **Apply to Collection...**, pick a target, confirm the rule name, click Apply.
+2. Pick a template (for example, "Workstations | Windows 11 24H2"). The expanded WQL appears in the right pane.
+3. Select **Apply to Collection...**, pick a target, confirm the rule name, and select **Apply**.
 
 ### Use a parameterized template
 
 1. **Templates** view -> **Parameterized** tab.
-2. Pick a template (e.g., "Software Installed by Name").
-3. Fill in the parameters (e.g., SoftwareName = `7-Zip`). The expanded WQL updates live.
+2. Pick a template (for example, "Software Installed by Name").
+3. Fill in the parameters (for example, SoftwareName = `7-Zip`). The expanded WQL updates live.
 4. **Apply to Collection...** or **Copy to WQL Editor** for further tuning.
 
 ## Template Categories
