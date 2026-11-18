@@ -15,8 +15,8 @@ Each entry folder contains exactly two files:
 
 | Key | Type | Notes |
 |--|--|--|
-| `Id` | string | kebab-case, globally unique. e.g. `smbv1-disable`. The stable identity used by the `<Id>@<Version>` deploy tag. |
-| `Version` | string | semver. e.g. `1.0.0`. Bumped when the builder's produced artifacts change. |
+| `Id` | string | kebab-case, globally unique, for example `smbv1-disable`. The stable identity used by the `<Id>@<Version>` deploy tag. |
+| `Version` | string | semver, for example `1.0.0`. Bumped when the builder's produced artifacts change. |
 | `DisplayName` | string | Human label for the grid. |
 | `Subcategory` | string | **Must equal the parent folder name.** Observed: `Compliance`, `Hardening`, `Configuration`, `CVE-Remediation`. |
 | `Mechanism` | string | Observed: `NativeRegistry` (15/15). Allowed (future): script-based. |
@@ -24,7 +24,7 @@ Each entry folder contains exactly two files:
 | `Description` | string | One-paragraph summary; surfaced in the detail pane. |
 | `Severity` | string | Observed: `Critical` (11), `Warning` (4). Maps to `NoncomplianceSeverity` in the builder. |
 | `Cves` | string[] | CVE IDs, possibly empty `@()`. |
-| `TenablePlugins` | int[] | Plugin IDs, possibly empty. e.g. `@(20007, 104743, 157288)`. |
+| `TenablePlugins` | int[] | Plugin IDs, possibly empty, for example `@(20007, 104743, 157288)`. |
 | `KbReferences` | string[] | **Mixed**: bare KB ids (`'KB4073119'`) and/or full learn.microsoft.com URLs. Possibly empty. |
 | `OsScope` | hashtable | `@{ Client = string[]; Server = string[] }`. Free-text OS labels. |
 | `RebootRequired` | bool | |
@@ -68,7 +68,7 @@ DependsOn = @(
 - `Type` - Observed: `Collection`.
 - `Name` - the live Configuration Manager object the deploy precondition checks for.
 - `CreatedBy` - relative path to a builder that can create the dependency, or `$null`.
-  **May climb out of the catalog tree**, e.g. `../../../Collections/New-HTBasedCollections.ps1`
+  **May climb out of the catalog tree**, for example `../../../Collections/New-HTBasedCollections.ps1`
   (resolves to `MECM/Collections/`, a sibling of `CI-CB/`). The dependency-builder affordance must
   resolve relative to the entry folder, not assume the target lives under the catalog root.
 
@@ -84,10 +84,10 @@ DependsOn = @(
 ## Deploy tag convention (`<Id>@<Version>`)
 
 Drift detection (Auditing view) maps a live Configuration Baseline back to its catalog source by a
-machine-readable tag embedded in the **CB Description**, formatted `<Id>@<Version>`
-(e.g. `smbv1-disable@1.0.0`).
+tag in the **CB Description**, formatted `<Id>@<Version>`
+(for example `smbv1-disable@1.0.0`).
 
-**The builders do not emit this tag.** It is applied **app-side** via `Set-CMBaseline` after the
+**The builders do not emit this tag.** It is applied **app-side** with `Set-CMBaseline` after the
 builder runs - keeping the catalog untouched, tagging CBs created outside the app, and letting
 admins adopt existing/hand-made CBs into a GUI-managed catalog. A recommended wrapped form keeps the
-builder's human description intact, e.g. `"<existing description> [ccm:<Id>@<Version>]"`.
+builder's human description intact, for example `"<existing description> [ccm:<Id>@<Version>]"`.

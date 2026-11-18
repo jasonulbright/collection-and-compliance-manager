@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The window text, log messages, catalog help and guide now use ConfigMgr terms.
+- The window text and the guide use the word select for actions.
+
 ## [2026.11.18.0028] - 2026-11-18
 
 ## 14 changes: ranged member loads, Cancel, 1080p layout

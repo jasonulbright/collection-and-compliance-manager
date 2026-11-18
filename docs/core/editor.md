@@ -63,8 +63,8 @@ This guide opened the dialog and cancelled it. The results of **Add**, **Edit Se
 
 | Message or symptom | Cause | Fix |
 |---|---|---|
-| `Editor: CI load failed:` | The read failed. | Read the log. |
-| `Editor: add setting failed:` | The site refused the setting. | Read the log line for the reason. |
+| `Editor: CI load failed:` | The read failed. | Review the log. |
+| `Editor: add setting failed:` | The site refused the setting. | Review the log line for the reason. |
 
 ## Links
 

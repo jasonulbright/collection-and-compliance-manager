@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Import this module to get:
-      - Structured logging and CM site connection management via the
+      - Structured logging and ConfigMgr site connection management by using the
         vendored SuiteCommon module (Lib\SuiteCommon)
       - Device collection queries and CRUD operations
       - Membership management (direct, query, include, exclude rules)
@@ -565,7 +565,7 @@ function Invoke-CollectionEvaluation {
 function Test-WqlQuery {
     <#
     .SYNOPSIS
-        Validates a WQL query expression via Invoke-CMWmiQuery.
+        Validates a WQL query expression with Invoke-CMWmiQuery.
     .DESCRIPTION
         Returns a PSCustomObject with IsValid, ResultCount, and ErrorMessage.
     #>
@@ -745,7 +745,7 @@ function Expand-TemplateParameters {
 function Export-CollectionCsv {
     <#
     .SYNOPSIS
-        Exports object rows (e.g. a grid's ItemsSource) to CSV.
+        Exports object rows (for example a grid's ItemsSource) to CSV.
     .DESCRIPTION
         Accepts the row objects directly. When -Column is supplied, only those properties are
         written, in that order; otherwise every property of the rows is written.
@@ -906,7 +906,7 @@ function Test-CatalogMetadata {
     }
     if ($Metadata.ContainsKey('Version') -and $Metadata['Version'] -is [string] -and
         $Metadata['Version'] -notmatch '^\d+\.\d+\.\d+(\.\d+)?$') {
-        $errors.Add("Version must be semver (e.g. 1.0.0): '$($Metadata['Version'])'")
+        $errors.Add("Version must be semver, for example 1.0.0: '$($Metadata['Version'])'")
     }
     if ($ExpectedSubcategory -and $Metadata.ContainsKey('Subcategory') -and
         $Metadata['Subcategory'] -ne $ExpectedSubcategory) {
@@ -1009,7 +1009,7 @@ function Get-CatalogIndex {
     .DESCRIPTION
         Walks <CatalogPath>/<Subcategory>/<Entry>/metadata.psd1, parses each with
         Import-PowerShellDataFile (data-only -- no script in the file executes),
-        validates it via Test-CatalogMetadata, and returns a PSCustomObject array
+        validates it with Test-CatalogMetadata, and returns a PSCustomObject array
         carrying the grid columns, the full metadata, resolved file paths, and the
         validation result.
 
@@ -1280,8 +1280,8 @@ function Set-BaselineDriftTag {
     .DESCRIPTION
         Applied app-side after a builder runs (the builders do not emit this tag), so it can
         also adopt hand-made baselines into the GUI-managed catalog. Reads the current
-        description via Get-CMBaseline, wraps it with Get-DriftTaggedDescription, and writes
-        it back via Set-CMBaseline. Requires an active CM connection. Returns $true on success.
+        description with Get-CMBaseline, wraps it with Get-DriftTaggedDescription, and writes
+        it back with Set-CMBaseline. Requires an active CM connection. Returns $true on success.
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -1453,7 +1453,7 @@ function Get-ConfigurationItemSettings {
     .SYNOPSIS
         Returns the compliance settings of a configuration item.
     .DESCRIPTION
-        Resolves the CI by name (Get-CMConfigurationItem -Fast) then returns its settings via
+        Resolves the CI by name (Get-CMConfigurationItem -Fast) then returns its settings with
         Get-CMComplianceSetting -InputObject (ConfigurationItemSetting objects). Returns @() if
         the CI is not found.
     #>
@@ -1525,7 +1525,7 @@ function Remove-ConfigurationItemSetting {
     .SYNOPSIS
         Removes a compliance setting from a configuration item.
     .DESCRIPTION
-        Resolves the CI by name and removes the named setting via Remove-CMComplianceSetting -Force.
+        Resolves the CI by name and removes the named setting with Remove-CMComplianceSetting -Force.
         Returns $true on success, $false if the CI is not found.
     #>
     [CmdletBinding(SupportsShouldProcess)]

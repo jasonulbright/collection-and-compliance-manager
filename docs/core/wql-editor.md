@@ -68,7 +68,7 @@ This guide did not add, update or remove a rule. The behavior of these buttons w
 | The tree is empty. | No refresh has run. | Select **Refresh**. |
 | `WQL validate:` shows an error. | The query has a syntax error. | Correct the query. |
 | The text next to the buttons shows `Refresh first to establish a CM connection.` | No connection is open. | Select **Refresh** and try again. |
-| The text next to the buttons shows `Preview failed:` | The site could not run the query. | Read the text after the colon and the log. |
+| The text next to the buttons shows `Preview failed:` | The site could not run the query. | Review the text after the colon and the log. |
 
 ## Links
 

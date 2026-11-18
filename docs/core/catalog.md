@@ -24,7 +24,7 @@ Use it to find an entry by subcategory, severity, status, operating system, CVE 
 
 ![The Catalog view](../images/catalog.png)
 
-### Read an entry
+### View an entry
 
 1. Select a row. The pane below the grid shows the full metadata. The text next to **Deploy...** shows the name.
 
@@ -41,7 +41,7 @@ Use it to find an entry by subcategory, severity, status, operating system, CVE 
 ### Deploy an entry
 
 1. Select a row and select **Deploy...**. The dialog `Deploy` shows the entry, its parameters (a star marks a required one), the dependencies and what it will create.
-2. Fill the parameters. The site code and the site server are filled from the connection.
+2. Fill the parameters. The site code and the SMS Provider are filled from the connection.
 3. Select **Deploy** to run the builder or **Cancel**.
 
 ![The Deploy dialog](../images/dialog-catalog-deploy.png)
