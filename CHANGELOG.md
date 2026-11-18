@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [2026.11.18.0028] - 2026-11-18
+
+## 14 changes: ranged member loads, Cancel, 1080p layout
+
 ### Changed
 
 - Compact density for a 1080p work area: 36 px sidebar, 26 px controls, 24 px rows.
