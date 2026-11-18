@@ -243,6 +243,7 @@ $btnCopyToWqlEditor          = $window.FindName('btnCopyToWqlEditor')
 $btnApplyTemplate            = $window.FindName('btnApplyTemplate')
 
 $progressOverlay  = $window.FindName('progressOverlay')
+$btnCancelWork     = $window.FindName('btnCancelWork')
 $txtProgressTitle = $window.FindName('txtProgressTitle')
 $txtProgressStep  = $window.FindName('txtProgressStep')
 
@@ -921,6 +922,25 @@ function Dispose-BgWork {
     $script:BgInvokeHandle = $null
 }
 
+# Cancel stops the running load. The cancel flag lets a worker that reads it stop at its next step; the pipeline is stopped
+# without blocking the window, and the background runspace is dropped, so that the next load never queues behind a call
+# that is stuck on an unresponsive provider.
+function Invoke-CancelWork {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Stops ephemeral background work only.')]
+    param()
+    if (-not $script:BgPowerShell) { return }
+    if ($script:BgState) { $script:BgState['Cancel'] = $true }
+    Dispose-BgWork
+    Close-SuiteBgRunspace -Runspace $script:BgRunspace
+    $script:BgRunspace = $null
+    $script:BgState = $null
+    $script:IsConnectedFromBg = $false
+    $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
+    $btnRefresh.IsEnabled = $true
+    Add-LogLine 'Cancelled. Nothing was changed.'
+    Set-StatusText 'Cancelled.'
+}$btnCancelWork.Add_Click({ Invoke-CancelWork })
+
 function Invoke-Refresh {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Posts work to the background runspace and arms a DispatcherTimer.')]
     param()
@@ -972,6 +992,7 @@ function Invoke-Refresh {
     $btnRefresh.IsEnabled = $false
     $txtProgressTitle.Text = 'Loading collections'
     $txtProgressStep.Text  = 'Connecting...'
+    $btnCancelWork.Visibility = [System.Windows.Visibility]::Visible
     $progressOverlay.Visibility = [System.Windows.Visibility]::Visible
     Add-LogLine ('Refresh: site={0} provider={1}' -f $global:Prefs.SiteCode, $global:Prefs.SMSProvider)
     Set-StatusText 'Refreshing...'
@@ -1793,6 +1814,7 @@ function Invoke-LoadLive {
     $btnRefresh.IsEnabled = $false
     $txtProgressTitle.Text = 'Loading CI / CB'
     $txtProgressStep.Text  = 'Connecting...'
+    $btnCancelWork.Visibility = [System.Windows.Visibility]::Collapsed
     $progressOverlay.Visibility = [System.Windows.Visibility]::Visible
     Set-StatusText 'Loading configuration items and baselines...'
 
@@ -2108,6 +2130,7 @@ function Invoke-LoadEditorCIs {
     $btnRefresh.IsEnabled = $false
     $txtProgressTitle.Text = 'Loading configuration items'
     $txtProgressStep.Text = 'Connecting...'
+    $btnCancelWork.Visibility = [System.Windows.Visibility]::Collapsed
     $progressOverlay.Visibility = [System.Windows.Visibility]::Visible
     Set-StatusText 'Loading configuration items...'
     $siteCode = [string]$global:Prefs.SiteCode
@@ -2864,6 +2887,7 @@ function Invoke-LoadAuditing {
     $btnRefresh.IsEnabled = $false
     $txtProgressTitle.Text = 'Auditing'
     $txtProgressStep.Text = 'Connecting...'
+    $btnCancelWork.Visibility = [System.Windows.Visibility]::Collapsed
     $progressOverlay.Visibility = [System.Windows.Visibility]::Visible
     Set-StatusText 'Loading compliance + drift...'
     $siteCode = [string]$global:Prefs.SiteCode

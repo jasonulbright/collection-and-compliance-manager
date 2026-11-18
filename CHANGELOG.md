@@ -22,6 +22,7 @@
 ### Added
 
 - Add the Title Case guard (D-12), the button style guard and the capture lock test; drop Ascii.Guard.Tests.ps1, which Encoding.Guard.Tests.ps1 covers in full.
+- Add a Cancel button to the progress overlay of the load: it stops the running read without blocking the window, drops the background runspace and leaves the data of the last load as it was.
 
 ## [2026.11.15.0027] - 2026-11-15
 
