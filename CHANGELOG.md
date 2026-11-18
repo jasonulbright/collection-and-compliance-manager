@@ -4,8 +4,8 @@
 
 ### Changed
 
-- Use ConfigMgr terms in the window text, the log messages, the catalog help and the guide.
-- Use the word select in the window text and the guide.
+- The window text, log messages, catalog help and guide now use ConfigMgr terms.
+- The window text and the guide use the word select for actions.
 
 ## [2026.11.18.0028] - 2026-11-18
 

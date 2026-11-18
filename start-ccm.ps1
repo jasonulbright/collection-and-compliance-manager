@@ -1178,9 +1178,9 @@ function Invoke-Refresh {
             # Membership) resolve. CM cmdlets require the current location to
             # be the site PSDrive, and Set-Location is per-runspace.
             try {
-                if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' }
+                if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed. Some actions can fail until you select Refresh again.' }
             } catch {
-                Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.'
+                Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The connection to the site failed. See the log file.'
             }
 
             Add-LogLine ('Refresh complete: {0} collections.' -f @($script:RawCollections).Count)
@@ -1905,8 +1905,8 @@ function Invoke-LoadLive {
             $btnRefresh.IsEnabled = $true
 
             # Mirror the bg connection into the UI thread for later per-action CM calls.
-            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' } }
-            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
+            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed. Some actions can fail until you select Refresh again.' } }
+            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The connection to the site failed. See the log file.' }
 
             Add-LogLine ('Live CI/CB loaded: {0} items, {1} baselines.' -f @($script:LiveCIs).Count, @($script:LiveCBs).Count)
         }
@@ -1919,7 +1919,7 @@ function Invoke-LoadBaselineDeployments {
     param([Parameter(Mandatory)][string]$BaselineName)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Live CI/CB: refresh first to connect to the site.'
+        Add-LogLine 'Live CI/CB: select Refresh first to connect to the site.'
         return
     }
     # Stamp the selection token BEFORE the busy-guard: if a load for the previous baseline is
@@ -2173,8 +2173,8 @@ function Invoke-LoadEditorCIs {
             $cboEditorCI.ItemsSource = @($script:BgState.Result | Sort-Object)
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
-            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' } }
-            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
+            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed. Some actions can fail until you select Refresh again.' } }
+            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The connection to the site failed. See the log file.' }
             Add-LogLine ('Editor: loaded {0} configuration items.' -f @($cboEditorCI.ItemsSource).Count)
             Update-StatusBarSummary
             Sync-FooterSite
@@ -2957,8 +2957,8 @@ function Invoke-LoadAuditing {
             Sync-FooterSite
             $progressOverlay.Visibility = [System.Windows.Visibility]::Collapsed
             $btnRefresh.IsEnabled = $true
-            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed on the UI thread. Actions that use ConfigMgr can fail until the next refresh.' } }
-            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'UI-thread CM connect failed. See the log file.' }
+            try { if (-not (Connect-CMSite -SiteCode $global:Prefs.SiteCode -SMSProvider $global:Prefs.SMSProvider)) { Add-LogLine 'The connection to the site failed. Some actions can fail until you select Refresh again.' } }
+            catch { Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The connection to the site failed. See the log file.' }
             $drifted = @($script:AuditDrift | Where-Object { $_.Status -eq 'Drifted' }).Count
             $catNote = if (-not $res.HadCatalog) { ' (drift skipped: set Catalog Path in Options)' } else { '' }
             Add-LogLine ('Auditing loaded: {0} drift rows ({1} drifted), {2} compliance rows.{3}' -f @($script:AuditDrift).Count, $drifted, @($script:AuditCompliance).Count, $catNote)
@@ -3000,7 +3000,7 @@ function Invoke-LoadDirectMembers {
     param([Parameter(Mandatory)][string]$CollectionID)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Direct members: refresh first to connect to the site.'
+        Add-LogLine 'Direct members: select Refresh first to connect to the site.'
         return
     }
 
@@ -3060,7 +3060,7 @@ $btnPreviewWql.Add_Click({
         return
     }
     if (-not $script:IsConnectedFromBg) {
-        $txtWqlValidation.Text = 'Refresh first to connect to the site.'
+        $txtWqlValidation.Text = 'Select Refresh first to connect to the site.'
         return
     }
     $txtWqlValidation.Text = 'Previewing...'
@@ -3193,7 +3193,7 @@ function Show-NewCollectionDialog {
     param()
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'New Collection: refresh first to connect to the site.'
+        Add-LogLine 'New Collection: select Refresh first to connect to the site.'
         return $false
     }
 
@@ -3469,7 +3469,7 @@ function Show-EditMembershipDialog {
     param([Parameter(Mandatory)]$Collection)
 
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Edit Membership: refresh first to connect to the site.'
+        Add-LogLine 'Edit Membership: select Refresh first to connect to the site.'
         return $false
     }
 
@@ -3658,7 +3658,7 @@ function Show-ApplyTemplateDialog {
         return $false
     }
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Apply Template: refresh first to connect to the site.'
+        Add-LogLine 'Apply Template: select Refresh first to connect to the site.'
         return $false
     }
 
@@ -3821,7 +3821,7 @@ $btnEvaluateColl.Add_Click({
         return
     }
     if (-not $script:IsConnectedFromBg) {
-        Add-LogLine 'Evaluate: refresh first to connect to the site.'
+        Add-LogLine 'Evaluate: select Refresh first to connect to the site.'
         return
     }
     try {
