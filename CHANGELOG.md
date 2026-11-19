@@ -4,11 +4,13 @@
 
 ### Changed
 
+- Preview Results opens a window with the returned rows in a grid. It shows Name, ResourceId and the other columns that the query selects, at most 200 rows, with the line Showing N of M rows. Cancel ends a long query.
 - The window text, log messages, catalog help and guide now use ConfigMgr terms.
 - The window text and the guide use the word select for actions.
 
 ### Fixed
 
+- Preview Results showed only the count and never the rows. A query that fails now shows a short message and no longer shows zero rows.
 - The guide capture tool stops only the processes that it started, by process id. It no longer stops PowerShell processes by command-line pattern, which could end the window of another session. A new guard test fails when a tool script stops a process by a pattern.
 
 ## [2026.11.18.0028] - 2026-11-18
