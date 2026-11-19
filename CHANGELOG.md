@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- The descriptions of four catalog items use through and fix instead of via and patch.
+- The descriptions of four catalog items use ConfigMgr wording.
 
 ### Changed
 
