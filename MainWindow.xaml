@@ -341,12 +341,20 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button x:Name="btnRefresh"
-                            Grid.Column="0"
-                            Content="Refresh"
-                            Style="{StaticResource SquareInlineButtonStyle}"
-                            MinWidth="120"
-                            ToolTip="Load the data of the active view."/>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Button x:Name="btnRefresh"
+                                Content="Refresh"
+                                Style="{StaticResource SquareInlineButtonStyle}"
+                                MinWidth="120"
+                                ToolTip="Load the data of the active view."/>
+                        <Button x:Name="btnCancelRules"
+                                Content="Cancel"
+                                Style="{StaticResource SquareInlineButtonStyle}"
+                                MinWidth="80"
+                                Margin="8,0,0,0"
+                                Visibility="Collapsed"
+                                ToolTip="Stops reading the rules of the collections. The list stays."/>
+                    </StackPanel>
 
                     <TextBox x:Name="txtFilter"
                              Grid.Column="1"
