@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The descriptions of four catalog items use through and fix instead of via and patch.
+
 ### Changed
 
 - Preview Results opens a window with the returned rows in a grid. It shows Name, ResourceId and the other columns that the query selects, at most 200 rows, with the line Showing N of M rows. Cancel ends a long query.

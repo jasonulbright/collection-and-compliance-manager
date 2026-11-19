@@ -8,7 +8,7 @@
     Status      = 'Draft'
 
     # === Summary ===
-    Description = 'Disables Link-Local Multicast Name Resolution via the DNSClient policy. Prevents Responder-style name-resolution poisoning attacks. Single DWORD; no reboot required.'
+    Description = 'Disables Link-Local Multicast Name Resolution through the DNSClient policy. Prevents Responder-style name-resolution poisoning attacks. Single DWORD; no reboot required.'
     Severity    = 'Warning'
 
     # === References ===

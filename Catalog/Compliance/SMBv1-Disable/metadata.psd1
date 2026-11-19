@@ -8,7 +8,7 @@
     Status      = 'Draft'
 
     # === Summary ===
-    Description = 'Disables the SMBv1 server protocol via LanmanServer\Parameters\SMB1 = 0. Server-side scope; the SMBv1 client redirector is Windows-feature-removed on supported OSes. Single DWORD enforcement.'
+    Description = 'Disables the SMBv1 server protocol through LanmanServer\Parameters\SMB1 = 0. Server-side scope; the SMBv1 client redirector is Windows-feature-removed on supported OSes. Single DWORD enforcement.'
     Severity    = 'Critical'
 
     # === References ===

@@ -8,7 +8,7 @@
     Status      = 'Draft'
 
     # === Summary ===
-    Description = 'Keeps UAC remote token filtering enabled (LocalAccountTokenFilterPolicy = 0). Blocks Pass-the-Hash / lateral movement via local admin accounts over the network. Often silently set to 1 by old remote-admin guides and never re-audited. Single DWORD; no reboot.'
+    Description = 'Keeps UAC remote token filtering enabled (LocalAccountTokenFilterPolicy = 0). Blocks Pass-the-Hash / lateral movement through local admin accounts over the network. Often silently set to 1 by old remote-admin guides and never re-audited. Single DWORD; no reboot.'
     Severity    = 'Critical'
 
     # === References ===
