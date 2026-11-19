@@ -988,6 +988,8 @@ function Invoke-Refresh {
         Result   = $null
         ErrorMsg = $null
     })
+    $script:LoadStarted = Get-Date
+    Stop-RulesLoad
 
     $btnRefresh.IsEnabled = $false
     $txtProgressTitle.Text = 'Loading collections'
@@ -1035,61 +1037,10 @@ function Invoke-Refresh {
                 $_ | Add-Member -MemberType NoteProperty -Name FolderID -Value $fid -Force -PassThru
             })
 
-            $State.Step = ('Parsing rules for {0} collections...' -f $collections.Count)
-            $rulesIndex = @{}
-            foreach ($c in $collections) {
-                $direct  = @()
-                $query   = @()
-                $include = @()
-                $exclude = @()
-
-                foreach ($r in @($c.CollectionRules)) {
-                    if ($null -eq $r) { continue }
-                    $typeName = $null
-                    try { $typeName = [string]$r.SmsProviderObjectPath } catch { $typeName = $null }
-                    if (-not $typeName) {
-                        try { $typeName = $r.GetType().Name } catch { continue }
-                    }
-                    switch -Wildcard ($typeName) {
-                        '*RuleDirect*' {
-                            $direct += [PSCustomObject]@{
-                                Name       = $r.RuleName
-                                ResourceID = $r.ResourceID
-                                Domain     = ''
-                            }
-                        }
-                        '*RuleQuery*' {
-                            $query += [PSCustomObject]@{
-                                RuleName        = $r.RuleName
-                                QueryExpression = $r.QueryExpression
-                            }
-                        }
-                        '*RuleIncludeCollection*' {
-                            $include += [PSCustomObject]@{
-                                IncludeCollectionName = $r.RuleName
-                                IncludeCollectionID   = $r.IncludeCollectionID
-                            }
-                        }
-                        '*RuleExcludeCollection*' {
-                            $exclude += [PSCustomObject]@{
-                                ExcludeCollectionName = $r.RuleName
-                                ExcludeCollectionID   = $r.ExcludeCollectionID
-                            }
-                        }
-                    }
-                }
-
-                $rulesIndex[$c.CollectionID] = @{
-                    Direct  = $direct
-                    Query   = $query
-                    Include = $include
-                    Exclude = $exclude
-                }
-            }
-
+            # One bulk query returned the list. The rules of each collection are read afterwards in their own runspace
+            # (Start-RulesLoad), so that the window shows the list now and the shared runspace is free again.
             $State.Result = [PSCustomObject]@{
                 Collections = $collections
-                RulesIndex  = $rulesIndex
                 Folders     = $folders
             }
         }
@@ -1106,6 +1057,14 @@ function Invoke-Refresh {
     $script:BgTimer = New-Object System.Windows.Threading.DispatcherTimer
     $script:BgTimer.Interval = [TimeSpan]::FromMilliseconds(150)
     $script:BgTimer.Add_Tick({
+        if ($script:BgState -and -not $script:BgState.Done -and $script:LoadStarted -and ((Get-Date) - $script:LoadStarted).TotalSeconds -gt (Get-LoadTimeoutSeconds)) {
+            # The list has a time limit. A provider that does not answer ends the load with a message that says what happened.
+            Invoke-CancelWork
+            $message = ('Loading the collection list took longer than {0} seconds, so it was stopped. Check the connection to the SMS Provider {1}, then refresh again.' -f (Get-LoadTimeoutSeconds), $global:Prefs.SMSProvider)
+            Add-LogLine $message
+            Set-StatusText $message
+            return
+        }
         if ($script:BgState) {
             $current = [string]$script:BgState.Step
             if ($txtProgressStep.Text -ne $current) { $txtProgressStep.Text = $current }
@@ -1129,7 +1088,7 @@ function Invoke-Refresh {
             $script:IsConnectedFromBg = $true
             $r = $script:BgState.Result
             $script:RawCollections       = @($r.Collections)
-            $script:CollectionRulesIndex = $r.RulesIndex
+            $script:CollectionRulesIndex = [hashtable]::Synchronized(@{})
             $script:Folders              = @($r.Folders)
             $script:FolderById           = @{}
             foreach ($f in $script:Folders) { $script:FolderById[[int]$f.FolderID] = $f }
@@ -1137,8 +1096,8 @@ function Invoke-Refresh {
 
             $script:Collections = @($script:RawCollections | ForEach-Object {
                 $idx = $script:CollectionRulesIndex[$_.CollectionID]
-                $directCount = if ($idx) { @($idx.Direct).Count }  else { 0 }
-                $queryCount  = if ($idx) { @($idx.Query).Count }   else { 0 }
+                $directCount = if ($idx) { @($idx.Direct).Count }  else { $null }
+                $queryCount  = if ($idx) { @($idx.Query).Count }   else { $null }
                 [PSCustomObject]@{
                     TypeGlyph          = Get-CollectionTypeGlyph -Collection $_
                     Name               = $_.Name
@@ -1183,10 +1142,136 @@ function Invoke-Refresh {
                 Write-Log ('UI-thread CM connect: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The connection to the site failed. See the log file.'
             }
 
-            Add-LogLine ('Refresh complete: {0} collections.' -f @($script:RawCollections).Count)
+            Add-LogLine ('Loaded {0} collections. Loading the rules of each collection in the background.' -f @($script:RawCollections).Count)
+            Start-RulesLoad
         }
     })
     $script:BgTimer.Start()
+}
+
+# The time limit for the collection list. Options can set LoadTimeoutSeconds; the default is 180 seconds.
+function Get-LoadTimeoutSeconds {
+    $value = 0
+    try { if ($global:Prefs.PSObject.Properties['LoadTimeoutSeconds']) { $value = [int]$global:Prefs.LoadTimeoutSeconds } } catch { $value = 0 }
+    if ($value -lt 10) { $value = 180 }
+    return $value
+}
+
+# The rules of each collection (direct, query, include, exclude) cost one provider round trip per collection. They are read after the
+# list is on screen, one collection at a time, in a runspace of their own: the window stays free, the shared runspace is not
+# held, and the counts fill in as they arrive. A new refresh, or closing the window, stops the pass.
+function Start-RulesLoad {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Starts a read-only background pass.')]
+    param()
+    Stop-RulesLoad
+    $ids = @($script:RawCollections | ForEach-Object { [string]$_.CollectionID })
+    if ($ids.Count -eq 0) { return }
+    # Four workers read the rules in parallel, each in a runspace of its own and each every fourth collection. The provider answers
+    # the reads side by side, so the pass takes about a quarter of the time.
+    $workers = 4
+    $script:RulesState = [hashtable]::Synchronized(@{ Total = $ids.Count; DoneN = [int[]]::new($workers); FailedN = [int[]]::new($workers); FinishedN = [int[]]::new($workers); FirstError = ''; Workers = $workers; Cancel = $false; Index = $script:CollectionRulesIndex })
+    $script:RulesRunspaces = @()
+    $script:RulesPowerShells = @()
+    # Each worker writes only its own slot of the counter arrays, so that no update is lost.
+    $worker = {
+        param($SiteCode, $SMSProvider, $State, $Ids, $W)
+        try {
+            [void](Connect-CMSite -SiteCode $SiteCode -SMSProvider $SMSProvider)
+            foreach ($id in $Ids) {
+                if ($State['Cancel']) { break }
+                # Invoke-SuiteCMRead tries a transient fault again (2 s and 6 s later) and logs each attempt.
+                try { $State.Index[$id] = Invoke-SuiteCMRead -Description ('Rules of ' + $id) -ScriptBlock { Get-CollectionRuleSet -CollectionId $id }.GetNewClosure() }
+                catch {
+                    $State.FailedN[$W] = [int]$State.FailedN[$W] + 1
+                    if (-not $State.FirstError) { $State.FirstError = ('{0}: {1}' -f $id, $_.Exception.Message) }
+                    if ([int]$State.FailedN[$W] -le 3) { try { Write-Log ('Rules of {0}: {1}' -f $id, $_.Exception.Message) } catch { $null = $_ } }
+                }
+                $State.DoneN[$W] = [int]$State.DoneN[$W] + 1
+            }
+        }
+        catch { $State.FailedN[$W] = [int]$State.FailedN[$W] + @($Ids).Count; $State.DoneN[$W] = [int]$State.DoneN[$W] + @($Ids).Count; try { Write-Log ('Rules load failed: {0}' -f $_.Exception.Message) } catch { $null = $_ } }
+        finally { $State.FinishedN[$W] = 1 }
+    }
+    for ($w = 0; $w -lt $workers; $w++) {
+        $mine = @(for ($i = $w; $i -lt $ids.Count; $i += $workers) { $ids[$i] })
+        $rs = New-SuiteBgRunspace -ModulePath (Join-Path $PSScriptRoot 'Module\CCMCommon.psd1') -LogPath $script:ToolLogPath
+        $ps = [powershell]::Create()
+        $ps.Runspace = $rs
+        [void]$ps.AddScript($worker).AddArgument([string]$global:Prefs.SiteCode).AddArgument([string]$global:Prefs.SMSProvider).AddArgument($script:RulesState).AddArgument($mine).AddArgument($w)
+        [void]$ps.BeginInvoke()
+        $script:RulesRunspaces += $rs
+        $script:RulesPowerShells += $ps
+    }
+
+    $script:RulesTimer = New-Object System.Windows.Threading.DispatcherTimer
+    $script:RulesTimer.Interval = [TimeSpan]::FromSeconds(1)
+    $script:RulesTimer.Add_Tick({
+        $rs = $script:RulesState
+        if (-not $rs) { return }
+        $allFinished = (@($rs.FinishedN | Where-Object { $_ -eq 1 }).Count -ge [int]$rs.Workers)
+        $doneNow = [int](($rs.DoneN | Measure-Object -Sum).Sum)
+        # The grid is refreshed every 5 seconds at most: a refresh of 2,000 rows costs the window time.
+        if ($allFinished -or -not $script:LastCountApply -or ((Get-Date) - $script:LastCountApply).TotalSeconds -ge 5) {
+            $script:LastCountApply = Get-Date
+            Update-RuleCountsFromIndex
+        }
+        if ($allFinished) {
+            $failed = [int](($rs.FailedN | Measure-Object -Sum).Sum)
+            $total = [int]$rs.Total
+            $done = $doneNow
+            $firstError = [string]$rs.FirstError
+            Stop-RulesLoad
+            Update-RuleCountsFromIndex -Final
+            if ($failed -gt 0) { Add-LogLine ('Rules loaded for {0} of {1} collections; {2} could not be read. First error: {3}' -f ($done - $failed), $total, $failed, $firstError) }
+            else { Add-LogLine ('Rules loaded for {0} of {1} collections.' -f $done, $total) }
+            Update-StatusBarSummary
+        }
+        else {
+            Set-StatusText ('Loaded {0} collections. Loading rules: {1} of {2}.' -f $rs.Total, $doneNow, $rs.Total)
+        }
+    })
+    $script:RulesTimer.Start()
+}
+
+function Stop-RulesLoad {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Stops ephemeral background work only.')]
+    param()
+    if ($script:RulesTimer) { try { $script:RulesTimer.Stop() } catch { $null = $_ }; $script:RulesTimer = $null }
+    if ($script:RulesState) { $script:RulesState['Cancel'] = $true }
+    foreach ($ps in @($script:RulesPowerShells)) { try { [void]$ps.BeginStop($null, $null) } catch { $null = $_ } }
+    foreach ($rs in @($script:RulesRunspaces)) { try { Close-SuiteBgRunspace -Runspace $rs } catch { $null = $_ } }
+    $script:RulesPowerShells = @()
+    $script:RulesRunspaces = @()
+    $script:RulesState = $null
+}
+
+# Copies the rule counts that the rules pass has read so far into the grid rows, and shows the rules of the selected collection when they arrive.
+function Update-RuleCountsFromIndex {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Updates in-window row values only.')]
+    param([switch]$Final)
+
+    $changed = $false
+    foreach ($row in @($script:Collections)) {
+        if ($null -ne $row.DirectCount) { continue }
+        $idx = $script:CollectionRulesIndex[[string]$row.CollectionID]
+        if (-not $idx) { continue }
+        $row.DirectCount = @($idx.Direct).Count
+        $row.QueryCount  = @($idx.Query).Count
+        $changed = $true
+    }
+    if (-not $changed) { return }
+    try { $gridCollections.Items.Refresh() } catch { $null = $_ }
+    $selected = $gridCollections.SelectedItem
+    if ($selected -and -not $gridQueryRules.ItemsSource) {
+        $idx = $script:CollectionRulesIndex[[string]$selected.CollectionID]
+        if ($idx) {
+            $gridQueryRules.ItemsSource   = $idx.Query
+            $gridIncludeRules.ItemsSource = $idx.Include
+            $gridExcludeRules.ItemsSource = $idx.Exclude
+        }
+    }
+    if ($script:WqlSelectedCollection -and @($lstWqlRules.ItemsSource).Count -eq 0) { Apply-WqlCollectionSelection -Collection $script:WqlSelectedCollection }
+    if ($Final) { Update-Filter }
 }
 
 function Invoke-LoadTemplates {
@@ -4234,6 +4319,7 @@ $global:WindowStatePath = Join-Path $PSScriptRoot 'CCM.windowstate.json'
 
 $window.Add_Closing({
     Save-WindowState -Window $window -Path $global:WindowStatePath -ExtraState @{ ActiveView = $script:ActiveView }
+    Stop-RulesLoad
     Dispose-BgWork
     if ($script:BgRunspace) {
         Close-SuiteBgRunspace -Runspace $script:BgRunspace
