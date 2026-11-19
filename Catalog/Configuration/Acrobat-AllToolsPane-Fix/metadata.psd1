@@ -8,7 +8,7 @@
     Status      = 'Draft'
 
     # === Summary ===
-    Description = 'Temporary Adobe-supplied workaround for the Acrobat bug where the All Tools pane disappears / goes empty on Edit PDF (bGenCoverPagesLabelStrings = 1 under FeatureLockDown). Restart Acrobat + host to apply. RETIRE once Adobe ships the permanent patch.'
+    Description = 'Temporary Adobe-supplied workaround for the Acrobat bug where the All Tools pane disappears / goes empty on Edit PDF (bGenCoverPagesLabelStrings = 1 under FeatureLockDown). Restart Acrobat + host to apply. RETIRE once Adobe ships the permanent fix.'
     Severity    = 'Warning'
 
     # === References ===
@@ -44,7 +44,7 @@
     }
 
     # === Dependencies ===
-    # Temporary vendor-bug workaround. Retire when Adobe's permanent patch is deployed.
+    # Temporary vendor-bug workaround. Retire when Adobe's permanent fix is deployed.
     DependsOn = @()
 
     # === Configuration Manager artifacts produced ===
