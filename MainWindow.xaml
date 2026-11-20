@@ -552,7 +552,7 @@
                         <Border Grid.Row="2" BorderThickness="1"
                                 BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                            <ListBox x:Name="lstWqlRules" ToolTip="Query rules of the selected collection. Select a rule to load it into the editor." FontSize="12" BorderThickness="0"
+                            <ListBox x:Name="lstWqlRules" ToolTip="Select a rule of the selected collection to load it into the editor." FontSize="12" BorderThickness="0"
                                      Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                      Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
                         </Border>
@@ -918,7 +918,7 @@
                     </Grid.RowDefinitions>
                     <TabControl x:Name="tabAudit" Controls:HeaderedControlHelper.HeaderFontSize="13" Grid.Row="0" BorderThickness="0"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                        <TabItem ToolTip="Show the baselines whose deployed version differs from the catalog version."><TabItem.Header><TextBlock Text="Drift" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                        <TabItem ToolTip="Show the deployed version of each baseline next to the catalog version and its drift status."><TabItem.Header><TextBlock Text="Drift" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridAuditDrift"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"

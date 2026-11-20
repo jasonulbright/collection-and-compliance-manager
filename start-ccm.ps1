@@ -2518,7 +2518,7 @@ function Show-AddSettingDialog {
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
                     <TextBlock Text="Remediation Script (optional)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtSetRemScript" ToolTip="Enter the script that corrects a noncompliant device. Optional." Style="{StaticResource ScriptBox}"/>
+                    <TextBox x:Name="txtSetRemScript" ToolTip="Enter the optional script that corrects a noncompliant device." Style="{StaticResource ScriptBox}"/>
                 </StackPanel>
 
                 <TextBlock Text="Rule Name *" Style="{StaticResource FieldLabel}"/>
@@ -2784,7 +2784,7 @@ function Show-EditSettingDialog {
 
                 <StackPanel x:Name="panelEditReg">
                     <TextBlock Text="Hive" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboEditHive" ToolTip="Select the registry hive. Keep (unchanged) to leave it as it is." FontSize="12">
+                    <ComboBox x:Name="cboEditHive" ToolTip="Select the registry hive, or keep (unchanged) to leave it as it is." FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="LocalMachine"/>
                         <ComboBoxItem Content="CurrentUser"/>
@@ -2793,14 +2793,14 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="Users"/>
                     </ComboBox>
                     <TextBlock Text="Key Name (blank keeps it)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtEditKeyName" ToolTip="Enter the new registry key path. Leave it blank to keep the current one." Style="{StaticResource FieldBox}"/>
+                    <TextBox x:Name="txtEditKeyName" ToolTip="Enter the new registry key path, or leave it blank to keep the current one." Style="{StaticResource FieldBox}"/>
                     <TextBlock Text="Value Name (blank keeps it)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtEditValueName" ToolTip="Enter the new registry value name. Leave it blank to keep the current one." Style="{StaticResource FieldBox}"/>
+                    <TextBox x:Name="txtEditValueName" ToolTip="Enter the new registry value name, or leave it blank to keep the current one." Style="{StaticResource FieldBox}"/>
                 </StackPanel>
 
                 <StackPanel x:Name="panelEditScript" Visibility="Collapsed">
                     <TextBlock Text="Discovery Script Language" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboEditDiscLang" ToolTip="Select the language of the discovery script. Keep (unchanged) to leave it as it is." FontSize="12">
+                    <ComboBox x:Name="cboEditDiscLang" ToolTip="Select the language of the discovery script, or keep (unchanged) to leave it as it is." FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="PowerShell"/>
                         <ComboBoxItem Content="VBScript"/>
@@ -2810,7 +2810,7 @@ function Show-EditSettingDialog {
                     <TextBlock Text="Discovery Script" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="txtEditDiscScript" ToolTip="Enter the discovery script of the setting." Style="{StaticResource ScriptBox}"/>
                     <TextBlock Text="Remediation Script Language" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboEditRemLang" ToolTip="Select the language of the remediation script. Keep (unchanged) to leave it as it is." FontSize="12">
+                    <ComboBox x:Name="cboEditRemLang" ToolTip="Select the language of the remediation script, or keep (unchanged) to leave it as it is." FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="PowerShell"/>
                         <ComboBoxItem Content="VBScript"/>

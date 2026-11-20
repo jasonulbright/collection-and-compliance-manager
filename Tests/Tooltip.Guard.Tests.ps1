@@ -5,7 +5,7 @@
 #
 # Rules:
 #   1. Every control in the audited list has a non-empty ToolTip.
-#   2. The tooltip is ASCII, ends with a period and has at most 200 characters.
+#   2. The tooltip is ASCII, ends with a period and has at most 160 characters.
 #   3. A tab in the audited list has a ToolTip on the TabItem.
 # Add a new control that needs an explanation to the lists below. A dialog button whose label says it all,
 # a read-only output box, a DataGrid column and a menu item are not listed.
@@ -35,7 +35,7 @@ BeforeDiscovery {
 BeforeAll {
     $script:Root = Split-Path -Path $PSScriptRoot -Parent
     $script:XamlNs = 'http://schemas.microsoft.com/winfx/2006/xaml'
-    $script:MaxLength = 200
+    $script:MaxLength = 160
 
     # Every XAML document of the app: MainWindow.xaml and each XAML here-string of start-ccm.ps1.
     function Get-XamlDocument {
@@ -81,6 +81,9 @@ BeforeAll {
         $tip | Should -Not -BeNullOrEmpty -Because ('{0} needs a ToolTip' -f $Label)
         $tip | Should -Match '^[\x20-\x7E]+$' -Because ('the ToolTip of {0} is ASCII' -f $Label)
         $tip | Should -Match '\.$' -Because ('the ToolTip of {0} ends with a period' -f $Label)
+        $tip | Should -Not -Match '["&<>]' -Because ('the ToolTip of {0} has no quote, ampersand or angle bracket' -f $Label)
+        $tip | Should -Not -Match '\.\s' -Because ('the ToolTip of {0} is one sentence' -f $Label)
+        $tip | Should -Not -Match '(?i)\b(click|sync|pull|MECM|facts)\b|e\.g\.' -Because ('the ToolTip of {0} follows the lexicon' -f $Label)
         $tip.Length | Should -BeLessOrEqual $script:MaxLength -Because ('the ToolTip of {0} is short' -f $Label)
     }
 
