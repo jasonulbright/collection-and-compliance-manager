@@ -356,7 +356,7 @@
                                 ToolTip="Stops reading the rules of the collections. The list stays."/>
                     </StackPanel>
 
-                    <TextBox x:Name="txtFilter"
+                    <TextBox x:Name="txtFilter" ToolTip="Filter the list of the active view by the text you type."
                              Grid.Column="1"
                              FontSize="12"
                              Padding="6,4,6,4"
@@ -475,7 +475,7 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem><TabItem.Header><TextBlock Text="Include Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                            <TabItem ToolTip="Show the collections that this collection includes."><TabItem.Header><TextBlock Text="Include Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <DataGrid x:Name="gridIncludeRules"
                                           Style="{StaticResource ViewDataGrid}"
                                           ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -486,7 +486,7 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem><TabItem.Header><TextBlock Text="Exclude Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                            <TabItem ToolTip="Show the collections that this collection excludes."><TabItem.Header><TextBlock Text="Exclude Rules" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                                 <DataGrid x:Name="gridExcludeRules"
                                           Style="{StaticResource ViewDataGrid}"
                                           ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -513,12 +513,12 @@
 
                     <!-- LEFT: full-height collection tree (folder hierarchy) -->
                     <DockPanel Grid.Column="0" Margin="0,0,8,0">
-                        <TextBox x:Name="txtWqlTreeFilter" DockPanel.Dock="Top" FontSize="12" Padding="6,4,6,4" Margin="0,8,0,8" Height="26"
+                        <TextBox x:Name="txtWqlTreeFilter" ToolTip="Filter the collection tree by collection name or ID." DockPanel.Dock="Top" FontSize="12" Padding="6,4,6,4" Margin="0,8,0,8" Height="26"
                                  Controls:TextBoxHelper.Watermark="Filter collections by name or ID..."/>
                         <Border BorderThickness="1"
                                 BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                            <TreeView x:Name="treeWqlCollections" FontSize="12" BorderThickness="0"
+                            <TreeView x:Name="treeWqlCollections" ToolTip="Select a device collection to load its query rules." FontSize="12" BorderThickness="0"
                                       Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                       VirtualizingStackPanel.IsVirtualizing="True"
@@ -552,16 +552,16 @@
                         <Border Grid.Row="2" BorderThickness="1"
                                 BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                            <ListBox x:Name="lstWqlRules" FontSize="12" BorderThickness="0"
+                            <ListBox x:Name="lstWqlRules" ToolTip="Query rules of the selected collection. Select a rule to load it into the editor." FontSize="12" BorderThickness="0"
                                      Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                      Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
                         </Border>
 
                         <TextBlock Grid.Row="3" Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,12,0,4"/>
-                        <TextBox x:Name="txtRuleName" Grid.Row="4" FontSize="12" Padding="6,4,6,4" Height="26"/>
+                        <TextBox x:Name="txtRuleName" ToolTip="Enter the name of the query rule." Grid.Row="4" FontSize="12" Padding="6,4,6,4" Height="26"/>
 
                         <TextBlock Grid.Row="5" Text="Query" FontSize="11" FontWeight="Bold" Margin="0,12,0,4"/>
-                        <TextBox x:Name="txtWqlEditor" Grid.Row="6" Style="{StaticResource WqlEditorStyle}"
+                        <TextBox x:Name="txtWqlEditor" ToolTip="Enter the WQL query of the rule." Grid.Row="6" Style="{StaticResource WqlEditorStyle}"
                                  Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                                  Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                  BorderThickness="1"
@@ -600,7 +600,7 @@
                     <TabControl x:Name="tabTemplateKind" Controls:HeaderedControlHelper.HeaderFontSize="13" Grid.Column="0"
                                 BorderThickness="0"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                        <TabItem><TabItem.Header><TextBlock Text="Operational" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                        <TabItem ToolTip="Show the ready-made queries that need no parameters."><TabItem.Header><TextBlock Text="Operational" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridOperationalTemplates"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -611,7 +611,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        <TabItem><TabItem.Header><TextBlock Text="Parameterized" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                        <TabItem ToolTip="Show the query templates that need parameters."><TabItem.Header><TextBlock Text="Parameterized" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridParameterizedTemplates"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -864,7 +864,7 @@
                     <DockPanel Grid.Column="0">
                         <StackPanel DockPanel.Dock="Top" Margin="0,8,0,8">
                             <TextBlock Text="Configuration Item" FontSize="11" FontWeight="Bold" Margin="0,0,0,4"/>
-                            <ComboBox x:Name="cboEditorCI" FontSize="12"/>
+                            <ComboBox x:Name="cboEditorCI" ToolTip="Select the configuration item to edit." FontSize="12"/>
                         </StackPanel>
                         <Border DockPanel.Dock="Bottom" Padding="0,8,0,0">
                             <StackPanel Orientation="Horizontal">
@@ -918,7 +918,7 @@
                     </Grid.RowDefinitions>
                     <TabControl x:Name="tabAudit" Controls:HeaderedControlHelper.HeaderFontSize="13" Grid.Row="0" BorderThickness="0"
                                 Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-                        <TabItem><TabItem.Header><TextBlock Text="Drift" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                        <TabItem ToolTip="Show the baselines whose deployed version differs from the catalog version."><TabItem.Header><TextBlock Text="Drift" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridAuditDrift"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -932,7 +932,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
-                        <TabItem><TabItem.Header><TextBlock Text="Compliance" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
+                        <TabItem ToolTip="Show the compliance counts of each baseline deployment."><TabItem.Header><TextBlock Text="Compliance" Style="{StaticResource TabHeaderText}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/></TabItem.Header>
                             <DataGrid x:Name="gridAuditCompliance"
                                       Style="{StaticResource ViewDataGrid}"
                                       ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
@@ -982,7 +982,7 @@
                                    HorizontalAlignment="Center"
                                    Margin="0,6,0,0"
                                    Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-                        <Button x:Name="btnCancelWork" Content="Cancel" Style="{StaticResource SquareInlineButtonStyle}" Visibility="Collapsed"
+                        <Button x:Name="btnCancelWork" ToolTip="Stop the running operation." Content="Cancel" Style="{StaticResource SquareInlineButtonStyle}" Visibility="Collapsed"
                                 Width="100" Height="26" Margin="0,14,0,0" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Border>
