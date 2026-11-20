@@ -12,6 +12,7 @@
 - Preview Results opens a window with the returned rows in a grid. It shows Name, ResourceId and the other columns that the query selects, at most 200 rows, with the line Showing N of M rows. Cancel ends a long query.
 - The window text, log messages, catalog help and guide now use ConfigMgr terms.
 - The window text and the guide use the word select for actions.
+- Added tooltips to 57 controls that had none: the filter boxes, the WQL editor fields, six tabs, the Add Setting and Edit Setting dialog fields, the collection dialogs, the direct member buttons and the Options dialog.
 
 ### Fixed
 

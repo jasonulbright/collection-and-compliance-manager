@@ -1584,7 +1584,7 @@ function Show-CatalogDeployDialog {
         <Border Grid.Row="2" Padding="0,12,0,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button x:Name="btnDeploy"       Content="Deploy" Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
+                    <Button x:Name="btnDeploy" ToolTip="Deploy the catalog entry to the site with the values above."       Content="Deploy" Style="{StaticResource DialogAccentButton}" IsDefault="True"/>
                     <Button x:Name="btnDeployCancel" Content="Cancel" Style="{StaticResource DialogButton}" Margin="0" IsCancel="True"/>
                 </StackPanel>
                 <TextBlock x:Name="txtDeployErr" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center"
@@ -2465,16 +2465,16 @@ function Show-AddSettingDialog {
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <TextBlock Text="Setting Name *" Style="{StaticResource FieldLabel}"/>
-                <TextBox x:Name="txtSetName" Style="{StaticResource FieldBox}"/>
+                <TextBox x:Name="txtSetName" ToolTip="Enter the name of the setting." Style="{StaticResource FieldBox}"/>
 
                 <TextBlock Text="Setting Type" Style="{StaticResource FieldLabel}"/>
-                <ComboBox x:Name="cboSetType" FontSize="12">
+                <ComboBox x:Name="cboSetType" ToolTip="Select how the setting reads its value: from a registry value or from a script." FontSize="12">
                     <ComboBoxItem Content="Registry" IsSelected="True"/>
                     <ComboBoxItem Content="Script"/>
                 </ComboBox>
 
                 <TextBlock Text="Data Type" Style="{StaticResource FieldLabel}"/>
-                <ComboBox x:Name="cboSetDataType" FontSize="12">
+                <ComboBox x:Name="cboSetDataType" ToolTip="Select the data type of the value that the setting returns." FontSize="12">
                     <ComboBoxItem Content="String" IsSelected="True"/>
                     <ComboBoxItem Content="Integer"/>
                     <ComboBoxItem Content="DateTime"/>
@@ -2485,7 +2485,7 @@ function Show-AddSettingDialog {
 
                 <StackPanel x:Name="panelReg">
                     <TextBlock Text="Hive" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboSetHive" FontSize="12">
+                    <ComboBox x:Name="cboSetHive" ToolTip="Select the registry hive that holds the key." FontSize="12">
                         <ComboBoxItem Content="LocalMachine" IsSelected="True"/>
                         <ComboBoxItem Content="CurrentUser"/>
                         <ComboBoxItem Content="ClassesRoot"/>
@@ -2493,38 +2493,38 @@ function Show-AddSettingDialog {
                         <ComboBoxItem Content="Users"/>
                     </ComboBox>
                     <TextBlock Text="Key Name * (example: SOFTWARE\Vendor\Product)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtSetKeyName" Style="{StaticResource FieldBox}"/>
+                    <TextBox x:Name="txtSetKeyName" ToolTip="Enter the registry key path without the hive." Style="{StaticResource FieldBox}"/>
                     <TextBlock Text="Value Name" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtSetValueName" Style="{StaticResource FieldBox}"/>
-                    <CheckBox x:Name="chkSetRemediateDword" Content="Remediate as DWORD" Margin="0,10,0,0"/>
-                    <CheckBox x:Name="chkSet64Bit" Content="64-Bit Registry Key" Margin="0,6,0,0"/>
+                    <TextBox x:Name="txtSetValueName" ToolTip="Enter the name of the registry value to read." Style="{StaticResource FieldBox}"/>
+                    <CheckBox x:Name="chkSetRemediateDword" ToolTip="Remediate the registry value as a DWORD." Content="Remediate as DWORD" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="chkSet64Bit" ToolTip="Read the registry key from the 64-bit registry view." Content="64-Bit Registry Key" Margin="0,6,0,0"/>
                 </StackPanel>
 
                 <StackPanel x:Name="panelScript" Visibility="Collapsed">
                     <TextBlock Text="Discovery Script Language" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboSetDiscLang" FontSize="12">
+                    <ComboBox x:Name="cboSetDiscLang" ToolTip="Select the language of the discovery script." FontSize="12">
                         <ComboBoxItem Content="PowerShell" IsSelected="True"/>
                         <ComboBoxItem Content="VBScript"/>
                         <ComboBoxItem Content="JScript"/>
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
                     <TextBlock Text="Discovery Script *" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtSetDiscScript" Style="{StaticResource ScriptBox}"/>
+                    <TextBox x:Name="txtSetDiscScript" ToolTip="Enter the script that discovers the current value on a device." Style="{StaticResource ScriptBox}"/>
                     <TextBlock Text="Remediation Script Language" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboSetRemLang" FontSize="12">
+                    <ComboBox x:Name="cboSetRemLang" ToolTip="Select the language of the remediation script." FontSize="12">
                         <ComboBoxItem Content="PowerShell" IsSelected="True"/>
                         <ComboBoxItem Content="VBScript"/>
                         <ComboBoxItem Content="JScript"/>
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
                     <TextBlock Text="Remediation Script (optional)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtSetRemScript" Style="{StaticResource ScriptBox}"/>
+                    <TextBox x:Name="txtSetRemScript" ToolTip="Enter the optional script that corrects a noncompliant device." Style="{StaticResource ScriptBox}"/>
                 </StackPanel>
 
                 <TextBlock Text="Rule Name *" Style="{StaticResource FieldLabel}"/>
-                <TextBox x:Name="txtSetRuleName" Style="{StaticResource FieldBox}"/>
+                <TextBox x:Name="txtSetRuleName" ToolTip="Enter the name of the compliance rule." Style="{StaticResource FieldBox}"/>
                 <TextBlock Text="Operator" Style="{StaticResource FieldLabel}"/>
-                <ComboBox x:Name="cboSetOperator" FontSize="12">
+                <ComboBox x:Name="cboSetOperator" ToolTip="Select how the discovered value is compared with the expected value." FontSize="12">
                     <ComboBoxItem Content="IsEquals" IsSelected="True"/>
                     <ComboBoxItem Content="NotEquals"/>
                     <ComboBoxItem Content="GreaterThan"/>
@@ -2540,17 +2540,17 @@ function Show-AddSettingDialog {
                     <ComboBoxItem Content="NotContains"/>
                 </ComboBox>
                 <TextBlock Text="Expected Value *" Style="{StaticResource FieldLabel}"/>
-                <TextBox x:Name="txtSetExpected" Style="{StaticResource FieldBox}"/>
+                <TextBox x:Name="txtSetExpected" ToolTip="Enter the value that a compliant device returns." Style="{StaticResource FieldBox}"/>
                 <TextBlock Text="Noncompliance Severity" Style="{StaticResource FieldLabel}"/>
-                <ComboBox x:Name="cboSetSeverity" FontSize="12">
+                <ComboBox x:Name="cboSetSeverity" ToolTip="Select the severity that is reported when a device is noncompliant." FontSize="12">
                     <ComboBoxItem Content="None"/>
                     <ComboBoxItem Content="Informational"/>
                     <ComboBoxItem Content="Warning" IsSelected="True"/>
                     <ComboBoxItem Content="Critical"/>
                     <ComboBoxItem Content="CriticalWithEvent"/>
                 </ComboBox>
-                <CheckBox x:Name="chkSetRemediate" Content="Remediate Noncompliance" Margin="0,10,0,0"/>
-                <CheckBox x:Name="chkSetReport" Content="Report Noncompliance" Margin="0,6,0,0"/>
+                <CheckBox x:Name="chkSetRemediate" ToolTip="Correct the value on a noncompliant device." Content="Remediate Noncompliance" Margin="0,10,0,0"/>
+                <CheckBox x:Name="chkSetReport" ToolTip="Report a noncompliant result of this rule to the site." Content="Report Noncompliance" Margin="0,6,0,0"/>
             </StackPanel>
         </ScrollViewer>
         <Border Grid.Row="1" Padding="0,12,0,0">
@@ -2774,17 +2774,17 @@ function Show-EditSettingDialog {
                            FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
 
                 <TextBlock Text="Setting Type" Style="{StaticResource FieldLabel}"/>
-                <ComboBox x:Name="cboEditType" FontSize="12">
+                <ComboBox x:Name="cboEditType" ToolTip="Select how the setting reads its value: from a registry value or from a script." FontSize="12">
                     <ComboBoxItem Content="Registry"/>
                     <ComboBoxItem Content="Script"/>
                 </ComboBox>
 
                 <TextBlock Text="Setting Name" Style="{StaticResource FieldLabel}"/>
-                <TextBox x:Name="txtEditNewName" Style="{StaticResource FieldBox}"/>
+                <TextBox x:Name="txtEditNewName" ToolTip="Enter the new name of the setting." Style="{StaticResource FieldBox}"/>
 
                 <StackPanel x:Name="panelEditReg">
                     <TextBlock Text="Hive" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboEditHive" FontSize="12">
+                    <ComboBox x:Name="cboEditHive" ToolTip="Select the registry hive, or keep (unchanged) to leave it as it is." FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="LocalMachine"/>
                         <ComboBoxItem Content="CurrentUser"/>
@@ -2793,14 +2793,14 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="Users"/>
                     </ComboBox>
                     <TextBlock Text="Key Name (blank keeps it)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtEditKeyName" Style="{StaticResource FieldBox}"/>
+                    <TextBox x:Name="txtEditKeyName" ToolTip="Enter the new registry key path, or leave it blank to keep the current one." Style="{StaticResource FieldBox}"/>
                     <TextBlock Text="Value Name (blank keeps it)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtEditValueName" Style="{StaticResource FieldBox}"/>
+                    <TextBox x:Name="txtEditValueName" ToolTip="Enter the new registry value name, or leave it blank to keep the current one." Style="{StaticResource FieldBox}"/>
                 </StackPanel>
 
                 <StackPanel x:Name="panelEditScript" Visibility="Collapsed">
                     <TextBlock Text="Discovery Script Language" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboEditDiscLang" FontSize="12">
+                    <ComboBox x:Name="cboEditDiscLang" ToolTip="Select the language of the discovery script, or keep (unchanged) to leave it as it is." FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="PowerShell"/>
                         <ComboBoxItem Content="VBScript"/>
@@ -2808,9 +2808,9 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
                     <TextBlock Text="Discovery Script" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtEditDiscScript" Style="{StaticResource ScriptBox}"/>
+                    <TextBox x:Name="txtEditDiscScript" ToolTip="Enter the discovery script of the setting." Style="{StaticResource ScriptBox}"/>
                     <TextBlock Text="Remediation Script Language" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="cboEditRemLang" FontSize="12">
+                    <ComboBox x:Name="cboEditRemLang" ToolTip="Select the language of the remediation script, or keep (unchanged) to leave it as it is." FontSize="12">
                         <ComboBoxItem Content="(unchanged)" IsSelected="True"/>
                         <ComboBoxItem Content="PowerShell"/>
                         <ComboBoxItem Content="VBScript"/>
@@ -2818,7 +2818,7 @@ function Show-EditSettingDialog {
                         <ComboBoxItem Content="ShellScript"/>
                     </ComboBox>
                     <TextBlock Text="Remediation Script" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="txtEditRemScript" Style="{StaticResource ScriptBox}"/>
+                    <TextBox x:Name="txtEditRemScript" ToolTip="Enter the remediation script of the setting." Style="{StaticResource ScriptBox}"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
@@ -3451,7 +3451,7 @@ function Show-NewCollectionDialog {
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <TextBlock Text="Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBox x:Name="txtName" FontSize="12" Padding="6,4,6,4"
+            <TextBox x:Name="txtName" ToolTip="Enter the name of the new device collection." FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Example: Workstations - Pilot Ring"/>
 
             <TextBlock Text="Limiting Collection" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -3474,11 +3474,11 @@ function Show-NewCollectionDialog {
             </Grid>
 
             <TextBlock Text="Comment" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBox x:Name="txtComment" FontSize="12" Padding="6,4,6,4"
+            <TextBox x:Name="txtComment" ToolTip="Enter an optional comment for the collection." FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Optional"/>
 
             <TextBlock Text="Refresh Type" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <ComboBox x:Name="cboRefresh" FontSize="12">
+            <ComboBox x:Name="cboRefresh" ToolTip="Select how the membership of the collection is updated." FontSize="12">
                 <ComboBoxItem Content="Manual"/>
                 <ComboBoxItem Content="Periodic"/>
                 <ComboBoxItem Content="Continuous"/>
@@ -3591,7 +3591,7 @@ function Show-CopyCollectionDialog {
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,16,0,0">
             <TextBlock Text="New Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBox x:Name="txtNewName" FontSize="12" Padding="6,4,6,4"
+            <TextBox x:Name="txtNewName" ToolTip="Enter the name of the copy." FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Name of the new collection"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
@@ -3751,11 +3751,11 @@ function Show-EditMembershipDialog {
         </DataGrid>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
-            <TextBox x:Name="txtAddDevice" Width="240" FontSize="12" Padding="6,4,6,4"
+            <TextBox x:Name="txtAddDevice" ToolTip="Enter the name of the device to add as a direct member." Width="240" FontSize="12" Padding="6,4,6,4"
                      Controls:TextBoxHelper.Watermark="Device name"/>
-            <Button x:Name="btnAddDevice"    Content="Add Direct Member"  Style="{StaticResource DialogButton}" Margin="8,0,0,0" MinWidth="160"/>
-            <Button x:Name="btnRemoveSel"    Content="Remove Selected"    Style="{StaticResource DialogButton}" Margin="8,0,0,0" MinWidth="140"/>
-            <Button x:Name="btnReloadMembers" Content="Reload"            Style="{StaticResource DialogButton}" Margin="8,0,0,0" MinWidth="100"/>
+            <Button x:Name="btnAddDevice" ToolTip="Add the device as a direct member of the collection."    Content="Add Direct Member"  Style="{StaticResource DialogButton}" Margin="8,0,0,0" MinWidth="160"/>
+            <Button x:Name="btnRemoveSel" ToolTip="Remove the selected devices from the direct members."    Content="Remove Selected"    Style="{StaticResource DialogButton}" Margin="8,0,0,0" MinWidth="140"/>
+            <Button x:Name="btnReloadMembers" ToolTip="Reload the direct members from the site." Content="Reload"            Style="{StaticResource DialogButton}" Margin="8,0,0,0" MinWidth="100"/>
         </StackPanel>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
@@ -3936,7 +3936,7 @@ function Show-ApplyTemplateDialog {
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
             <TextBlock Text="Rule Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-            <TextBox x:Name="txtRuleName" FontSize="12" Padding="6,4,6,4"/>
+            <TextBox x:Name="txtRuleName" ToolTip="Enter the name of the query rule." FontSize="12" Padding="6,4,6,4"/>
         </StackPanel>
         <TextBlock Grid.Row="3" Text="Expanded WQL" FontSize="11" FontWeight="Bold" Margin="0,12,0,4" Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
         <TextBox x:Name="txtExpanded" Grid.Row="4" IsReadOnly="True"
@@ -4174,9 +4174,9 @@ function Show-OptionsDialog {
 
         <Border Grid.Column="0" Grid.Row="0" Padding="6,12,0,12">
             <StackPanel>
-                <Button x:Name="btnCatConnection" Content="Connection" Style="{StaticResource CategoryRowStyle}"/>
-                <Button x:Name="btnCatCatalog"    Content="Catalog"    Style="{StaticResource CategoryRowStyle}"/>
-                <Button x:Name="btnCatAbout"      Content="About"      Style="{StaticResource CategoryRowStyle}"/>
+                <Button x:Name="btnCatConnection" ToolTip="Show the connection settings." Content="Connection" Style="{StaticResource CategoryRowStyle}"/>
+                <Button x:Name="btnCatCatalog" ToolTip="Show the catalog settings."    Content="Catalog"    Style="{StaticResource CategoryRowStyle}"/>
+                <Button x:Name="btnCatAbout" ToolTip="Show the version and the author of the app."      Content="About"      Style="{StaticResource CategoryRowStyle}"/>
             </StackPanel>
         </Border>
 
@@ -4187,11 +4187,11 @@ function Show-OptionsDialog {
                 <TextBlock Text="Configuration Manager Connection" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
                 <TextBlock x:Name="lblSiteCode" Text="Site Code" FontSize="14" FontWeight="Bold" Margin="0,4,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-                <TextBox x:Name="txtSiteCode" FontSize="12" Padding="6,4,6,4"
+                <TextBox x:Name="txtSiteCode" ToolTip="Enter the site code of the ConfigMgr site." FontSize="12" Padding="6,4,6,4"
                          Controls:TextBoxHelper.Watermark="Example: P01" Width="120" HorizontalAlignment="Left"/>
                 <TextBlock x:Name="lblSmsProvider" Text="SMS Provider FQDN" FontSize="14" FontWeight="Bold" Margin="0,12,0,2"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
-                <TextBox x:Name="txtSmsProvider" FontSize="12" Padding="6,4,6,4"
+                <TextBox x:Name="txtSmsProvider" ToolTip="Enter the FQDN of the computer that runs the SMS Provider." FontSize="12" Padding="6,4,6,4"
                          Controls:TextBoxHelper.Watermark="Example: cm01.contoso.com"/>
                 <TextBlock Text="The app reads and changes ConfigMgr objects. The account that runs the app needs the matching ConfigMgr permissions."
                            FontSize="11" TextWrapping="Wrap" Margin="0,16,0,0"
@@ -4206,7 +4206,7 @@ function Show-OptionsDialog {
                     <Button x:Name="btnBrowseCatalog" DockPanel.Dock="Right" Content="Browse..."
                             Style="{StaticResource DialogButton}" Margin="8,0,0,0"
                             ToolTip="Pick the catalog folder."/>
-                    <TextBox x:Name="txtCatalogPath" FontSize="12" Padding="6,4,6,4"
+                    <TextBox x:Name="txtCatalogPath" ToolTip="Enter the path of the local clone of the CI and CB catalog." FontSize="12" Padding="6,4,6,4"
                              Controls:TextBoxHelper.Watermark="Local path to a clone of the CI / CB catalog"/>
                 </DockPanel>
                 <TextBlock Text="Set the path to a local clone of the CI/CB catalog. The folder holds the subcategory folders: Compliance, Hardening, Configuration and CVE-Remediation. The app only reads the catalog."
