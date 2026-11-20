@@ -279,7 +279,7 @@ Describe 'Update-StatusBarSummary' {
         $script:RawCollections = @(1, 2, 3); $script:OperationalTemplates = @(1, 2); $script:ParameterizedTemplates = @(1)
         $script:LastRefreshTime = [datetime]'2026-11-06T09:08:07'
         Update-StatusBarSummary
-        $script:StatusText | Should -Be 'Connected to MCM   |   3 collections   |   2 op templates   |   1 param templates   |   last refresh 09:08:07'
+        $script:StatusText | Should -Be 'Connected to MCM   |   3 collections   |   2 operational templates   |   1 parameterized templates   |   last refresh 09:08:07'
     }
 }
 

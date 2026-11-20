@@ -346,7 +346,7 @@ $script:ViewMeta = @{
     'Catalog'     = @{ Title = 'Catalog';     Subtitle = 'Configuration Item / Baseline catalog from a local clone. Set the Catalog Path in Options, then select Reload Catalog.' }
     'Live CI/CB'  = @{ Title = 'Live CI/CB';  Subtitle = 'Configuration items and baselines on the live site. Select a baseline to see its deployments. Select Refresh to load or reload.' }
     'Editor'      = @{ Title = 'Editor';      Subtitle = 'Edit the compliance settings of a configuration item. Refresh to load CIs, pick one, then view / remove its settings.' }
-    'Auditing'    = @{ Title = 'Auditing';    Subtitle = 'Drift (deployed [ccm:] tag vs catalog version), compliance summary, and evaluation freshness. Refresh to load or reload; export to CSV.' }
+    'Auditing'    = @{ Title = 'Auditing';    Subtitle = 'Drift (deployed [ccm:] tag compared with the catalog version), compliance summary, and evaluation freshness. Refresh to load or reload; export to CSV.' }
 }
 
 function Set-ActiveView {
@@ -550,10 +550,10 @@ function Update-StatusBarSummary {
         $parts += ('{0} collections' -f @($script:RawCollections).Count)
     }
     if ($script:OperationalTemplates -and @($script:OperationalTemplates).Count -gt 0) {
-        $parts += ('{0} op templates' -f @($script:OperationalTemplates).Count)
+        $parts += ('{0} operational templates' -f @($script:OperationalTemplates).Count)
     }
     if ($script:ParameterizedTemplates -and @($script:ParameterizedTemplates).Count -gt 0) {
-        $parts += ('{0} param templates' -f @($script:ParameterizedTemplates).Count)
+        $parts += ('{0} parameterized templates' -f @($script:ParameterizedTemplates).Count)
     }
     if ($script:LastRefreshTime) {
         $parts += ('last refresh {0}' -f $script:LastRefreshTime.ToString('HH:mm:ss'))
