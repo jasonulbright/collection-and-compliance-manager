@@ -102,7 +102,7 @@ function Get-CmPreferences {
         CatalogPath = ''
     } -Site $site -SiteKeys @('SiteCode', 'SMSProvider')
     # A path that an older version saved as the default (the Catalog folder of the install) is stale: it counts as empty.
-    $settings.CatalogPath = ConvertTo-CcmCatalogPref -Value ([string]$settings.CatalogPath) -ToolRoot $PSScriptRoot
+    $settings.CatalogPath = ConvertTo-CcmCatalogPref -Value ([string]$settings.CatalogPath) -ToolRoot $PSScriptRoot -OnRead
     return $settings
 }
 
@@ -4295,7 +4295,8 @@ function Show-OptionsDialog {
         $lblCatalogInUse.Text = if ($inUse) { 'In use: ' + $inUse } else { 'In use: none' }
     }.GetNewClosure()
     & $updateCatalogHint
-    $txtCatalogPath.Add_TextChanged($updateCatalogHint)
+    # Not on each key: a UNC path that is typed or pasted would query the share for each partial path.
+    $txtCatalogPath.Add_LostFocus($updateCatalogHint)
 
     $btnCatConnection.Add_Click({
         $paneConnection.Visibility = [System.Windows.Visibility]::Visible
@@ -4321,6 +4322,7 @@ function Show-OptionsDialog {
         if ($cur -and (Test-Path -LiteralPath $cur)) { $fb.SelectedPath = $cur }
         if ($fb.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             $txtCatalogPath.Text = $fb.SelectedPath
+            & $updateCatalogHint
         }
     })
 

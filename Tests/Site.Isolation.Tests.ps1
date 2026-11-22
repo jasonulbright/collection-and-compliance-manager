@@ -187,6 +187,14 @@ Describe 'Per-site data of Collection and Compliance Manager' {
         Test-Path -LiteralPath (Join-Path $script:Ab1Again.Reports 'CCM-Collections-CD2.csv') | Should -BeFalse
     }
 
+    It 'copies only once: the second start for AB1 changes no file of AB1 that the first start made' {
+        $ab1Now = Get-TreeHash -Root (Join-Path $script:DataRoot 'sites\AB1')
+        foreach ($k in $script:Ab1After.Keys) {
+            if ($k -like '*prefs.json') { continue }
+            $ab1Now[$k] | Should -Be $script:Ab1After[$k] -Because "$k must not be copied or written again"
+        }
+    }
+
     It 'keeps a different provider for each site' {
         (Get-Content -LiteralPath (Join-Path $script:DataRoot 'sites\CD2\tools\collection-and-compliance-manager\prefs.json') -Raw | ConvertFrom-Json).SMSProvider | Should -Be 'cm03.example.com'
         (Get-Content -LiteralPath (Join-Path $script:DataRoot 'sites\AB1\tools\collection-and-compliance-manager\prefs.json') -Raw | ConvertFrom-Json).SMSProvider | Should -Be 'cm02.example.com'
@@ -256,9 +264,25 @@ Describe 'Catalog path of the user' {
         ConvertTo-CcmCatalogPref -Value (Join-Path $script:Root 'sub\..\Catalog') -ToolRoot $script:Root | Should -Be ''
     }
 
-    It 'treats a Catalog folder of an old install folder that does not exist any more as empty' {
-        ConvertTo-CcmCatalogPref -Value 'D:\Old\AppPackagerSuite\collection-and-compliance-manager\Catalog' -ToolRoot $script:Root | Should -Be ''
-        Resolve-CcmCatalogPath -Pref 'D:\Old\collection-and-compliance-manager\Catalog\' -ToolRoot $script:Root | Should -Be (Join-Path $script:Root 'Catalog')
+    It 'treats a Catalog folder of an old install folder that does not exist any more as empty, on read' {
+        $old = Join-Path $env:SystemDrive '\q112f-gone\AppPackagerSuite\collection-and-compliance-manager\Catalog'
+        ConvertTo-CcmCatalogPref -Value $old -ToolRoot $script:Root -OnRead | Should -Be ''
+        Resolve-CcmCatalogPath -Pref ($old + '\') -ToolRoot $script:Root | Should -Be (Join-Path $script:Root 'Catalog')
+    }
+
+    It 'keeps the value as typed when it is written, also when it looks stale' {
+        $old = Join-Path $env:SystemDrive '\q112f-gone\collection-and-compliance-manager\Catalog'
+        ConvertTo-CcmCatalogPref -Value $old -ToolRoot $script:Root | Should -Be $old
+    }
+
+    It 'never treats a path on a drive that is not there, or a UNC path, as stale' {
+        $letter = [char[]](68..90) | Where-Object { -not (Test-Path -LiteralPath ('{0}:\' -f $_)) } | Select-Object -First 1
+        if ($letter) {
+            $off = ('{0}:\src\collection-and-compliance-manager\Catalog' -f $letter)
+            ConvertTo-CcmCatalogPref -Value $off -ToolRoot $script:Root -OnRead | Should -Be $off
+        }
+        $unc = '\\files.example.com\share\collection-and-compliance-manager\Catalog'
+        ConvertTo-CcmCatalogPref -Value $unc -ToolRoot $script:Root -OnRead | Should -Be $unc
     }
 
     It 'keeps a path of the user, also when it does not exist yet' {
@@ -267,6 +291,27 @@ Describe 'Catalog path of the user' {
         $other = Join-Path $TestDrive 'clone\Catalog'
         [void](New-Item -ItemType Directory -Path $other -Force)
         ConvertTo-CcmCatalogPref -Value $other -ToolRoot $script:Root | Should -Be $other
+    }
+}
+
+Describe 'Preferences with no site variable' {
+    BeforeAll {
+        $script:Saved = @{}
+        foreach ($n in $script:EnvNames) { $script:Saved[$n] = [Environment]::GetEnvironmentVariable($n); [Environment]::SetEnvironmentVariable($n, $null) }
+        $script:ToolRoot = Join-Path $TestDrive 'c\collection-and-compliance-manager'
+        [void](New-Item -ItemType Directory -Path $script:ToolRoot -Force)
+        $global:PrefsPath = Join-Path $script:ToolRoot 'CCM.prefs.json'
+        $script:Site = $null
+    }
+    AfterAll {
+        foreach ($n in $script:EnvNames) { [Environment]::SetEnvironmentVariable($n, $script:Saved[$n]) }
+    }
+
+    It 'reads and saves the old prefs file when the site variable is empty' {
+        $p = Get-CmPreferences
+        $p['SiteCode'] = 'EF3'
+        Save-CmPreferences -Prefs $p
+        (Get-CmPreferences)['SiteCode'] | Should -Be 'EF3'
     }
 }
 

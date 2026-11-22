@@ -1857,17 +1857,22 @@ function ConvertTo-CcmCatalogPref {
         Returns the catalog path to store in the prefs: empty for the shipped Catalog folder and for a stale path.
     .DESCRIPTION
         An empty value means the Catalog folder beside the script. A value that equals that folder is the old default and
-        counts as empty. A value that points to a Catalog folder of an install folder of this tool that does not exist any
-        more is stale after a move and also counts as empty. Any other value is a choice of the user and stays.
+        counts as empty. With -OnRead, a value that points to a Catalog folder of an install folder of this tool that does
+        not exist any more (its drive is there, the folder is gone) is stale after a move and also counts as empty. A path on
+        a drive that is not there at the moment, and a UNC path, is never stale. Any other value is a choice of the user and stays.
+    .PARAMETER OnRead
+        Apply the stale rule. Do not use it when the value is written: a value that the user typed stays as typed.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param([string]$Value, [Parameter(Mandatory)][string]$ToolRoot)
+    param([string]$Value, [Parameter(Mandatory)][string]$ToolRoot, [switch]$OnRead)
     if ([string]::IsNullOrWhiteSpace($Value)) { return '' }
     $v = Get-CcmNormalizedPath -Path $Value
     $shipped = Get-CcmNormalizedPath -Path (Join-Path $ToolRoot 'Catalog')
     if ($v.Equals($shipped, [StringComparison]::OrdinalIgnoreCase)) { return '' }
-    if (-not (Test-Path -LiteralPath $v)) {
+    $qualifier = ''
+    if ($v -match '^[A-Za-z]:') { $qualifier = $v.Substring(0, 2) + '\' }
+    if ($OnRead -and $qualifier -and (Test-Path -LiteralPath $qualifier) -and -not (Test-Path -LiteralPath $v)) {
         $leaf = [regex]::Escape((Split-Path -Path $ToolRoot.TrimEnd('\', '/') -Leaf))
         if ($v -imatch ('[\\/](collection-and-compliance-manager|' + $leaf + ')[\\/]Catalog$')) { return '' }
     }
@@ -1882,7 +1887,7 @@ function Resolve-CcmCatalogPath {
     [CmdletBinding()]
     [OutputType([string])]
     param([string]$Pref, [Parameter(Mandatory)][string]$ToolRoot)
-    $p = ConvertTo-CcmCatalogPref -Value $Pref -ToolRoot $ToolRoot
+    $p = ConvertTo-CcmCatalogPref -Value $Pref -ToolRoot $ToolRoot -OnRead
     if ($p) { return $p }
     $bundled = Join-Path $ToolRoot 'Catalog'
     if (Test-Path -LiteralPath $bundled) { return $bundled }
