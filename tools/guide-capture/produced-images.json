@@ -1,5 +1,5 @@
 {
-  "Count": 77,
+  "Count": 79,
   "Images": [
     "after-remove-cancel.png",
     "auditing-before.png",
@@ -30,6 +30,7 @@
     "editor-ci-list.png",
     "editor-ci-picked.png",
     "editor.png",
+    "footer-site-note.png",
     "light-catalog.png",
     "light-collection-selected.png",
     "light-collections-filter-list.png",
@@ -64,6 +65,7 @@
     "options-catalog.png",
     "options-connection.png",
     "options-empty.png",
+    "options-site.png",
     "refresh-running.png",
     "refresh-without-connection.png",
     "start-first-run.png",

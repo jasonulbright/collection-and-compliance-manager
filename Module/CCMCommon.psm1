@@ -1811,3 +1811,85 @@ function Export-ComplianceReport {
     Write-Log ("Exported {0} report rows to {1}." -f @($Rows).Count, $Path)
     return $Path
 }
+
+
+# =============================================================================
+# Per-site data (Q-112f). Small functions that the start script and the tests call without a window.
+# =============================================================================
+
+function Resolve-CcmReportsFolder {
+    <#
+    .SYNOPSIS
+        Returns the folder for exports: the reports store of the active site, or Reports beside the script with no site.
+    .PARAMETER ToolRoot
+        The folder of the start script.
+    .PARAMETER Site
+        The result of Resolve-SuiteToolSite. $null or an inactive site gives the old folder.
+    .PARAMETER Create
+        Create the folder when it does not exist.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string]$ToolRoot,
+        $Site,
+        [switch]$Create
+    )
+    $legacy = Join-Path $ToolRoot 'Reports'
+    $path = $legacy
+    if ($Site -and $Site.Active) { $path = Resolve-SuiteToolPath -Site $Site -Name 'reports' -LegacyPath $legacy }
+    if ($Create -and -not (Test-Path -LiteralPath $path)) { [void](New-Item -ItemType Directory -Path $path -Force) }
+    return $path
+}
+
+function Get-CcmNormalizedPath {
+    # A path in one form for a comparison: full, no trailing separator. The text itself when it is not a valid path.
+    [OutputType([string])]
+    param([string]$Path)
+    $p = $Path.Trim()
+    try { $p = [IO.Path]::GetFullPath($p) } catch { $null = $_ }
+    return $p.TrimEnd('\', '/')
+}
+
+function ConvertTo-CcmCatalogPref {
+    <#
+    .SYNOPSIS
+        Returns the catalog path to store in the prefs: empty for the shipped Catalog folder and for a stale path.
+    .DESCRIPTION
+        An empty value means the Catalog folder beside the script. A value that equals that folder is the old default and
+        counts as empty. With -OnRead, a value that points to a Catalog folder of an install folder of this tool that does
+        not exist any more (its drive is there, the folder is gone) is stale after a move and also counts as empty. A path on
+        a drive that is not there at the moment, and a UNC path, is never stale. Any other value is a choice of the user and stays.
+    .PARAMETER OnRead
+        Apply the stale rule. Do not use it when the value is written: a value that the user typed stays as typed.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([string]$Value, [Parameter(Mandatory)][string]$ToolRoot, [switch]$OnRead)
+    if ([string]::IsNullOrWhiteSpace($Value)) { return '' }
+    $v = Get-CcmNormalizedPath -Path $Value
+    $shipped = Get-CcmNormalizedPath -Path (Join-Path $ToolRoot 'Catalog')
+    if ($v.Equals($shipped, [StringComparison]::OrdinalIgnoreCase)) { return '' }
+    $qualifier = ''
+    if ($v -match '^[A-Za-z]:') { $qualifier = $v.Substring(0, 2) + '\' }
+    if ($OnRead -and $qualifier -and (Test-Path -LiteralPath $qualifier) -and -not (Test-Path -LiteralPath $v)) {
+        $leaf = [regex]::Escape((Split-Path -Path $ToolRoot.TrimEnd('\', '/') -Leaf))
+        if ($v -imatch ('[\\/](collection-and-compliance-manager|' + $leaf + ')[\\/]Catalog$')) { return '' }
+    }
+    return $Value.Trim()
+}
+
+function Resolve-CcmCatalogPath {
+    <#
+    .SYNOPSIS
+        Returns the catalog folder in use: the path of the user, else the shipped Catalog folder, else an empty text.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([string]$Pref, [Parameter(Mandatory)][string]$ToolRoot)
+    $p = ConvertTo-CcmCatalogPref -Value $Pref -ToolRoot $ToolRoot -OnRead
+    if ($p) { return $p }
+    $bundled = Join-Path $ToolRoot 'Catalog'
+    if (Test-Path -LiteralPath $bundled) { return $bundled }
+    return ''
+}

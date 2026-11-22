@@ -81,6 +81,11 @@
         'Get-ComplianceSummary'
         'Get-EvaluationFreshness'
         'Export-ComplianceReport'
+
+        # Per-site data (Q-112f)
+        'Resolve-CcmReportsFolder'
+        'ConvertTo-CcmCatalogPref'
+        'Resolve-CcmCatalogPath'
     )
 
     CmdletsToExport   = @()

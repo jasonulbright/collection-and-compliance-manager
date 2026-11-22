@@ -8,7 +8,7 @@ BeforeAll {
     Import-AppModule
     $script:ShellPath = Join-Path $script:AppRoot 'start-ccm.ps1'
     $script:Ast = [System.Management.Automation.Language.Parser]::ParseFile($script:ShellPath, [ref]$null, [ref]$null)
-    $wanted = 'Get-CmPreferences', 'Save-CmPreferences', 'Get-CollectionTypeGlyph', 'Get-CollectionFilterValue', 'Test-CollectionFilterMatch', 'Update-Filter',
+    $wanted = 'Get-CmPreferences', 'Save-CmPreferences', 'Get-CmCatalogRoot', 'Get-CollectionTypeGlyph', 'Get-CollectionFilterValue', 'Test-CollectionFilterMatch', 'Update-Filter',
         'Set-StatusText', 'Update-StatusBarSummary', 'Get-ActiveExportInfo', 'Test-BgBusy', 'Add-CatalogDisplayFields', 'Format-CatalogDetail', 'Format-CMDate',
         'Get-CcmTagFromDescription', 'Get-SettingDisplayName', 'Add-LogLine'
     foreach ($n in $wanted) {
@@ -298,7 +298,7 @@ Describe 'Get-ActiveExportInfo' {
 
 Describe 'Preferences file' {
     BeforeEach { $global:PrefsPath = Join-Path $TestDrive ('prefs-{0}.json' -f [guid]::NewGuid().ToString('N')) }
-    AfterAll { Remove-Variable -Name PrefsPath -Scope Global -ErrorAction SilentlyContinue }
+    AfterAll { Remove-Variable -Name PrefsPath, Prefs -Scope Global -ErrorAction SilentlyContinue }
 
     It 'gives the defaults on first run' {
         $p = Get-CmPreferences
@@ -312,8 +312,20 @@ Describe 'Preferences file' {
         (Get-CmPreferences).SiteCode | Should -Be ''
     }
 
-    It 'defaults the catalog path to the bundled Catalog folder' {
-        (Get-CmPreferences).CatalogPath | Should -Be (Join-Path $script:AppRoot 'Catalog')
+    It 'stores no default catalog path: empty means the bundled Catalog folder' {
+        (Get-CmPreferences).CatalogPath | Should -Be ''
+        $global:Prefs = Get-CmPreferences
+        Get-CmCatalogRoot | Should -Be (Join-Path $script:AppRoot 'Catalog')
+    }
+
+    It 'treats a saved default under the install folder as empty' {
+        Set-Content -LiteralPath $global:PrefsPath -Value ('{ "CatalogPath": ' + (ConvertTo-Json (Join-Path $script:AppRoot 'Catalog')) + ' }')
+        (Get-CmPreferences).CatalogPath | Should -Be ''
+    }
+
+    It 'saves the bundled Catalog folder as an empty value' {
+        Save-CmPreferences -Prefs @{ DarkMode = $true; SiteCode = 'X'; SMSProvider = ''; CatalogPath = (Join-Path $script:AppRoot 'Catalog') }
+        (Get-Content -LiteralPath $global:PrefsPath -Raw | ConvertFrom-Json).CatalogPath | Should -Be ''
     }
 
     It 'keeps an explicit catalog path' {

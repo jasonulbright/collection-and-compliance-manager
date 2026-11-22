@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Keep reports and site settings per site under the data folder.
+- Store no default catalog path: empty means the shipped Catalog folder.
+
+### Added
+
+- Show the launcher site read-only and a footer note when it changes.
+
 ## [2026.11.22.0031] - 2026-11-22
 
 ## 7 guide images retaken without a stray tooltip

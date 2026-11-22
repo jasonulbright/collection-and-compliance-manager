@@ -41,7 +41,7 @@ BeforeAll {
         foreach ($path in $paths) { ($names -ccontains $path) | Should -BeTrue -Because "a column of $GridName binds to $path" }
     }
     $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:ShellPath, [ref]$null, [ref]$null)
-    foreach ($n in 'Invoke-LoadCatalog', 'Add-CatalogDisplayFields', 'Set-CatalogComboItems', 'Update-CatalogFacets', 'Format-CatalogDetail',
+    foreach ($n in 'Invoke-LoadCatalog', 'Get-CmCatalogRoot', 'Add-CatalogDisplayFields', 'Set-CatalogComboItems', 'Update-CatalogFacets', 'Format-CatalogDetail',
         'Update-Filter', 'Get-CollectionFilterValue', 'Test-CollectionFilterMatch', 'Invoke-LoadTemplates') {
         $def = $ast.Find({ param($x) $x -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $x.Name -eq $n }, $true)
         if (-not $def) { throw "function $n not found in the script" }
