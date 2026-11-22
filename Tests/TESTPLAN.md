@@ -6,6 +6,7 @@ Measured 2026-11-06 with `Invoke-Checks.ps1` (Pester 5.7.1, PSScriptAnalyzer 1.2
 |---|---|---|
 | Tests | 86 | 742 on Windows PowerShell 5.1 and on PowerShell 7 (54 skip on 7: contract tests need the console) |
 | Module coverage | 63.6% (515 of 810 commands) | 99.2% (890 of 898 commands) |
+| View data | `RulesLoad.View.Tests.ps1`, `CatalogTemplates.View.Tests.ps1` | The rows that reach the controls, counted on real WPF controls that are not shown. The rules pass: a site fake that returns no rules for a lazy read, `Get-CollectionRuleSet`, the rules index, then the rule grids, the rule counts and the WQL Editor rule list. The shipped catalog in the catalog grid, its facet lists, filter and detail pane. The shipped templates in the two template grids |
 | Lab steps | none | 22 (`Tests/Lab`) |
 
 Run: `.\Invoke-Checks.ps1` (lint, tests, coverage floor 80%). It runs in CI on both hosts (`.github/workflows/checks.yml`).

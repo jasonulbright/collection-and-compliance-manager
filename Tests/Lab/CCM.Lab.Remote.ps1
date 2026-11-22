@@ -56,6 +56,11 @@ try {
     try { Update-QueryRule -CollectionId $c.CollectionID -OldRuleName 'ZZTEST rule' -NewRuleName 'ZZTEST rule 2' -NewQueryExpression 'this is not WQL' } catch { $refused = $_.Exception.Message }
     $q = @(Get-CollectionQueryRules -CollectionId $c.CollectionID)
     Add-Result 'a refused update keeps the old rule' ([bool]($refused -and $q.Count -eq 1 -and $q[0].RuleName -eq 'ZZTEST rule')) "refused=[$refused]"
+    # The read that the window uses for the rule grids and the WQL Editor rule list. A wrong read option gives no rule here, and the window shows an empty list.
+    $set = Get-CollectionRuleSet -CollectionId $c.CollectionID
+    Add-Result 'Get-CollectionRuleSet returns the direct rule and the query rule' (@($set.Direct).Count -eq 1 -and @($set.Query).Count -eq 1 -and $set.Query[0].RuleName -eq 'ZZTEST rule') "direct=$(@($set.Direct).Count) query=$(@($set.Query).Count)"
+    $listed = @(Get-AllDeviceCollections | Where-Object { $_.CollectionID -eq $c.CollectionID })
+    Add-Result 'Get-AllDeviceCollections lists the new collection by name' ($listed.Count -eq 1 -and $listed[0].Name -eq $collName) "found=$($listed.Count)"
     Invoke-CollectionEvaluation -CollectionId $c.CollectionID
     Add-Result 'evaluation triggers' $true ''
     $copy = Copy-ManagedCollection -SourceCollectionId $c.CollectionID -NewName "$collName-copy"
