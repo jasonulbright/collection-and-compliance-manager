@@ -11,6 +11,7 @@ BeforeAll {
     . "$PSScriptRoot\TestHelpers.ps1"
     Import-AppModule
     Add-Type -AssemblyName PresentationFramework
+    if ([Threading.Thread]::CurrentThread.GetApartmentState() -ne 'STA') { throw 'These tests create WPF controls and need an STA thread. Start the host with -STA.' }
 
     $script:ShellPath = Join-Path $script:AppRoot 'start-ccm.ps1'
     $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:ShellPath, [ref]$null, [ref]$null)
