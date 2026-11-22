@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [2026.11.22.0032] - 2026-11-22
+
+## 3 changes: reports and site settings kept per site
+
 ### Changed
 
 - Keep reports and site settings per site under the data folder.
