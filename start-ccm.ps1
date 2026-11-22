@@ -84,44 +84,60 @@ if (-not (Get-Command Initialize-Logging -ErrorAction SilentlyContinue)) {
 # =============================================================================
 $global:PrefsPath = Join-Path $PSScriptRoot 'CCM.prefs.json'
 
+# The site is chosen in the suite launcher. With a site, the first start copies the old site data into
+# sites\<SITE>\tools\collection-and-compliance-manager (old files stay). With no site the tool keeps its old paths.
+$script:Site = Resolve-SuiteToolSite -Tool 'collection-and-compliance-manager' -ToolRoot $PSScriptRoot -LegacyPrefsPath $global:PrefsPath
+
 function Get-CmPreferences {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Returns the full preferences hashtable by design.')]
     param()
-    $settings = Read-SuiteSettings -Path $global:PrefsPath -Defaults @{
+    $site = if ($script:Site) { $script:Site } else { [pscustomobject]@{ Active = $false } }
+    $settings = Read-SuiteToolPrefs -Path $global:PrefsPath -Defaults @{
         DarkMode    = $true
         SiteCode    = ''
         SMSProvider = ''
         # Seconds to wait for the collection list before the load stops with a message.
         LoadTimeoutSeconds = 180
+        # Empty means the Catalog folder beside the script. No default path is stored.
         CatalogPath = ''
-    }
-    # The CI/CB catalog is vendored into the project under .\Catalog. Default to it when no
-    # explicit path is set (an explicit pref still wins).
-    if (-not $settings.CatalogPath) {
-        $bundled = Join-Path $PSScriptRoot 'Catalog'
-        if (Test-Path -LiteralPath $bundled) { $settings.CatalogPath = $bundled }
-    }
+    } -Site $site -SiteKeys @('SiteCode', 'SMSProvider')
+    # A path that an older version saved as the default (the Catalog folder of the install) is stale: it counts as empty.
+    $settings.CatalogPath = ConvertTo-CcmCatalogPref -Value ([string]$settings.CatalogPath) -ToolRoot $PSScriptRoot
     return $settings
 }
 
 function Save-CmPreferences {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Writes the full preferences hashtable by design.')]
     param([Parameter(Mandatory)][hashtable]$Prefs)
-    $null = Save-SuiteSettings -Path $global:PrefsPath -Settings $Prefs
+    $site = if ($script:Site) { $script:Site } else { [pscustomobject]@{ Active = $false } }
+    # The shipped Catalog folder is never stored: an empty value stands for it.
+    $toSave = $Prefs.Clone()
+    if ($toSave.ContainsKey('CatalogPath')) { $toSave['CatalogPath'] = ConvertTo-CcmCatalogPref -Value ([string]$toSave['CatalogPath']) -ToolRoot $PSScriptRoot }
+    [void](Save-SuiteToolPrefs -Path $global:PrefsPath -Settings $toSave -Site $site -SiteKeys @('SiteCode', 'SMSProvider'))
+}
+
+# The catalog folder in use: the path of the user, else the Catalog folder beside the script.
+function Get-CmCatalogRoot {
+    param()
+    return (Resolve-CcmCatalogPath -Pref ([string]$global:Prefs.CatalogPath) -ToolRoot $PSScriptRoot)
 }
 
 $global:Prefs = Get-CmPreferences
 
-# The suite launcher hands its site code and provider to each tool it starts.
-# A value saved in this tool wins; the launcher value fills an empty one.
-if (-not $global:Prefs.SiteCode    -and $env:SUITE_CM_SITECODE) { $global:Prefs.SiteCode    = [string]$env:SUITE_CM_SITECODE }
-if (-not $global:Prefs.SMSProvider -and $env:SUITE_CM_PROVIDER) { $global:Prefs.SMSProvider = [string]$env:SUITE_CM_PROVIDER }
+# The suite launcher hands its site code and provider to each tool it starts. With a site, the site decides and
+# these two variables are ignored here. With no site, a value saved in this tool wins and the variable fills an empty one.
+if (-not $script:Site.Active) {
+    if (-not $global:Prefs.SiteCode    -and $env:SUITE_CM_SITECODE) { $global:Prefs.SiteCode    = [string]$env:SUITE_CM_SITECODE }
+    if (-not $global:Prefs.SMSProvider -and $env:SUITE_CM_PROVIDER) { $global:Prefs.SMSProvider = [string]$env:SUITE_CM_PROVIDER }
+}
 
 # =============================================================================
 # Tool log.
 # =============================================================================
 $script:ToolLogPath = Join-Path $__txDir ('CCM-{0}.log' -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 Initialize-Logging -LogPath $script:ToolLogPath
+if ($script:Site.Active) { Write-Log ('Site {0}; data in {1}' -f $script:Site.SiteFolder, $script:Site.ToolFolder) }
+elseif ($script:Site.Reason) { Write-Log ('No site data folder: {0}' -f $script:Site.Reason) }
 
 # =============================================================================
 # Load XAML and resolve named elements.
@@ -1427,7 +1443,7 @@ function Format-CatalogDetail {
 }
 
 function Invoke-LoadCatalog {
-    $path = [string]$global:Prefs.CatalogPath
+    $path = Get-CmCatalogRoot
     if (-not $path) {
         Add-LogLine 'Catalog: set a Catalog Path in Options first (the bundled catalog is .\Catalog).'
         Set-StatusText 'Open Options and set the Catalog Path (the bundled catalog ships under .\Catalog).'
@@ -1862,8 +1878,9 @@ function Invoke-CatalogDeploy {
 $btnCatDeploy.Add_Click({
     $row = $gridCatalog.SelectedItem
     if (-not $row) { return }
-    if (-not $global:Prefs.CatalogPath) { Add-LogLine 'Deploy: set a Catalog Path in Options first.'; return }
-    $entry = Get-CatalogEntry -CatalogPath ([string]$global:Prefs.CatalogPath) -Id ([string]$row.Id)
+    $catalogRoot = Get-CmCatalogRoot
+    if (-not $catalogRoot) { Add-LogLine 'Deploy: set a Catalog Path in Options first.'; return }
+    $entry = Get-CatalogEntry -CatalogPath $catalogRoot -Id ([string]$row.Id)
     if (-not $entry) { Add-LogLine ('Deploy: entry {0} not found on disk.' -f $row.Id); return }
     $entry = Add-CatalogDisplayFields -Entry $entry
     if (-not $entry.IsValid) { Add-LogLine ('Deploy: {0} has schema issues; not deployable.' -f $entry.Id); return }
@@ -2997,7 +3014,7 @@ function Invoke-LoadAuditing {
     Set-StatusText 'Loading compliance + drift...'
     $siteCode = [string]$global:Prefs.SiteCode
     $smsProvider = [string]$global:Prefs.SMSProvider
-    $catalogPath = [string]$global:Prefs.CatalogPath
+    $catalogPath = Get-CmCatalogRoot
     $script:BgPowerShell = [powershell]::Create()
     $script:BgPowerShell.Runspace = $script:BgRunspace
     [void]$script:BgPowerShell.AddScript({
@@ -3080,8 +3097,7 @@ $btnAuditExport.Add_Click({
     $sfd = New-Object Microsoft.Win32.SaveFileDialog
     $sfd.Filter = 'CSV files (*.csv)|*.csv'
     $sfd.FileName = ('CCM-{0}-{1}.csv' -f $kind, (Get-Date -Format 'yyyyMMdd-HHmmss'))
-    $reportsDir = Join-Path $PSScriptRoot 'Reports'
-    if (-not (Test-Path -LiteralPath $reportsDir)) { New-Item -ItemType Directory -Path $reportsDir -Force | Out-Null }
+    $reportsDir = Resolve-CcmReportsFolder -ToolRoot $PSScriptRoot -Site $script:Site -Create
     $sfd.InitialDirectory = $reportsDir
     if ($sfd.ShowDialog() -eq $true) {
         try {
@@ -4092,8 +4108,7 @@ $btnExportCsv.Add_Click({
     $sfd = New-Object Microsoft.Win32.SaveFileDialog
     $sfd.Filter = 'CSV files (*.csv)|*.csv'
     $sfd.FileName = ('CCM-{0}-{1}.csv' -f $info.Name, (Get-Date -Format 'yyyyMMdd-HHmmss'))
-    $reportsDir = Join-Path $PSScriptRoot 'Reports'
-    if (-not (Test-Path -LiteralPath $reportsDir)) { New-Item -ItemType Directory -Path $reportsDir -Force | Out-Null }
+    $reportsDir = Resolve-CcmReportsFolder -ToolRoot $PSScriptRoot -Site $script:Site -Create
     $sfd.InitialDirectory = $reportsDir
     if ($sfd.ShowDialog() -eq $true) {
         Export-CollectionCsv -Row $info.Rows -Column $info.Columns -OutputPath $sfd.FileName
@@ -4110,8 +4125,7 @@ $btnExportHtml.Add_Click({
     $sfd = New-Object Microsoft.Win32.SaveFileDialog
     $sfd.Filter = 'HTML files (*.html)|*.html'
     $sfd.FileName = ('CCM-{0}-{1}.html' -f $info.Name, (Get-Date -Format 'yyyyMMdd-HHmmss'))
-    $reportsDir = Join-Path $PSScriptRoot 'Reports'
-    if (-not (Test-Path -LiteralPath $reportsDir)) { New-Item -ItemType Directory -Path $reportsDir -Force | Out-Null }
+    $reportsDir = Resolve-CcmReportsFolder -ToolRoot $PSScriptRoot -Site $script:Site -Create
     $sfd.InitialDirectory = $reportsDir
     if ($sfd.ShowDialog() -eq $true) {
         Export-CollectionHtml -Row $info.Rows -Column $info.Columns -OutputPath $sfd.FileName
@@ -4206,9 +4220,11 @@ function Show-OptionsDialog {
                     <Button x:Name="btnBrowseCatalog" DockPanel.Dock="Right" Content="Browse..."
                             Style="{StaticResource DialogButton}" Margin="8,0,0,0"
                             ToolTip="Pick the catalog folder."/>
-                    <TextBox x:Name="txtCatalogPath" ToolTip="Enter the path of the local clone of the CI and CB catalog." FontSize="12" Padding="6,4,6,4"
+                    <TextBox x:Name="txtCatalogPath" ToolTip="Enter the path of a catalog folder, or leave the box empty to use the Catalog folder of the tool." FontSize="12" Padding="6,4,6,4"
                              Controls:TextBoxHelper.Watermark="Local path to a clone of the CI / CB catalog"/>
                 </DockPanel>
+                <TextBlock x:Name="lblCatalogInUse" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"
+                           Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
                 <TextBlock Text="Set the path to a local clone of the CI/CB catalog. The folder holds the subcategory folders: Compliance, Hardening, Configuration and CVE-Remediation. The app only reads the catalog."
                            FontSize="11" TextWrapping="Wrap" Margin="0,16,0,0"
                            Foreground="{DynamicResource MahApps.Brushes.Gray1}"/>
@@ -4259,12 +4275,27 @@ function Show-OptionsDialog {
     $txtSmsProvider   = $dlg.FindName('txtSmsProvider')
     $txtCatalogPath   = $dlg.FindName('txtCatalogPath')
     $btnBrowseCatalog = $dlg.FindName('btnBrowseCatalog')
+    $lblCatalogInUse  = $dlg.FindName('lblCatalogInUse')
     $btnOk            = $dlg.FindName('btnOk')
     $btnCancel        = $dlg.FindName('btnCancel')
 
     $txtSiteCode.Text    = [string]$global:Prefs.SiteCode
     $txtSmsProvider.Text = [string]$global:Prefs.SMSProvider
     $txtCatalogPath.Text = [string]$global:Prefs.CatalogPath
+
+    # The launcher chooses the site. A tool that is open keeps its site until it restarts.
+    if ($script:Site.Active) {
+        $txtSiteCode.IsReadOnly = $true
+        $txtSiteCode.ToolTip = 'The site is chosen in the AppPackager Suite launcher. Restart this tool after you change it.'
+    }
+    # An empty box means the Catalog folder of the tool. The line below the box shows the folder in use.
+    $toolRoot = $PSScriptRoot
+    $updateCatalogHint = {
+        $inUse = Resolve-CcmCatalogPath -Pref ([string]$txtCatalogPath.Text) -ToolRoot $toolRoot
+        $lblCatalogInUse.Text = if ($inUse) { 'In use: ' + $inUse } else { 'In use: none' }
+    }.GetNewClosure()
+    & $updateCatalogHint
+    $txtCatalogPath.Add_TextChanged($updateCatalogHint)
 
     $btnCatConnection.Add_Click({
         $paneConnection.Visibility = [System.Windows.Visibility]::Visible
@@ -4294,14 +4325,14 @@ function Show-OptionsDialog {
     })
 
     $btnOk.Add_Click({
-        $newSite     = ([string]$txtSiteCode.Text).Trim()
+        $newSite     = if ($script:Site.Active) { [string]$global:Prefs.SiteCode } else { ([string]$txtSiteCode.Text).Trim() }
         $newProvider = ([string]$txtSmsProvider.Text).Trim()
         $connectionChanged = ($newSite -ne [string]$global:Prefs.SiteCode) -or
                              ($newProvider -ne [string]$global:Prefs.SMSProvider)
 
         $global:Prefs.SiteCode    = $newSite
         $global:Prefs.SMSProvider = $newProvider
-        $global:Prefs.CatalogPath = ([string]$txtCatalogPath.Text).Trim()
+        $global:Prefs.CatalogPath = ConvertTo-CcmCatalogPref -Value ([string]$txtCatalogPath.Text) -ToolRoot $PSScriptRoot
         Save-CmPreferences -Prefs $global:Prefs
         Sync-FooterSite
 
@@ -4369,6 +4400,8 @@ $window.Add_Loaded({
     try { [void](Initialize-SuiteFooter -Window $window -StatusName 'txtStatus' -OnOpenOptions { Show-OptionsDialog }) }
     catch { Write-Log ('Footer: {0}' -f $_.Exception.Message) -Level ERROR -Quiet; Add-LogLine 'The footer failed. The log file has the details.' }
     Sync-FooterSite
+    $null = Start-SuiteSiteWatch -Window $window -Site $script:Site
+    if ($script:Site.Active) { Add-LogLine ('Site {0}; data in {1}' -f $script:Site.SiteFolder, $script:Site.ToolFolder) }
     Add-LogLine 'Collection and Compliance Manager ready. Configure Site / Provider in Options, then select Refresh.'
 
     # Auto-load templates so the Templates view is populated on first switch

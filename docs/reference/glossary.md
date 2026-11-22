@@ -18,6 +18,7 @@ None.
 
 | Term | Meaning |
 |---|---|
+| Site (data) | The ConfigMgr site that the suite launcher chose. The tool keeps its reports and the site settings per site. |
 | Device collection | A group of devices on the site. It has a limiting collection and rules. |
 | Limiting collection | The collection that limits which devices a collection can hold. |
 | Built-in collection | A collection that the site makes. Its ID starts with `SMS`. |

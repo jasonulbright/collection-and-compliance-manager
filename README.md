@@ -32,6 +32,8 @@ The [user guide](docs/index.md) walks every view, dialog and setting with images
 2. Select the **Options** button on the sidebar and set your Site Code and SMS Provider. The footer then shows the site at the right end, for example `Site MCM - cm01.contoso.com`. The footer is read-only. Select the site text to open Options.
 3. Select **Refresh** to load every device collection.
 
+The AppPackager Suite launcher chooses the site. The tool keeps its reports and site settings per site under `%LOCALAPPDATA%\AppPackagerData\sites\<SITE>\tools\collection-and-compliance-manager`, copies the old data at the first start and keeps the old files.
+
 ## Layout
 
 The shell uses a sidebar layout with seven views and an Options modal, grouped into **Collections** and **CI/CB**:

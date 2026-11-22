@@ -4,7 +4,7 @@ This page lists every folder and file that Collection and Compliance Manager wri
 
 ## What it does
 
-The tool writes in the folder of the script. It writes nothing in the registry. The buttons that change the site change the site, not these files.
+The tool writes in the folder of the script and, for the data of a site, in `%LOCALAPPDATA%\AppPackagerData\sites\<SITE>\tools\collection-and-compliance-manager`. It writes nothing in the registry. The buttons that change the site change the site, not these files.
 
 ## When to use it
 
@@ -22,8 +22,11 @@ None.
 | `CCM.windowstate.json` | The size, the place and the open view of the window. | You close the window. |
 | `Logs\CCM-<yyyyMMdd-HHmmss>.log` | The log of one session. Each read, each change and each failure. | During the session. |
 | `Logs\CCM-startup-<yyyyMMdd-HHmmss>.txt` | The PowerShell transcript of the start. | At the start. |
-| `Reports\CCM-Collections-<date>-<time>.csv` or `.html` | An export of the Collections view. | **Export CSV** or **Export HTML**. |
-| `Reports\CCM-drift-<date>-<time>.csv` or `CCM-compliance-<date>-<time>.csv` | An export of an Auditing tab. | **Export Current Tab to CSV...**. |
+| `<site folder>\prefs.json` | The site code and the SMS Provider of the site. | You select **OK** in Options. |
+| `<site folder>\reports\CCM-Collections-<date>-<time>.csv` or `.html` | An export of the Collections view. | **Export CSV** or **Export HTML**. |
+| `<site folder>\reports\CCM-drift-<date>-<time>.csv` or `CCM-compliance-<date>-<time>.csv` | An export of an Auditing tab. | **Export Current Tab to CSV...**. |
+
+`<site folder>` is `%LOCALAPPDATA%\AppPackagerData\sites\<SITE>\tools\collection-and-compliance-manager`, for example for the site `AB1`. When the launcher has chosen no site, the reports go to `Reports` beside the script. The first start for a site copies the old `Reports` folder into the site folder and keeps the old files.
 
 The tool reads `Templates\operational-collections.json`, `Templates\parameterized-templates.json` and the `Catalog` folder. It does not write to them.
 
@@ -32,7 +35,7 @@ The tool reads `Templates\operational-collections.json`, `Templates\parameterize
 ### Clean up
 
 1. Close the tool.
-2. Delete the logs and the reports that you do not need.
+2. Delete the logs and the reports that you do not need. The reports of each site are in the folder of that site.
 
 ## Limits
 

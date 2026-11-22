@@ -4,7 +4,7 @@ This page lists what Collection and Compliance Manager saves and where.
 
 ## What it does
 
-The tool saves its settings in `CCM.prefs.json` in the folder of the script. The Options dialog writes the file when you select **OK**. The file is also written when you change the **Dark Theme** switch. The window state is in `CCM.windowstate.json`.
+The tool saves its settings in `CCM.prefs.json` in the folder of the script. The site code and the SMS Provider are saved per site in `%LOCALAPPDATA%\AppPackagerData\sites\<SITE>\tools\collection-and-compliance-manager\prefs.json`, for example for the site `AB1`. The Options dialog writes the files when you select **OK**. The file is also written when you change the **Dark Theme** switch. The window state is in `CCM.windowstate.json`.
 
 ## When to use it
 
@@ -18,9 +18,9 @@ None.
 
 | Key | Option | Default |
 |---|---|---|
-| `SiteCode` | **Site Code** | Empty. |
-| `SMSProvider` | **SMS Provider FQDN** | Empty. |
-| `CatalogPath` | **Catalog Path** | The `Catalog` folder beside the script. |
+| `SiteCode` | **Site Code** | Empty. With a site, the site of the launcher. |
+| `SMSProvider` | **SMS Provider FQDN** | Empty. Saved per site. |
+| `CatalogPath` | **Catalog Path** | Empty. An empty value means the `Catalog` folder beside the script. |
 | `DarkMode` | **Dark Theme** switch | `true`. |
 
 `CCM.windowstate.json` keeps the size, the place and the open view of the window.
@@ -30,7 +30,7 @@ None.
 ### Reset the settings
 
 1. Close the tool.
-2. Delete `CCM.prefs.json` and `CCM.windowstate.json`.
+2. Delete `CCM.prefs.json` and `CCM.windowstate.json`. To reset the site code and the SMS Provider of one site, also delete the `prefs.json` of that site.
 3. Start the tool. The window of the first start shows.
 
 ## Limits
