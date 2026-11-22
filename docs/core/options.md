@@ -42,9 +42,15 @@ Type the **Catalog Path** or select **Browse...**. The folder holds the subcateg
 The AppPackager Suite launcher chooses the site. The tool reads the site at the start and keeps its data per site in `%LOCALAPPDATA%\AppPackagerData\sites\<SITE>\tools\collection-and-compliance-manager`, for example `...\sites\AB1\tools\collection-and-compliance-manager`. That folder holds the `reports` folder and `prefs.json` with the site code and the SMS Provider of the site. A second site, for example `CD2`, has its own folder and shows none of the data of `AB1`.
 
 - When the launcher has chosen a site, the **Site Code** box is read-only. Point to it to read why. The **SMS Provider FQDN** stays editable and is saved with the site.
+
+![The read-only Site Code box with its tooltip](../images/options-site.png)
+
 - A tool that is open keeps its site until you restart it. When the launcher chooses another site, the footer shows a note, for example `The launcher now uses site CD2. This window keeps site AB1 until you restart it.`
 - The first start after an update copies the old reports and the site settings into the folder of the site. It keeps the old files in the folder of the tool.
-- Without a chosen site the tool works as before: the files stay beside the script.
+
+![The footer note after the launcher chose another site](../images/footer-site-note.png)
+
+- Without the launcher, the tool takes the site code of its old `CCM.prefs.json` file, and the box is read-only too. To change that site code, edit the file. With no site code anywhere, the tool works as before: the box is editable and the files stay beside the script.
 
 ### About
 
