@@ -82,9 +82,10 @@ Describe 'Per-site data of Collection and Compliance Manager' {
     BeforeAll {
         $script:Saved = @{}
         foreach ($n in $script:EnvNames) { $script:Saved[$n] = [Environment]::GetEnvironmentVariable($n); [Environment]::SetEnvironmentVariable($n, $null) }
-        $temp = Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        # A short folder name: a path on Windows PowerShell 5.1 stops at 260 characters, and the site layout is deep.
+        $temp = Join-Path $TestDrive 'a'
         $script:Suite = Join-Path $temp 'AppPackagerSuite'
-        $script:Data = Join-Path $temp 'Data'
+        $script:Data = Join-Path $temp 'D'
         [void](New-Item -ItemType Directory -Path $script:Suite, $script:Data -Force)
         [Environment]::SetEnvironmentVariable('APP_PACKAGER_DATA_ROOT', $script:Data)
         $script:ToolRoot = New-OldToolFolder -Suite $script:Suite
@@ -196,9 +197,9 @@ Describe 'Collection and Compliance Manager with no site chosen' {
     BeforeAll {
         $script:Saved = @{}
         foreach ($n in $script:EnvNames) { $script:Saved[$n] = [Environment]::GetEnvironmentVariable($n); [Environment]::SetEnvironmentVariable($n, $null) }
-        $temp = Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        $temp = Join-Path $TestDrive 'b'
         $script:Suite = Join-Path $temp 'AppPackagerSuite'
-        $script:Data = Join-Path $temp 'Data'
+        $script:Data = Join-Path $temp 'D'
         [void](New-Item -ItemType Directory -Path $script:Suite, $script:Data -Force)
         [Environment]::SetEnvironmentVariable('APP_PACKAGER_DATA_ROOT', $script:Data)
         $script:ToolRoot = New-OldToolFolder -Suite $script:Suite -NoSiteCode

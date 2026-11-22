@@ -20,7 +20,7 @@ Use it to create or copy collections, to write and test WQL query rules, to appl
 
 ### Start the tool
 
-1. Extract the release zip to a folder that you can write to. The tool saves its logs in that folder. It saves the reports and the settings of a site per site, see [Sites](core/options.md#sites).
+1. Extract the release zip to a folder that you can write to. The tool saves its log files in that folder. It saves the reports and the settings of a site per site, see [Sites](core/options.md#sites).
 2. Right-click `start-ccm.ps1` and select **Run with PowerShell**. Or run this command:
 
 ```powershell
