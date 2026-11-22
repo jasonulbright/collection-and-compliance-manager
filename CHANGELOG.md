@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [2026.11.22.0031] - 2026-11-22
+
+## 7 guide images retaken without a stray tooltip
+
+### Changed
+
+- Retake 7 guide images without a stray tooltip, with a neutral lab folder name.
+
 ## [2026.11.21.0030] - 2026-11-21
 
 ## 1 fix: the rules of a collection show again
